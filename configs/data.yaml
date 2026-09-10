@@ -1,0 +1,13 @@
+# TODO: confirm exact BraTS Adult Glioma release, labels, and file layout.
+release: null
+# Paths are resolved relative to the working directory; CSV paths relative to root.
+root: null
+train_manifest: null
+val_manifest: null
+normalize: true
+# TODO: provide all valid raw labels (including background) and region memberships.
+known_labels: null
+region_labels:
+  WT: null
+  TC: null
+  ET: null

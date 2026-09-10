@@ -1,0 +1,10 @@
+epochs: 1
+batch_size: 1
+learning_rate: 0.001
+num_workers: 0
+device: cpu
+seed: 42
+output_dir: outputs/baseline
+dice_weight: 1.0
+bce_weight: 1.0
+threshold: 0.5
