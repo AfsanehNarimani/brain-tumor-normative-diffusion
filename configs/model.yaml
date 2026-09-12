@@ -1,3 +1,5 @@
+name: baseline_unet3d
 in_channels: 4
-out_channels: 3
-base_channels: 16
+out_channels: 4
+base_channels: 32
+# Fixed encoder multipliers: [1, 2, 4, 8] (32, 64, 128, 256).

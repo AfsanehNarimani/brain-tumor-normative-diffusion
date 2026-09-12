@@ -5,7 +5,7 @@ from losses.dice import DiceLoss
 
 
 class SegmentationLoss(nn.Module):
-    """Weight Dice and BCE, averaging each over the three regions."""
+    """Weight Dice and BCE, averaging each over all tissue channels equally."""
 
     def __init__(self, dice_weight: float = 1.0, bce_weight: float = 1.0) -> None:
         super().__init__()

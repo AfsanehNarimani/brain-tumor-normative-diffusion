@@ -3,3 +3,5 @@ numpy>=1.26,<3
 nibabel>=5.2,<6
 PyYAML>=6,<7
 pytest>=8,<10
+
+synapseclient

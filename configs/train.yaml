@@ -1,10 +1,10 @@
-epochs: 1
+epochs: 30
 batch_size: 1
 learning_rate: 0.001
-num_workers: 0
-device: cpu
+weight_decay: 0.00001
 seed: 42
-output_dir: outputs/baseline
-dice_weight: 1.0
-bce_weight: 1.0
+num_workers: 0
+device: mps
+output_dir: outputs/baseline_unet3d_full
+validation_frequency: 1
 threshold: 0.5

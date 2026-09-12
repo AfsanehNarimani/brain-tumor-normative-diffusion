@@ -13,6 +13,8 @@ def train_epoch(model: nn.Module, loader: DataLoader, optimizer: torch.optim.Opt
         image, target = batch["image"].to(device), batch["target"].to(device)
         optimizer.zero_grad(set_to_none=True)
         loss = criterion(model(image), target)
+        if not torch.isfinite(loss):
+            raise RuntimeError("Non-finite training loss.")
         loss.backward()
         optimizer.step()
         total += loss.item() * image.shape[0]

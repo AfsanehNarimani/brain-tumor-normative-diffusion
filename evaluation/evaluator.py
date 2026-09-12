@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from datasets.label_mapping import REGIONS
-from evaluation.metrics import region_dice
+from evaluation.metrics import EVALUATION_REGIONS, region_dice
 
 
 @torch.no_grad()
@@ -22,4 +22,5 @@ def evaluate(model: nn.Module, loader: DataLoader, device: str | torch.device = 
     if not scores:
         raise ValueError("Evaluation loader is empty.")
     means = torch.cat(scores).mean(0)
-    return {region: means[i].item() for i, region in enumerate(REGIONS)}
+    names = EVALUATION_REGIONS if len(means) == len(EVALUATION_REGIONS) else REGIONS
+    return {region: means[i].item() for i, region in enumerate(names)}

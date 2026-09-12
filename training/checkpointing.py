@@ -6,12 +6,16 @@ from torch import nn
 
 
 def save_checkpoint(path: str | Path, model: nn.Module, optimizer: torch.optim.Optimizer,
-                    epoch: int, config: dict[str, Any]) -> None:
+                    epoch: int, config: dict[str, Any], best_metric: float | None = None,
+                    seed: int | None = None, best_epoch: int | None = None) -> None:
     """Save model, optimizer, completed epoch, and configuration."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
     torch.save({"model": model.state_dict(), "optimizer": optimizer.state_dict(),
-                "epoch": epoch, "config": config}, path)
+                "epoch": epoch, "config": config, "best_metric": best_metric, "seed": seed,
+                "best_epoch": best_epoch}, temporary)
+    temporary.replace(path)
 
 
 def load_checkpoint(path: str | Path, model: nn.Module,

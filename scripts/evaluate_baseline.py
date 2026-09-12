@@ -2,13 +2,13 @@
 import argparse
 import torch
 from torch.utils.data import DataLoader
-from models.baseline_unet3d import BaselineUNet3D
-from evaluation.evaluator import evaluate
-from scripts.train_baseline import make_dataset, read_config
+from evaluation.tiled import validate
+from losses.segmentation_loss import SegmentationLoss
+from scripts.train_baseline import build_model, make_dataset, read_config
 
 
 def main() -> None:
-    """Print subject-averaged WT/TC/ET Dice."""
+    """Print subject-averaged tissue and composite Dice."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--data-config", default="configs/data.yaml")
@@ -18,13 +18,14 @@ def main() -> None:
     args = parser.parse_args()
     state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
     data = read_config(args.data_config)
-    for key in ("release", "known_labels", "region_labels", "normalize"):
+    for key in ("release", "normalize"):
         if data.get(key) != state["config"]["data"].get(key):
             raise ValueError(f"Evaluation configuration differs from checkpoint: {key}")
     dataset = make_dataset(data, "val")
-    model = BaselineUNet3D(**state["config"]["model"]).to(args.device)
+    model = build_model(state["config"]["model"]).to(args.device)
     model.load_state_dict(state["model"])
-    print(evaluate(model, DataLoader(dataset, batch_size=args.batch_size), args.device, args.threshold))
+    print(validate(model, DataLoader(dataset, batch_size=1), SegmentationLoss(), args.device,
+                   tuple(data.get("patch_size", (96, 96, 96))), args.threshold))
 
 
 if __name__ == "__main__":
