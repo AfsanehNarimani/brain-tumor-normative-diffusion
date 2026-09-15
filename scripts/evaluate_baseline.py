@@ -1,32 +1,29 @@
-"""Evaluate a baseline checkpoint using its saved model configuration."""
+"""Evaluate a best checkpoint on the complete saved validation split."""
 import argparse
+from pathlib import Path
 import torch
-from torch.utils.data import DataLoader
-from evaluation.tiled import validate
-from losses.segmentation_loss import SegmentationLoss
-from scripts.train_baseline import build_model, make_dataset, read_config
+from evaluation.artifacts import evaluate_artifacts
+from scripts.train_baseline import build_model, make_dataset
 
 
-def main() -> None:
-    """Print subject-averaged tissue and composite Dice."""
+def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", required=True)
-    parser.add_argument("--data-config", default="configs/data.yaml")
-    parser.add_argument("--device", default="cpu")
-    parser.add_argument("--threshold", type=float, default=0.5)
-    parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument('--output-dir', default='outputs/baseline_unet3d')
+    parser.add_argument('--checkpoint', help='Defaults to <output-dir>/best.pt')
+    parser.add_argument('--device', default='cpu')
+    parser.add_argument('--save-predictions', nargs='+', default=[], metavar='CASE_ID')
     args = parser.parse_args()
-    state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
-    data = read_config(args.data_config)
-    for key in ("release", "normalize"):
-        if data.get(key) != state["config"]["data"].get(key):
-            raise ValueError(f"Evaluation configuration differs from checkpoint: {key}")
-    dataset = make_dataset(data, "val")
-    model = build_model(state["config"]["model"]).to(args.device)
-    model.load_state_dict(state["model"])
-    print(validate(model, DataLoader(dataset, batch_size=1), SegmentationLoss(), args.device,
-                   tuple(data.get("patch_size", (96, 96, 96))), args.threshold))
+    checkpoint = Path(args.checkpoint) if args.checkpoint else Path(args.output_dir) / 'best.pt'
+    state = torch.load(checkpoint, map_location='cpu', weights_only=True)
+    config = state['config']
+    dataset = make_dataset(config['data'], 'val')  # No short-run case limits.
+    model = build_model(config['model']).to(args.device)
+    model.load_state_dict(state['model'])
+    result = evaluate_artifacts(model, dataset, checkpoint.parent / 'evaluation', args.device,
+                               config['train'].get('threshold', 0.5),
+                               tuple(config['data'].get('patch_size', (96, 96, 96))), args.save_predictions)
+    print(result)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

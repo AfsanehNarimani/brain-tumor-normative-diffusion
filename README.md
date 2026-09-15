@@ -170,3 +170,39 @@ python -m scripts.train_baseline --resume outputs/resume_smoke/latest.pt --epoch
 Resume appends to the existing history in the checkpoint directory. It checks model config, debug mode, patch size, normalization, augmentation, sampling settings, split paths, case limits, batch size, seed, learning rate, weight decay, threshold, and selection metric. Model loading additionally checks state tensor compatibility. History must have the current columns and contiguous epochs ending at the checkpoint epoch; mismatches fail explicitly without truncating history. Use the latest consistent checkpoint/history pair. Saving checkpoints uses a temporary file followed by replacement to avoid partial checkpoint files.
 
 The previous best metric is preserved; `best.pt` changes only on a strictly better eligible validation score. Older compatible checkpoints without `best_epoch` can recover it from an existing best checkpoint. Resume does not provide bitwise continuation of the sampling stream: RNGs are reseeded, and prior RNG/loader positions are not restored. Backend/device determinism limits still apply. The model, optimizer type, loss, and augmentation definitions are unchanged.
+
+## Research artifacts
+
+Training writes the resolved nested data/model/train configuration to `config.yaml`, environment/version/git metadata to `environment.json`, and final run statistics to `summary.json`. Optional environment fields are null when unavailable. Summary duration accumulates completed invocation durations across resume when a prior summary exists; downtime is excluded. Existing history and checkpoint behavior are unchanged. Compatible resumes archive prior snapshots as `config.before_epoch_N.yaml` and `environment.before_epoch_N.json`; incompatible snapshots fail without overwriting the config.
+
+Final full-validation evaluation is explicit (it is not automatically run after each training invocation):
+
+```bash
+python -m scripts.evaluate_baseline --output-dir outputs/baseline_unet3d --device mps
+# Optional prediction export for selected validation case IDs:
+python -m scripts.evaluate_baseline --output-dir outputs/baseline_unet3d --device mps --save-predictions CASE_ID
+```
+
+This defaults to `best.pt`, uses its saved configuration and threshold, and ignores short-run validation limits. `--checkpoint` can explicitly select a checkpoint; artifacts are placed beside it in `evaluation/`. Cases retain split-file order, without shuffling or augmentation. Per-case absent-target Dice is blank, and aggregate unavailable values are JSON null. The reported mean uses the unchanged presence-aware checkpoint selection rule.
+
+Predictions are disabled by default. Selected cases produce four binary NIfTI files in NETC/SNFH/ET/RC order, named by case and tissue, with the reference segmentation's affine and header geometry. Separate masks preserve potentially overlapping sigmoid predictions without introducing argmax or changing metric semantics. Existing evaluation reports are replaced on rerun; previously exported masks are retained.
+
+```text
+<output_dir>/
+  config.yaml
+  environment.json
+  history.csv
+  summary.json
+  best.pt
+  latest.pt
+  config.before_epoch_N.yaml          # on resume
+  environment.before_epoch_N.json     # on resume
+  evaluation/
+    aggregate_metrics.json
+    per_case_metrics.csv
+    predictions/                     # only when explicitly requested
+      <case>-NETC.nii.gz
+      <case>-SNFH.nii.gz
+      <case>-ET.nii.gz
+      <case>-RC.nii.gz
+```

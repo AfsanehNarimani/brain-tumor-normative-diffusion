@@ -1,6 +1,7 @@
 """Train the Milestone 1 baseline from explicit YAML configuration."""
 import argparse
 import csv
+import json
 import random
 import time
 import numpy as np
@@ -13,6 +14,7 @@ from datasets.brats_dataset import BraTSDataset
 from models.baseline_unet3d import BaselineUNet3D
 from losses.segmentation_loss import SegmentationLoss
 from training.trainer import train_epoch
+from training.artifacts import snapshot, write_json
 from training.checkpointing import save_checkpoint, load_checkpoint
 from evaluation.tiled import validate
 from evaluation.metrics import VALIDATION_METRIC_FIELDS, best_validation_metric
@@ -161,6 +163,14 @@ def run_training(data, model_config, run, debug=False):
                 raise ValueError("Resume history schema/epochs do not match checkpoint; use the latest consistent checkpoint/history pair.")
         if best_epoch is None and best is not None and (output / "best.pt").exists():
             best_epoch = torch.load(output / "best.pt", map_location="cpu", weights_only=True)["epoch"]
+    parameter_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    artifact_config = {**config, "data": {"normalize": True, "patch_size": [96, 96, 96],
+                       "foreground_sampling_probability": 0.7, **data},
+                       "train": {"threshold": 0.5, **run}}
+    snapshot(output, artifact_config, parameter_count, state["epoch"] if state else None)
+    previous_duration = 0.0
+    if state is not None and (output / "summary.json").exists():
+        previous_duration = json.loads((output / "summary.json").read_text()).get("total_run_duration", 0.0)
     with history.open("a" if state is not None else "w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         if state is None:
@@ -194,6 +204,15 @@ def run_training(data, model_config, run, debug=False):
             stream.flush()
             print(row, flush=True)
 
+    write_json(output / "summary.json", {
+        "total_epochs_completed": epoch, "best_epoch": best_epoch, "best_validation_metric": best,
+        "final_training_loss": row["training_loss"], "final_validation_loss": row.get("validation_loss"),
+        "total_run_duration": previous_duration + time.perf_counter() - run_started,
+        "train_case_count": len(train_data), "validation_case_count": len(val_data),
+        "model_parameter_count": parameter_count,
+        "best_checkpoint_path": str(output / "best.pt") if (output / "best.pt").exists() else None,
+        "latest_checkpoint_path": str(output / "latest.pt"),
+    })
     print(f"Total run duration: {time.perf_counter() - run_started:.2f}s; "
           f"average epoch duration: {sum(durations) / len(durations):.2f}s; "
           f"best validation metric: {best}; best epoch: {best_epoch}", flush=True)
