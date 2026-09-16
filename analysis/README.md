@@ -25,3 +25,11 @@ mean. Inconsistencies are recorded in analysis_summary.json; no source data is
 corrected. Summary metadata is checked instead of loading checkpoint tensors.
 The official expected case count is 270; experimental performance is never
 hard-coded. Figures plot raw observations without smoothing.
+
+## Experiment 0.1 evaluator reports
+
+Run `python -m scripts.analyze_brats2024_evaluation --evaluation-dir outputs/baseline_unet3d_full/evaluation/brats2024` after installing `analysis/requirements.txt`. Optional `--top-k` defaults to 10. The CLI requires exactly 270 cases, all six regions per case, and 1,620 rows. It reads only `official_metrics.csv` and `overlap_summary.json`; reports go into their sibling `analysis/` directory. Repeated runs regenerate derived reports, never evaluator inputs.
+
+Statistics summarize the evaluator's original values across all cases, including empty references; this is not Experiment 0's presence-aware aggregation. Finite-only summaries always include total/finite/NaN/positive-infinity/negative-infinity counts. No missing metric is imputed. Unavailable summary values are empty in CSV and null in JSON. Standard deviation is population standard deviation (`ddof=0`); quantiles use linear interpolation. Counts and volumes must be finite and nonnegative, and instance counts must be integers so presence and burden remain well-defined.
+
+Extreme-case selection uses finite observations, ordered by metric and then lexicographic case ID, independently per region and criterion. Fewer than K rows are emitted when fewer finite observations exist. A case can appear under multiple criteria. Pairwise overlap fractions are not exclusive categories and can sum above one; a zero denominator produces null. Input byte hashes identify exactly the files analyzed. Numerical reports are deterministic; the provenance timestamp and Git dirty state describe each invocation and may differ. These reports do not establish split membership beyond the case IDs in the evaluator CSV and do not change or recompute official metric definitions.
