@@ -206,3 +206,111 @@ Predictions are disabled by default. Selected cases produce four binary NIfTI fi
       <case>-ET.nii.gz
       <case>-RC.nii.gz
 ```
+
+## Experiment 0.1 — BraTS-compatible local evaluation
+
+Experiment 0 is the frozen sigmoid-based 3D U-Net. Experiment 0.1 evaluates that
+same `best.pt` without retraining, threshold selection, or changes to historical
+artifacts. Three distinct concepts must not be conflated:
+
+- Existing presence-aware case Dice and dataset Dice remain unchanged.
+- Experiment 0.1 executes the official BraTS evaluation package's bundled gli evaluator
+  locally on our 270 labeled held-out cases.
+- Official hidden challenge scoring is performed on the challenge's hidden
+  evaluation set; our local results are **not** official challenge scores.
+
+The authoritative adapter uses the installed [official BraTS evaluation package](https://github.com/BraTS/BraTS_evaluation), its bundled `gli` configuration, and Panoptica. This is **BraTS-compatible local evaluation using the official BraTS evaluation package with the bundled gli configuration**, not official hidden challenge scoring. No legacy BraTS-2024-Metrics adapter or fallback remains. Package/Panoptica versions, dependency versions, bundled config hash, source repository and source-checkout Git revision when available are recorded. Missing packages/configuration, initialization errors, evaluation errors and incompatible result schemas fail explicitly.
+
+Conversion uses the frozen threshold 0.5 independently, emits background if no
+channel passes, and otherwise chooses the highest probability **among passing
+channels**. Exact ties use the first output-channel index (NETC,SNFH,ET,RC).
+This is stable index tie-breaking, not an added tissue-priority policy.
+Pre-conversion overlap auditing preserves information that exclusive conversion
+would destroy. Foreground means at least one positive channel; overlap means at
+least two. Pairwise counts include every positive pair, including multiple pairs
+per triple/quadruple-overlap voxel. Zero foreground gives overlap fraction 0.0.
+
+Use a separate evaluation environment with the project requirements plus:
+
+```bash
+python -m pip install -r evaluation/requirements_brats2024.txt
+```
+
+No evaluator checkout or environment variable is needed. Evaluator dependencies are optional for the training pipeline. The official package and Panoptica run their own configured matching/metric behavior unchanged; this project does not reimplement any formulas or add prediction post-processing.
+
+CUDA-server five-case smoke test:
+
+```bash
+python -m scripts.evaluate_brats2024 \
+  --output-dir outputs/baseline_unet3d_full \
+  --data-root /path/to/BraTS2024/train/training_data1_v2 \
+  --device cuda --max-cases 5
+```
+
+Full saved 270-case validation split:
+
+```bash
+python -m scripts.evaluate_brats2024 \
+  --output-dir outputs/baseline_unet3d_full \
+  --data-root /path/to/BraTS2024/train/training_data1_v2 \
+  --device cuda
+```
+
+The command
+first audits every local case and both frozen split lists, then reads checkpoint configuration and the saved validation list without modifying
+it. It requires 270 IDs before applying the optional first-N limit. An explicit
+`--max-cases` always marks the run incomplete, even if the limit covers all IDs.
+Deterministic tiled inference is reused, without changing the threshold or
+introducing post-processing. Hardware/backend differences can still affect
+floating-point inference. No real-data inference was run during implementation.
+
+Full-run outputs are additive under `evaluation/brats2024/`:
+
+```text
+predictions/<case_id>.nii.gz
+dataset_audit.json
+dataset_manifest.csv
+evaluator_audit.json
+prediction_integrity.json
+overlap_per_case.csv
+overlap_summary.json
+official_metrics.csv
+official_evaluation_summary.json
+evaluation_config.json
+run_summary.json
+```
+
+Smoke runs use the same structure under `evaluation/brats2024/smoke_N/` so a
+smoke run cannot occupy or replace full-run outputs. Existing run outputs are
+never overwritten; archive them separately before repeating the same run.
+`official_metrics.csv` preserves upstream per-case/per-region columns (as returned by the bundled gli evaluation), prefixed with case ID; the word "official" identifies
+the metric implementation only. Prediction maps are uint8 NIfTI, retain reference
+geometry, and are validated after saving. Failures after output initialization
+are recorded with case/stage in `run_summary.json`; evaluator preflight failures
+stop before inference, with audit/run failure records where output initialization has completed. `complete_validation_run` is true only after successful
+export and evaluation of the entire saved split without a smoke limit.
+
+### Experiment 0.1 provenance and reproducibility
+
+The intended dataset is **BraTS 2024 Adult Glioma Post-Treatment, declared release v2**. This is a declaration, not proof established by a folder name. Before model creation or inference, the command reads the complete local dataset (all MRI headers and all segmentation label arrays) and the complete frozen 1080/270 split, even for `--max-cases 5`. It requires 1,350 discovered cases, unique split IDs, disjoint splits, exact union coverage, all five required files per case, valid segmentation labels in 0..4, and aligned 3D geometry. No resampling occurs. Unexpected auxiliary files are reported; unexpected case directories fail coverage/count checks. Observed labels and tissue-presence counts are computed, not assumed.
+
+`dataset_audit.json` distinguishes expected identity from observed files, shapes, voxel spacing, labels, missing/unexpected files/cases, and audit status. It checks case-ID leakage and physical-directory aliases; **patient-level independence is not established** without verified patient identifiers. These audits do not authenticate the official release or license against a publisher-supplied manifest. No external validation or TCIA data is included.
+
+`dataset_manifest.csv` has deterministic case ordering and records split membership, filenames, relative paths and byte sizes for t1n/t1c/t2w/t2f/seg. `manifest_sha256` hashes its exact canonical UTF-8/LF CSV bytes. By default this is a structure/metadata fingerprint, **not file-content verification**. Add `--hash-dataset` to either command to stream SHA256 for all five files of all 1,350 cases; the manifest fingerprint then incorporates full content identities. This may read roughly 35 GB and is never enabled implicitly. Even full hashes require an independently trusted reference to prove an official release.
+
+Both actual split-file SHA256 hashes and normalized sorted case-ID hashes are recorded. `evaluation_config.json` includes those hashes, the dataset-manifest hash, and the SHA256 of the frozen `best.pt`. Split and checkpoint changes detected while preparing inference cause failure. Exported prediction identities and post-export geometry/label checks are recorded in `prediction_integrity.json`; all predictions are validated again before official evaluation.
+
+`evaluator_audit.json` records BraTS-evaluation 0.0.10, Panoptica 2.1.7 (the inspected versions pinned in the optional dependency file), dependency/Python versions, resolved bundled configuration path/hash, actual API, and inspected label groups. It validates semantic labels NETC=1, SNFH=2, ET=3, RC=4, WT={1,2,3}, TC={1,3} from the tagged YAML without replacing the package's constructors or metric behavior. Evaluation calls `Panoptica_Evaluator.load_from_config(str(config_path("gli")))` and `brats_evaluation.evaluate_single_exam(prediction_filepath=..., reference_filepath=..., subject_identifier=..., evaluator=...)`. No metric formulas are implemented locally. Git revision/dirty/remote are recorded only when available from an identifiable evaluator source checkout; wheel installations use null plus an explanation.
+
+The official wrapper can return an error dictionary instead of raising: this is treated as evaluation failure, not an empty success. Result region names, subject identity and required numeric metrics are checked. Upstream edge-case NaN/Infinity values are serialized explicitly as strings `"NaN"`, `"Infinity"` or `"-Infinity"` rather than replaced by local Dice conventions or penalty constants. The raw structured official results are retained in `official_evaluation_summary.json`; CSV retains per-region results and JSON-encoded instance details. The optional official parser's ranking/penalty transformations are not invoked.
+
+Every run summary includes dataset/evaluator/integrity status. An audit failure prevents inference; no custom metric fallback exists. Smoke selection limits inference/evaluation only. This is **BraTS-compatible local evaluation using the official BraTS evaluation package with the bundled gli configuration**, not hidden challenge scoring, and does not claim historical 2024 scoring equivalence merely from the dataset year.
+
+
+Before inference, run a provenance-only preflight:
+
+```bash
+python -m scripts.evaluate_brats2024 --output-dir outputs/baseline_unet3d_full --data-root ~/datasets/BraTS2024/train/training_data1_v2 --audit-only
+```
+
+This validates and fingerprints the checkpoint on CPU, audits the full dataset and frozen split, and initializes the official evaluator with its bundled `gli` configuration. It writes `dataset_manifest.csv`, `dataset_audit.json`, `evaluator_audit.json`, `evaluation_config.json` and `run_summary.json` under `evaluation/brats2024/audit/`. It stops before model construction, weight loading into a model, inference, prediction export, overlap measurement or metric evaluation. Both configuration and summary record `audit_only: true`; zero exports and incomplete evaluation are expected successful-audit outcomes. Existing audit outputs cannot be overwritten. The full-run and `smoke_N/` paths remain separate and available. `--hash-dataset` also works in this mode; `--max-cases` never limits the full audit.

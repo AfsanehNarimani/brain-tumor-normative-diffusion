@@ -1,0 +1,3 @@
+# Optional Experiment 0.1 official evaluator; install in an evaluation environment.
+BraTS-evaluation==0.0.10
+panoptica==2.1.7
