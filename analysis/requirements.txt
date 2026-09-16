@@ -1,0 +1,2 @@
+# Additional dependency for CPU-only post-hoc figures.
+matplotlib>=3.9,<4
