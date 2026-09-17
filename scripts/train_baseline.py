@@ -12,6 +12,7 @@ import yaml
 from torch.utils.data import DataLoader
 from datasets.brats_dataset import BraTSDataset
 from models.baseline_unet3d import BaselineUNet3D
+from models.latent_split_unet3d import LatentSplitUNet3D
 from losses.segmentation_loss import SegmentationLoss
 from training.trainer import train_epoch
 from training.artifacts import snapshot, write_json
@@ -52,10 +53,13 @@ def make_dataset(config: dict[str, Any], split: str) -> BraTSDataset:
     return dataset
 
 
-def build_model(config: dict[str, Any]) -> BaselineUNet3D:
+def build_model(config: dict[str, Any]) -> BaselineUNet3D | LatentSplitUNet3D:
     """Separate the configuration model name from constructor parameters."""
     parameters = dict(config)
-    if parameters.pop("name", "baseline_unet3d") != "baseline_unet3d":
+    name = parameters.pop("name", "baseline_unet3d")
+    if name == "latent_split_unet3d":
+        return LatentSplitUNet3D(**parameters)
+    if name != "baseline_unet3d":
         raise ValueError("Unsupported model name.")
     return BaselineUNet3D(**parameters)
 
@@ -103,6 +107,15 @@ def run_training(data, model_config, run, debug=False):
     if debug:
         run.update(epochs=1, num_workers=0, validation_frequency=1)
         model_config["base_channels"] = 2
+        if model_config.get("name") == "latent_split_unet3d":
+            model_config["latent_channels"] = 16
+    if model_config.get("name") == "latent_split_unet3d":
+        model_config.setdefault("latent_projection", "conv1x1x1")
+        model_config.setdefault("latent_channels", 8 * model_config.get("base_channels", 32))
+        destination = Path(run["output_dir"]).expanduser().resolve()
+        frozen = Path("outputs/baseline_unet3d_full").resolve()
+        if destination == frozen or frozen in destination.parents:
+            raise ValueError("E1-A must use a distinct output directory outside frozen baseline artifacts.")
     state = None
     start_epoch = 1
     if run.get("resume"):
@@ -150,6 +163,10 @@ def run_training(data, model_config, run, debug=False):
           f"{sum(p.numel() for p in model.parameters() if p.requires_grad)} output_dir={output}", flush=True)
     config = {"data": data, "model": model_config, "train": run, "debug": debug,
               "selection_metric": "mean target-positive case Dice over NETC,SNFH,ET,RC,WT,TC; exclude regions with zero positive cases"}
+    if model_config.get("name") == "latent_split_unet3d":
+        config.update(experiment_name="E1-A latent-split control",
+                      segmentation_loss={"name": "Dice+BCE", "dice_weight": 1.0, "bce_weight": 1.0, "dice_smooth": 1e-5},
+                      optimizer="AdamW")
     fields = ["epoch", "training_loss", "validation_loss", *VALIDATION_METRIC_FIELDS, "learning_rate", "epoch_duration_seconds", "training_duration_seconds", "validation_duration_seconds"]
     if state is not None:
         if Path(run["resume"]).resolve().parent != output.resolve():
@@ -224,6 +241,7 @@ def main():
     parser.add_argument("--train-cases")
     parser.add_argument("--val-cases")
     parser.add_argument("--config", default="configs/train.yaml")
+    parser.add_argument("--model-config", default="configs/model.yaml")
     parser.add_argument("--output-dir")
     parser.add_argument("--device")
     parser.add_argument("--debug", action="store_true")
@@ -233,7 +251,7 @@ def main():
     parser.add_argument("--resume", help="Checkpoint to continue; epochs is the final desired epoch.")
     args = parser.parse_args()
     data = read_config("configs/data.yaml")
-    model = read_config("configs/model.yaml")
+    model = read_config(args.model_config)
     run = read_config(args.config)
     if args.resume:
         checkpoint = torch.load(Path(args.resume).expanduser(), map_location="cpu", weights_only=True)
@@ -259,7 +277,7 @@ def main():
     if args.output_dir:
         run["output_dir"] = args.output_dir
     elif args.debug:
-        run["output_dir"] = "outputs/baseline_unet3d_debug"
+        run["output_dir"] = "outputs/e1a_latent_split_debug" if model.get("name") == "latent_split_unet3d" else "outputs/baseline_unet3d_debug"
     if any(run[key] < 1 for key in ("epochs", "batch_size", "validation_frequency")) or run["num_workers"] < 0:
         parser.error("epochs, batch_size, validation_frequency must be positive; num_workers nonnegative")
     run_training(data, model, run, args.debug)

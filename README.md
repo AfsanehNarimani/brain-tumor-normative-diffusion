@@ -314,3 +314,21 @@ python -m scripts.evaluate_brats2024 --output-dir outputs/baseline_unet3d_full -
 ```
 
 This validates and fingerprints the checkpoint on CPU, audits the full dataset and frozen split, and initializes the official evaluator with its bundled `gli` configuration. It writes `dataset_manifest.csv`, `dataset_audit.json`, `evaluator_audit.json`, `evaluation_config.json` and `run_summary.json` under `evaluation/brats2024/audit/`. It stops before model construction, weight loading into a model, inference, prediction export, overlap measurement or metric evaluation. Both configuration and summary record `audit_only: true`; zero exports and incomplete evaluation are expected successful-audit outcomes. Existing audit outputs cannot be overwritten. The full-run and `smoke_N/` paths remain separate and available. `--hash-dataset` also works in this mode; `--max-cases` never limits the full audit.
+
+### Experiment E1-A: latent-split control
+
+`LatentSplitUNet3D` composes the unchanged `Encoder` and `SegmentationDecoder`. Two independent, biased 1×1×1 Conv3d layers project the bottleneck to full-width anatomy/background and disease representations (`8 * base_channels` each). The decoder receives the disease projection **and the original three encoder skip features**. Segmentation therefore does not depend solely on the disease latent. `forward(image)` returns raw logits; `forward_with_latents(image)` returns a typed `LatentSplitOutput` with logits, anatomy latent and disease latent from one encoder execution.
+
+The anatomy projector has no direct task supervision: segmentation-only backward leaves its parameter gradients `None`, so AdamW does not update those parameters. Its output can still change as the shared encoder learns. E1-A tests the latent-projection architecture; it is not evidence of successful healthy/disease disentanglement. There are no additional objectives, healthy datasets, diffusion components or post-processing.
+
+Default parameter counts are 5,840,132 (baseline) and 5,971,716 (E1-A), a delta of 131,584 = 2 × (256² + 256). E1-A starts from ordinary random initialization; it does not load or change Experiment 0 weights.
+
+For a single synthetic forward/backward/AdamW step and checkpoint round-trip on CUDA after review:
+
+```bash
+python -m scripts.smoke_test_e1a --device cuda --output-dir outputs/e1a_latent_split_smoke
+```
+
+The smoke directory must be empty. It records both parameter counts, their delta, tensor shapes, finite loss and checkpoint verification in `summary.json`, reusing existing configuration/environment tracking. It uses no real cases and is a smoke check, not a memorization experiment.
+
+For later approved training, select `--model-config configs/model_e1a.yaml --config configs/train_e1a.yaml` with `python -m scripts.train_baseline`. Existing `configs/data.yaml` supplies the unchanged split, normalization, 96³ patches and augmentation. Training config defaults mirror the current baseline hyperparameters, with a distinct `outputs/e1a_latent_split/` destination. Resolved artifacts retain the model/projection configuration, seed, data paths, augmentation, optimizer and original Dice+BCE loss settings. Existing baseline configs and model code remain unchanged. No training is launched by adding these configs.

@@ -1,0 +1,11 @@
+epochs: 30
+batch_size: 1
+learning_rate: 0.001
+weight_decay: 0.00001
+seed: 42
+num_workers: 4
+device: cuda
+output_dir: outputs/e1a_latent_split
+validation_frequency: 1
+threshold: 0.5
+experiment_name: E1-A latent-split control
