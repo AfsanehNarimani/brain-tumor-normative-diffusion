@@ -1,0 +1,48 @@
+{
+  "analysis_timestamp_utc": "2026-09-18T18:13:44.024881+00:00",
+  "anatomy_input": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1a_probe_anatomy/evaluation/per_case_metrics.csv",
+  "disease_input": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1a_probe_disease/evaluation/per_case_metrics.csv",
+  "anatomy_input_sha256": "1569ba8b5ff53917025e1379f506367afbb43ca8826a2292d7ef1463e185d5d8",
+  "disease_input_sha256": "bab9e9531acf7b6d5022aa3b60480a9947c1297847842ae6c979ee427234c48b",
+  "case_count": 270,
+  "anatomy_case_count": 270,
+  "disease_case_count": 270,
+  "target_positive_counts": {
+    "NETC": 114,
+    "SNFH": 270,
+    "ET": 198,
+    "RC": 230,
+    "WT": 270,
+    "TC": 200
+  },
+  "expected_positive_counts": {
+    "NETC": 114,
+    "SNFH": 270,
+    "ET": 198,
+    "RC": 230,
+    "WT": 270,
+    "TC": 200
+  },
+  "bootstrap_seed": 20260917,
+  "bootstrap_resamples": 10000,
+  "bootstrap_ci_method": "paired percentile bootstrap of mean disease-minus-anatomy Dice; 2.5th and 97.5th percentiles",
+  "wilcoxon_parameters": {
+    "zero_method": "wilcox",
+    "correction": false,
+    "alternative": "two-sided",
+    "method": "auto",
+    "axis": 0,
+    "nan_policy": "raise",
+    "keepdims": false
+  },
+  "all_zero_wilcoxon_policy": "p = 1.0 when all paired differences are zero",
+  "multiple_comparison_correction": "Holm step-down across six regional Wilcoxon p-values",
+  "win_tie_tolerance": 1e-08,
+  "paper_table_format": "Dice, delta, CI: four decimals; p-values: three significant digits; source CSV/JSON retain full precision.",
+  "git_commit_sha": "62d15a77072dd19da4102c4567aed76d45568c56",
+  "git_dirty": false,
+  "python_version": "3.11.15",
+  "numpy_version": "2.2.6",
+  "scipy_version": "1.17.1",
+  "interpretation": "Relative pathology accessibility under identical probes; does not establish disentanglement."
+}
