@@ -1,0 +1,11 @@
+{
+  "best_NETC_epoch": 10,
+  "best_NETC_case_dice": 0.4128202058481085,
+  "best_NETC_dataset_dice": 0.4346694776270241,
+  "first_zero_NETC_epoch": 11,
+  "consecutive_zero_epochs_after_first_zero": 20,
+  "NETC_case_dice_at_selected_best_epoch": 0.4128202058481085,
+  "collapse_epoch": 11,
+  "zero_tolerance": 1e-08,
+  "zero_streak_includes_first_zero": true
+}

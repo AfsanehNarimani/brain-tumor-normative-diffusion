@@ -1,0 +1,22 @@
+{
+  "analysis_timestamp": "2026-09-17T19:36:15.068822+00:00",
+  "input_csv_path": "/home/friend/BrainTumorSeg/outputs/e1a_latent_split/evaluation/brats2024/official_metrics.csv",
+  "official_metrics_sha256": "608d0f74b9301682d60d214c167eee148a44ee80c16a03fbc68eb36b04e75b08",
+  "overlap_summary_path": "/home/friend/BrainTumorSeg/outputs/e1a_latent_split/evaluation/brats2024/overlap_summary.json",
+  "overlap_summary_sha256": "9776957925c5e9ce41f45f12f1ac71a2f2c0bae5af8afbe6286e18d5710ea123",
+  "git_commit": "05f7aed8c909309ebf63497a3778f92fcf045cc2",
+  "git_dirty": false,
+  "python_version": "3.11.10",
+  "pandas_version": "2.3.3",
+  "numpy_version": "2.2.6",
+  "expected_case_count": 270,
+  "expected_regions": [
+    "NETC",
+    "SNFH",
+    "ET",
+    "RC",
+    "WT",
+    "TC"
+  ],
+  "top_k": 10
+}

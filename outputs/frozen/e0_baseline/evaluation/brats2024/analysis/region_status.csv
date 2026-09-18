@@ -1,0 +1,7 @@
+region,reference_positive_cases,reference_empty_cases,prediction_positive_cases,prediction_empty_cases,both_positive,reference_positive_prediction_empty,reference_empty_prediction_positive,both_empty
+NETC,114,156,138,132,109,5,29,127
+SNFH,270,0,270,0,270,0,0,0
+ET,198,72,270,0,198,0,72,0
+RC,230,40,270,0,230,0,40,0
+WT,270,0,270,0,270,0,0,0
+TC,200,70,270,0,200,0,70,0

@@ -1,0 +1,18 @@
+{
+  "case_count": 270,
+  "cases_with_overlap": 270,
+  "total_foreground_voxels": 25234758,
+  "total_overlapping_voxels": 561698,
+  "overall_overlap_fraction": 0.022258901789349438,
+  "maximum_case_overlap_fraction": 0.2260863460863461,
+  "maximum_overlap_channels_seen": 3,
+  "pairwise_overlap_counts": {
+    "NETC_SNFH": 15770,
+    "NETC_ET": 10510,
+    "NETC_RC": 96748,
+    "SNFH_ET": 297282,
+    "SNFH_RC": 141338,
+    "ET_RC": 1366
+  },
+  "zero_foreground_convention": "overlap_fraction=0.0"
+}

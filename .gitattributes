@@ -1,0 +1,2 @@
+outputs/frozen/**/*.pt filter=lfs diff=lfs merge=lfs -text
+outputs/frozen/**/*.pth filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,52 @@
+{
+  "evaluator_repository": "https://github.com/BraTS/BraTS_evaluation",
+  "evaluator_package": "BraTS-evaluation",
+  "evaluator_package_version": "0.0.10",
+  "evaluator_configuration": "gli",
+  "evaluator_configuration_path": "/home/friend/BrainTumorSeg/.venv/lib/python3.11/site-packages/brats_evaluation/configs/config_gli.yaml",
+  "evaluator_configuration_sha256": "c0f47cf65347eb42c3a56d7b220ac5749085e5ce407b97b93012a8cde8ca7d60",
+  "Panoptica_version": "2.1.7",
+  "Python_version": "3.11.10",
+  "relevant_dependency_versions": {
+    "numpy": "2.2.6",
+    "nibabel": "5.4.2",
+    "SimpleITK": "2.5.6",
+    "scipy": "1.17.1",
+    "pandas": "2.3.3",
+    "connected-components-3d": "3.29.0",
+    "scikit-image": "0.26.0",
+    "ruamel.yaml": "0.19.1"
+  },
+  "evaluation_API_used": "Panoptica_Evaluator.load_from_config(str(config_path(\"gli\"))); brats_evaluation.evaluate_single_exam(prediction_filepath=..., reference_filepath=..., subject_identifier=..., evaluator=...)",
+  "configuration_semantics": {
+    "expected_input": "SEMANTIC",
+    "label_groups": {
+      "snfh": [
+        2
+      ],
+      "et": [
+        3
+      ],
+      "netc": [
+        1
+      ],
+      "rc": [
+        4
+      ],
+      "tc": [
+        1,
+        3
+      ],
+      "wt": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "git_revision": null,
+  "git_dirty_status": null,
+  "git_remote": null,
+  "git_metadata_reason": "Installed distribution has no identifiable source checkout.",
+  "audit_passed": true
+}

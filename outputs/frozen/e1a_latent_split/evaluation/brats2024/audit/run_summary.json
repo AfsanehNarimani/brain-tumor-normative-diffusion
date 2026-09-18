@@ -1,0 +1,17 @@
+{
+  "audit_only": true,
+  "requested_case_count": 270,
+  "successfully_exported_cases": 0,
+  "failed_cases": [],
+  "prediction_directory": "/home/friend/BrainTumorSeg/outputs/e1a_latent_split/evaluation/brats2024/audit/predictions",
+  "overlap_audit_completed": false,
+  "official_evaluator_completed": false,
+  "official_output_paths": [],
+  "inference_duration_seconds": 0.0,
+  "evaluation_duration_seconds": 0.0,
+  "total_duration_seconds": 120.67731505299889,
+  "complete_validation_run": false,
+  "dataset_audit_passed": true,
+  "evaluator_audit_passed": true,
+  "prediction_integrity_passed": false
+}
