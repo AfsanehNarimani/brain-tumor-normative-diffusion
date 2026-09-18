@@ -27,4 +27,4 @@ reconstruction:
   enabled: true
   loss_type: L1
   # Intentionally unset until raw diagnostic loss magnitudes are inspected.
-  lambda_rec: null
+  lambda_rec: 1.0
