@@ -1,0 +1,15 @@
+experiment_name: E1-A disease latent pathology-accessibility probe
+latent_source: disease
+output_dir: outputs/e1a_probes/disease
+source_checkpoint: outputs/e1a_latent_split/best.pt
+data_config: configs/data.yaml
+# Training values inherited from configs/train_e1a.yaml.
+epochs: 30
+batch_size: 1
+learning_rate: 0.001
+weight_decay: 0.00001
+seed: 42
+num_workers: 4
+device: cuda
+validation_frequency: 1
+threshold: 0.5
