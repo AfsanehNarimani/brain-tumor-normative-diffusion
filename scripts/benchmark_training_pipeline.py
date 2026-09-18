@@ -29,6 +29,9 @@ def benchmark(
     iterations,
     warmup,
     device,
+    pin_memory=False,
+    persistent_workers=False,
+    non_blocking=False,
 ):
     with open(config_path) as f:
         config = yaml.safe_load(f)
@@ -47,14 +50,18 @@ def benchmark(
 
     dataset = make_dataset(data_config, "train")
 
-    loader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=num_workers,
-        worker_init_fn=seed_worker,
-        generator=torch.Generator().manual_seed(config["seed"]),
-    )
+    loader_kwargs = {
+        "batch_size": batch_size,
+        "shuffle": True,
+        "num_workers": num_workers,
+        "worker_init_fn": seed_worker,
+        "generator": torch.Generator().manual_seed(config["seed"]),
+        "pin_memory": pin_memory,
+    }
+    if num_workers > 0:
+        loader_kwargs["persistent_workers"] = persistent_workers
+
+    loader = DataLoader(dataset, **loader_kwargs)
 
     optimizer = torch.optim.AdamW(
         model.probe.parameters(),
@@ -90,8 +97,8 @@ def benchmark(
 
         transfer_start = time.perf_counter()
 
-        image = batch["image"].to(device)
-        target = batch["target"].to(device)
+        image = batch["image"].to(device, non_blocking=non_blocking)
+        target = batch["target"].to(device, non_blocking=non_blocking)
 
         sync(device)
 
@@ -139,6 +146,9 @@ def benchmark(
     result = {
         "batch_size": batch_size,
         "num_workers": num_workers,
+        "pin_memory": pin_memory,
+        "persistent_workers": persistent_workers,
+        "non_blocking": non_blocking,
         "iterations": iterations,
         "warmup": warmup,
         "loader_wait_ms": mean_ms(loader_wait_times),
@@ -195,6 +205,10 @@ def main():
         default="cuda",
     )
 
+    parser.add_argument("--pin-memory", action="store_true")
+    parser.add_argument("--persistent-workers", action="store_true")
+    parser.add_argument("--non-blocking", action="store_true")
+
     args = parser.parse_args()
 
     benchmark(
@@ -204,6 +218,9 @@ def main():
         args.iterations,
         args.warmup,
         args.device,
+        pin_memory=args.pin_memory,
+        persistent_workers=args.persistent_workers,
+        non_blocking=args.non_blocking,
     )
 
 
