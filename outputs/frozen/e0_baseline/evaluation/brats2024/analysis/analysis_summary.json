@@ -1,0 +1,570 @@
+{
+  "case_count": 270,
+  "row_count": 1620,
+  "regions": [
+    "NETC",
+    "SNFH",
+    "ET",
+    "RC",
+    "WT",
+    "TC"
+  ],
+  "statistics_policy": "All upstream case observations; finite-only summaries with explicit nonfinite counts; no imputation.",
+  "standard_deviation": "population (ddof=0)",
+  "quantiles": "linear interpolation",
+  "extreme_selection": "Finite values only; top-K per region/criterion; ties ordered lexicographically by case ID.",
+  "metric_counts": [
+    {
+      "region": "NETC",
+      "metric": "global_bin_dsc",
+      "total_count": 270,
+      "finite_count": 143,
+      "nan_count": 127,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "global_bin_hd95",
+      "total_count": 270,
+      "finite_count": 106,
+      "nan_count": 127,
+      "positive_infinity_count": 37,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "global_bin_nsd",
+      "total_count": 270,
+      "finite_count": 143,
+      "nan_count": 127,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "rq",
+      "total_count": 270,
+      "finite_count": 143,
+      "nan_count": 127,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "sq_dsc",
+      "total_count": 270,
+      "finite_count": 143,
+      "nan_count": 127,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "pq_dsc",
+      "total_count": 270,
+      "finite_count": 143,
+      "nan_count": 127,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "sq_hd95",
+      "total_count": 270,
+      "finite_count": 106,
+      "nan_count": 127,
+      "positive_infinity_count": 37,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "sq_nsd",
+      "total_count": 270,
+      "finite_count": 143,
+      "nan_count": 127,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "prec",
+      "total_count": 270,
+      "finite_count": 138,
+      "nan_count": 132,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "NETC",
+      "metric": "rec",
+      "total_count": 270,
+      "finite_count": 114,
+      "nan_count": 156,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "global_bin_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "global_bin_hd95",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "global_bin_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "rq",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "sq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "pq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "sq_hd95",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "sq_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "prec",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "SNFH",
+      "metric": "rec",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "global_bin_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "global_bin_hd95",
+      "total_count": 270,
+      "finite_count": 192,
+      "nan_count": 0,
+      "positive_infinity_count": 78,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "global_bin_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "rq",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "sq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "pq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "sq_hd95",
+      "total_count": 270,
+      "finite_count": 192,
+      "nan_count": 0,
+      "positive_infinity_count": 78,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "sq_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "prec",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "ET",
+      "metric": "rec",
+      "total_count": 270,
+      "finite_count": 198,
+      "nan_count": 72,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "global_bin_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "global_bin_hd95",
+      "total_count": 270,
+      "finite_count": 221,
+      "nan_count": 0,
+      "positive_infinity_count": 49,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "global_bin_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "rq",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "sq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "pq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "sq_hd95",
+      "total_count": 270,
+      "finite_count": 221,
+      "nan_count": 0,
+      "positive_infinity_count": 49,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "sq_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "prec",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "RC",
+      "metric": "rec",
+      "total_count": 270,
+      "finite_count": 230,
+      "nan_count": 40,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "global_bin_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "global_bin_hd95",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "global_bin_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "rq",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "sq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "pq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "sq_hd95",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "sq_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "prec",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "WT",
+      "metric": "rec",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "global_bin_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "global_bin_hd95",
+      "total_count": 270,
+      "finite_count": 192,
+      "nan_count": 0,
+      "positive_infinity_count": 78,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "global_bin_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "rq",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "sq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "pq_dsc",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "sq_hd95",
+      "total_count": 270,
+      "finite_count": 192,
+      "nan_count": 0,
+      "positive_infinity_count": 78,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "sq_nsd",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "prec",
+      "total_count": 270,
+      "finite_count": 270,
+      "nan_count": 0,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    },
+    {
+      "region": "TC",
+      "metric": "rec",
+      "total_count": 270,
+      "finite_count": 200,
+      "nan_count": 70,
+      "positive_infinity_count": 0,
+      "negative_infinity_count": 0
+    }
+  ],
+  "artifacts": [
+    "metric_statistics.csv",
+    "region_status.csv",
+    "instance_burden.csv",
+    "false_positive_burden.csv",
+    "extreme_cases.csv",
+    "paper_global_metrics.csv",
+    "paper_lesion_metrics.csv",
+    "overlap_analysis.json",
+    "analysis_metadata.json",
+    "analysis_summary.json"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "experiment_name": "baseline_unet3d_full",
+  "case_count": 270,
+  "best_epoch": 10,
+  "best_selection_metric": 0.6049340746335133,
+  "minimum_validation_loss_epoch": 30,
+  "minimum_validation_loss": 0.4067133651563415,
+  "regions": [
+    "NETC",
+    "SNFH",
+    "ET",
+    "RC",
+    "WT",
+    "TC"
+  ],
+  "NETC_collapse_detected": true,
+  "NETC_first_zero_epoch": 11,
+  "NETC_best_epoch": 10,
+  "NETC_best_case_dice": 0.4128202058481085,
+  "inconsistencies": [],
+  "statistics_convention": "population std (ddof=0); linear percentiles; absent targets excluded",
+  "checkpoint_metadata_checked": false,
+  "artifact_paths": [
+    "analysis/analysis_summary.json",
+    "analysis/baseline_metrics.csv",
+    "analysis/baseline_metrics.md",
+    "analysis/difficult_cases.csv",
+    "analysis/figures/case_dice_boxplot.pdf",
+    "analysis/figures/case_dice_boxplot.png",
+    "analysis/figures/loss_curve.pdf",
+    "analysis/figures/loss_curve.png",
+    "analysis/figures/netc_dice_curve.pdf",
+    "analysis/figures/netc_dice_curve.png",
+    "analysis/figures/region_dice_curves.pdf",
+    "analysis/figures/region_dice_curves.png",
+    "analysis/figures/selection_metric_curve.pdf",
+    "analysis/figures/selection_metric_curve.png",
+    "analysis/netc_analysis.json",
+    "analysis/per_region_statistics.csv",
+    "analysis/training_history.csv"
+  ]
+}

@@ -1,0 +1,1352 @@
+[
+  {
+    "case_id": "BraTS-GLI-00008-101",
+    "prediction_sha256": "8cdd06f6471ddcb1046fc68de63b7c5497e2ee5bf4cb0b160b0be696cffd3f18",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00027-100",
+    "prediction_sha256": "34279d649812ae7a31a5b2473ce2ebafe003134ca8f4f0be428a637a7ca9b1d3",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00096-100",
+    "prediction_sha256": "1f20d886aff05b0543c68b6e18ed60367707d3de6ff856b947c46dda4858b0d2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00463-101",
+    "prediction_sha256": "c534ad6425ae318a6a2cd12de33a4a086da6b29a87bd1ddbe11335a3afcb7d7c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00469-100",
+    "prediction_sha256": "9f43df92be698793153c64a1dc84662bfd8f0986dffcac6e4feaf9f95956a24d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00485-101",
+    "prediction_sha256": "eca46f11c71dafb5d2d4f7b546dfdec1b7896620c0c9e742cbddbca06ba5b2a6",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00506-100",
+    "prediction_sha256": "0667f4aeead15bf12d3400023992c4412eadf045d47c55f428b114431cd6086e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00517-101",
+    "prediction_sha256": "446acf531181896833709ce649f53d9fbc7bed92e879e27695b62a4eb69a25d6",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00518-100",
+    "prediction_sha256": "41c952e398a264ffe9629da53a1167ff6f93960fe39dcc686bd93fd130642b6b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00529-101",
+    "prediction_sha256": "fa547b901a3632a2c5f722f601d6f4d8103b5c9f890036fa34d99c0bc01f8983",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00548-100",
+    "prediction_sha256": "366d0856642203ddab05388657620dd15fba428b674579123de1aa8b20819e23",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00556-100",
+    "prediction_sha256": "f86c367c1efbd28f54b94c22e1243cc5a32b49e7f73a9c4d7b1cf0f09110ac81",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00556-101",
+    "prediction_sha256": "9693e1c0b495de737193fc4e1f318171963df260679fd0a26d79c9d1f9b3fea9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-00557-101",
+    "prediction_sha256": "0c12d8d29ba8604ae6345e6056616121e6ca8dc3e5c39f69737e093601ab8f32",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02062-100",
+    "prediction_sha256": "001ddb4a94b31f2a9d62aa69c6adab7cbd02f49adfb762075abe19cd4a54a7be",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02063-101",
+    "prediction_sha256": "32720d234d4ec214b69dde1cd9d3341dfd2ef485a1582908a35fc7773750eb28",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02069-100",
+    "prediction_sha256": "c4b0d9114508c113865544b718bd0af6e597fe0f483cb5d4312fd85b85c56fd0",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02070-102",
+    "prediction_sha256": "eb4ab3d96f9ed97d475792da97cab833b894d176b49e6fe011da1cb25a5abcda",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02072-102",
+    "prediction_sha256": "13970f5caa31587c00ce47f5c01dab9a85c485681131009c0aa73015225615d7",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02078-103",
+    "prediction_sha256": "4c75b02644bcaf5d7b5080e8b3ef5ca767452d77a26842e9ef2be2c24060a59f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02082-101",
+    "prediction_sha256": "cb13015507a2a1996b6d0adb095a040e9e06d0ac5a9acffda0aa6aa45a20703d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02082-103",
+    "prediction_sha256": "e2a79107877c182e073be682dfb4517d53b360070fe3703b8b616a37d9213a9c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02082-104",
+    "prediction_sha256": "e3e71793e032ef7a578cbffaf1620ab0968bfd08d09bd3c3b278c355f2580d6c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02084-100",
+    "prediction_sha256": "a2468e74cbdeaa820858228b69c356f737f98f3f2d094d3fa73b22fd63e5cf43",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02086-100",
+    "prediction_sha256": "46cc0f819685fd0a23aca73b06a09b94a6ec65e709a18c983f2ffc7ab9fffb2e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02087-101",
+    "prediction_sha256": "0ca809294d08aa4384b506bd9ed215162595dc70fe761a12def92378b85add26",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02089-101",
+    "prediction_sha256": "db4463564d9fb3385d21479be1130947f15c1a450f521f159d4516126f90ca74",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02091-101",
+    "prediction_sha256": "37d4b062fff8e27740e5c06aaac5ccea1d07a9cf84fd07d1d90813f899c42965",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02092-100",
+    "prediction_sha256": "d9f19da27e8eccfe8283b51e12f9c2ead4cdbe3cd3f37a8afbaeec6a5866cfc9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02092-101",
+    "prediction_sha256": "2d76918cace6fd5640f2ff83b3828ee73c1870fadfa9b1e57d2c2f0df281604c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02092-102",
+    "prediction_sha256": "54ab5b61dcaa9c3e32227d36281349cbdc53268ca49d46510c12dd86a7b34b69",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02092-105",
+    "prediction_sha256": "9be8478998cdbb20c9a14ffb85fc76e8451d6251beca60be74ef1913c8a41ce8",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02093-101",
+    "prediction_sha256": "551e208c17e0fd23afd91b0fef20407ae4438d675b2974ba65ddb10ff7ce5370",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02093-103",
+    "prediction_sha256": "9ec7101f1f08097417b0d32149fa58799d5c717dd47a0599496aa2472eb4b8eb",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02093-109",
+    "prediction_sha256": "cde6a46b4b9d2e564f78e06cc3ad661a08090afe18b8e8322c59b49c36d3ac55",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02096-101",
+    "prediction_sha256": "14ccc56734443fd12d158eae3b8acb72a9e52293de769eca0d393604267a835c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02096-103",
+    "prediction_sha256": "c6b04d664fc6953f7815c77618d4323165ff6c006c98b87525d2ba4b45614fea",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02102-101",
+    "prediction_sha256": "71c15d8b4c6851d3ac32983590f8db5c92217339e8ca9bbbe4cc4dfc59a18f6e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02103-105",
+    "prediction_sha256": "dd631c9899fdf546ce06cf4a91b991eabd157860b3969dac9717674e4a1f57d4",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02104-100",
+    "prediction_sha256": "a044d43cf9b3962c5372854275cf0af059911a79673e823bb4dcc95abe506203",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02105-102",
+    "prediction_sha256": "8fbe8ded6daa5897dff3a7dbe2a692d1f543272c9280ad763b9b4faee535b872",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02105-103",
+    "prediction_sha256": "b963e6c4c6c374dee3c4a568f9ee95d1d40a646e0d8de2d0cb9a1102ba7a6b50",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02105-106",
+    "prediction_sha256": "8b7cb66c230703dbd8506a9671eb76f07fba6107da224d41207400f77a37120a",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02108-100",
+    "prediction_sha256": "a9873d09df2a1736cefa157aa3a6f96c15c0a19edbf8003a72090d7b7c4317b1",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02111-101",
+    "prediction_sha256": "365e6f59f266c1e4218d12f7580b5c8bbf38f2cfb65e4eca1c55379df3ab264e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02112-103",
+    "prediction_sha256": "4914f9b0af477483cc665b3edaf5d5685ad9f14226254fda5e86ff47d6b57886",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02114-100",
+    "prediction_sha256": "46800b0e081ba21be0c662e04ffd5b18c7d413596649be8036f1dc9d9a888fd0",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02115-101",
+    "prediction_sha256": "0eb560cef86e300c0f10b427d2f696210a92c9b901831e5ddab3966cc9c65f0f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02116-101",
+    "prediction_sha256": "e1b1e41534bcf9874f6559bc8179b44564bea90f5bcdabcf98c32faac7a0204d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02123-100",
+    "prediction_sha256": "7c1e11abdf02d4fd81108fb885191e5925501fb9b05ffac51ffa7737e20d395f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02129-104",
+    "prediction_sha256": "09d40566e1605b274cb6b784beee0597f6e03fb31915777fdfea0efc26eee98b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02131-100",
+    "prediction_sha256": "66925566a372e51207a58f7032102e5c9ce8c5133e8162cebd0fe46d7b7a1ae7",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02131-101",
+    "prediction_sha256": "fff5d8ef2e876b999e941daa3d837f5af27b9f9367bf29c68ddb8480d404ec55",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02137-102",
+    "prediction_sha256": "0fc5012d76d414197c5de53d651f734863c06d4b78eab72155730806f9cf72db",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02138-100",
+    "prediction_sha256": "0f72cab5bc45019e38004b106217756d97161bdc47f74a419b4beee65b8e2538",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02143-100",
+    "prediction_sha256": "f899d1dcea97c86caad3ef0f6faa4d0f3b98d1f5d76b3572655443d0a53253d4",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02143-101",
+    "prediction_sha256": "2ef74cabf779dda702514ffab8a7251ec6574bb13d06dd26884e4195aa19ba19",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02143-102",
+    "prediction_sha256": "89df5592b37abb596b32996258d2713c7956f30a73bb1b033299f36536a0eccd",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02146-102",
+    "prediction_sha256": "fb0ade6ca10829fa352e73e2f4814533095ec2b1260010b37108945d44f58b58",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02149-102",
+    "prediction_sha256": "083d147a666e1ceca79c65818142220db4217ba533a0c0a6eb7d0f673f1f9941",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02153-100",
+    "prediction_sha256": "4a7889cdf69b73fd46a0111c05931f879fc1e13f2255e1bc8afbca5734eb2a58",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02156-101",
+    "prediction_sha256": "bbd5bd1f81cebfdabba44ff76d2665c3dd6ffddb95c850906361c919a8fbaf21",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02157-100",
+    "prediction_sha256": "413b691fe1ea8dcaa96505495ffd18adfd948ad0e2717815f2ac994bb97aa78a",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02158-100",
+    "prediction_sha256": "69d81e1667a2764c5ac1ba27d9d0884f9427f10de38b17ec18754072355ae553",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02158-101",
+    "prediction_sha256": "c24e777e9ef1b0a3e511e9ce8f44e201578f518c909942f347413b68584dc69c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02164-101",
+    "prediction_sha256": "04909a56e5ab51997141c5377ca49ac502179b8200586ec3eac507514db91909",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02164-102",
+    "prediction_sha256": "232705bfc8d188cbd8c3fab557bfe0d67669dbc327adbab7c56ef5ae84decdbf",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02164-103",
+    "prediction_sha256": "41ddc393856e106f0820699658b64065dd3e8ae6ea5e3f9cbcfa37320b43c92d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02167-100",
+    "prediction_sha256": "2296e6766288e7afc7d83162c87b51003741efaa1678d827c8fa5dfe69c490fa",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02170-102",
+    "prediction_sha256": "2498ee6fa6ba3eb0c8cb4d33f8ab3466c81e1ccb751560b52e2963d3f27c7a8d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02172-101",
+    "prediction_sha256": "a79c8073be1b146e48b4a8e6b395b8af701884ff39c1dc0e54005684efc6cc06",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02175-101",
+    "prediction_sha256": "714d75bbc36ce5afbcf5d9112a1b23c768a0b2f804176f9a1a1b8143e9b4017b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02176-101",
+    "prediction_sha256": "afa68b97f02222b497ccd72c774304f11b1fa610011e13c6c661418f3c3cbda5",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02178-100",
+    "prediction_sha256": "1faf5599c031e71b2d9341a4477a5a972d201a8bbc626eefdffa2e3dcb45728d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02181-101",
+    "prediction_sha256": "951f45174833f415117cbf44f7a1fa88127944419d7aace020fe50338efd826d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02184-100",
+    "prediction_sha256": "8a1384b0eeb596c7133cf90390bea0495e4f9f2a6f7717ca58a7c8b316ef930e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02185-100",
+    "prediction_sha256": "f7d4095012abba0666039c3bcb3b10507391a8b553a419650c5bde9439fc1ebc",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02186-102",
+    "prediction_sha256": "0c3a827d8331f8918043e8c903b1b03de84761e78dfa92843c3ab6808c26b694",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02192-102",
+    "prediction_sha256": "065b2622a696a10646ce0b32eff3123ecbf6e8c243a16dde3566a85df3da0f50",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02193-100",
+    "prediction_sha256": "dcb0c3b20e6b7ed8b3639b6c5a57e99a8bc292cb8a742473f71a80338620e545",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02193-101",
+    "prediction_sha256": "20da2325184c0fb351c61a02e3e4707faafef53e7454315cd65a27e1d7ec5913",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02194-102",
+    "prediction_sha256": "aef16356bdac27819e4de123a0fb44cd107101b69e4f85ad610836a632a0a889",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02194-104",
+    "prediction_sha256": "d6108d20c92258ff7a0d9c57ea7e6d746d976615c09a85831a2e877ed51f916f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02194-106",
+    "prediction_sha256": "2f52cbc2d580f039a3ab918b68309d00a86dc07f448c53b214e923b3eaa87125",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02196-102",
+    "prediction_sha256": "89e1236df0a107b830fcc372fb7a4c82cb29d8f2ea67cda8ddd5be1223f7673f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02196-103",
+    "prediction_sha256": "76ba2fb42ede95a154898cd4bec8b6ebbaa5aca0d297f410edf1be4d974941f3",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02197-101",
+    "prediction_sha256": "fa6ca777d1813769565878988dfe084fc6c238485586ef3a9a07489e68707466",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02198-100",
+    "prediction_sha256": "7a9e8039ce057205e06648dd0b2aebc6510159c5925f7a45c13371a48bf81397",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02198-104",
+    "prediction_sha256": "f3d2677d1a757f31862325cccfa06f3ddca19703e0e44a182317c90dab017023",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02199-101",
+    "prediction_sha256": "b74f8317ba58af4a8c4a2460200a9ebdc96b445194c248b84f8ec3fd5aad07de",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02199-103",
+    "prediction_sha256": "11fb6591466ccd0dff9ca547ba338fb5a85b08a3cc8d5077fcaed6557ea7bd09",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02204-100",
+    "prediction_sha256": "c1d2926c6ffab8cb12ebd5874228bdf54806f0dd7784b22a4b5970e1a69fd559",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02204-104",
+    "prediction_sha256": "f185796ec8824e3e5560a04f029a971c782f55624e3a450c2641e245bf3080cc",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02205-100",
+    "prediction_sha256": "e87a546df2a7a1c3f7312c302468f422de26816dcae2d380a8c3b14d4f6b90ea",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02205-103",
+    "prediction_sha256": "be3efabb04159f35bafeaee1aa2c9f01523c6aae32a95cba37b0c3b3fcbfb9b2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02206-103",
+    "prediction_sha256": "8e85e214b95c8c3a407d7e30e53746c143fe5e29992522a9971f2fb60fac8f9e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02208-101",
+    "prediction_sha256": "a6cf1782894d0058dab3e9a94106afb8e5d1520ebabbbe0ab4a5e23d531438f0",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02209-102",
+    "prediction_sha256": "f3218822ec5399b6e065f9248d98cf4d46e0365e49449f3a99a3519c6c6168fa",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02216-102",
+    "prediction_sha256": "79dba9ae45d622016285c7c36b6f62d53151e6257ed493920d21358ba21fac3e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02216-103",
+    "prediction_sha256": "4662247c39ff701e12bd0ab0c7eae944165ec7b6d3b2a6e185f3f7f2c2a0a743",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02218-102",
+    "prediction_sha256": "519be67fe91fde4092da43f6d0b8028c74f92eb5d9ea813d3d4b7a75c351e279",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02221-103",
+    "prediction_sha256": "288fd2623c5584a460c9f19d351f1e4c9ce58751fa973fd1eff5b5a485ea8266",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02224-100",
+    "prediction_sha256": "d5c4964f18b1b2fa2aadacb2c50b6502534f06d2404d26fbeeb682c3aa80c96a",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02225-100",
+    "prediction_sha256": "774ddc53aeb675f5ef420e35a0994a4c39f44e1f817e75a324e36cef311b2c93",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02230-102",
+    "prediction_sha256": "206fc2db664db10418e918a0b9acb627189bc505fcbb925750023b705fc1c517",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02236-100",
+    "prediction_sha256": "4cc3577d872562343792d2c1bd9ba2b109469989359b2108399f9f46bb99d917",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02236-101",
+    "prediction_sha256": "728e7041938b7b091e1d76929d18beb0b26d2a3f0d62e5b1d546e89aa86aafb6",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02239-102",
+    "prediction_sha256": "37dc2e9bfe21d47ada5e72437362bcb45ba6ffed75af157a48564ad8460ad38d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02242-101",
+    "prediction_sha256": "d7650c9e2d5dfc896c0c70dcbc187b3f25817314cf9954c0b6fd7ccf1bf13b1c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02244-101",
+    "prediction_sha256": "edb96d894446bbf617176d5fd313fd140f99eba34297d95097aa8c7f75b69cee",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02245-104",
+    "prediction_sha256": "eca5c73b7d40a9407cfad72962bad11c346800871e59930357ca9d46ccb80439",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02248-103",
+    "prediction_sha256": "6f7cee83d7aebdc6f01826de46e640a8576f4ff7caec0398f019f1220b199842",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02259-100",
+    "prediction_sha256": "fa4fb31f8f31e040fe6f2d2707486e8b5e3354f846442d4472f68c82c8629a50",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02265-100",
+    "prediction_sha256": "625e24cf7e7c0cf555ec2ac41bd9db0fede9b6f3f49d80df3d57bff142edbf32",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02270-100",
+    "prediction_sha256": "64ad53ab84ed3b8dab5986e4b482f71d30161fcdc80b1d254623ef3ac727ee1e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02290-100",
+    "prediction_sha256": "6a8ee50acecde03498b65df92640fc47fd8b03695b864a2f72d346edc28eef6d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02303-101",
+    "prediction_sha256": "51f0436c8e7e0df559c9ca37696f4137d110c9e85442c97c43473d37c093ba59",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02306-100",
+    "prediction_sha256": "055d87ecfc08d6a362b082d829732f3874b1d867df54d9fc6626bc0473e959ff",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02307-101",
+    "prediction_sha256": "90bb34b8a94f975f1cdda1281b6c3209b328c9297c9d9c0ae039dacc6e5d5ed9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02317-100",
+    "prediction_sha256": "c990ef4eec96077b37e256bcf454f59208be85392214a222d04918b4ef196ad9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02331-100",
+    "prediction_sha256": "2273612b7be5af0d5b07727fd6cbc59623c9a304295888ed3c6702ba268eec4d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02335-100",
+    "prediction_sha256": "86a9bf6208e0fd1f2b734af12934cf743fc8981c38d27b43a6defc993d56c3d1",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02348-100",
+    "prediction_sha256": "f023cbbb5182875eb4493a7c1de9a47067f244082f11b8c0931f5963fd3b5959",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02354-100",
+    "prediction_sha256": "fde6867f4b33eee07aa1aa9e2bd5f4bdf9532100343cf424ccc89d6843cb2e77",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02355-100",
+    "prediction_sha256": "19cd7566ecb667a8144fa1e2ceb8192cdd5147092d11361163372f04b65c9591",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02372-100",
+    "prediction_sha256": "ded51f0a6dd1a8b7ee83f8c41ef9a5d8d59063ce0f7cc0acd3b80f97013b4cf6",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02375-100",
+    "prediction_sha256": "7f013f14968df32524bd99eeb15af6eb96ab3ab21520205646661fd8dec7f416",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02377-100",
+    "prediction_sha256": "a3e060d8baa2e65df137a8a8a5992f2c8d47e4d51f0f4438ba2491de2e039464",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02378-100",
+    "prediction_sha256": "f6efd3d01efef649797af9f5430c21fb1fba47b8fd35d3c391c0dd0fa737e961",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02379-101",
+    "prediction_sha256": "d62b84a5616aa8f07863b11057c0d253221c158bc0364c3f03e91984fad78e24",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02382-100",
+    "prediction_sha256": "a75ee6e9705ee1266aa4104224b6c5458b72e2324651c9c7fc3b672363b423b5",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02390-102",
+    "prediction_sha256": "e93cb3f8d0a69aa6fb568e4ae6a40695064c1757dc02bec2330a44780d1e0b9c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02498-102",
+    "prediction_sha256": "6e8b8850425866514b8058eeab9a73aabd6b2e09ee19059c6c45e228613eb814",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02514-100",
+    "prediction_sha256": "b5f09c40357d9503329183a399459fe3971de078dda88089723f9392e762258c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02514-101",
+    "prediction_sha256": "45851ee0a4cd0d346e6f53abdd4e257eea121afc6319988bb38b4d65caef1216",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02514-102",
+    "prediction_sha256": "9630a93fc0a354ed3fd24740278aa641d326a89bf557ca0662d365fad98715c7",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02518-100",
+    "prediction_sha256": "5f394d04d4d8a1b34f3b36c82005c06a596012395c6c033d786b4ac4e716206b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02518-101",
+    "prediction_sha256": "309b825f79fa72e0f48a63fe160eab9365001fc533e27c4da20813cb4475ea23",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02518-103",
+    "prediction_sha256": "5a0eed9eed03a52a9029aeb5aca3c3d4cb2bf86fcfeb15e02a0a3602a1bb7653",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02524-101",
+    "prediction_sha256": "92d2025882251fb772cf19676be7325683a590718d4ee507391ad6d13464b207",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02524-103",
+    "prediction_sha256": "591780ddc6b04e52db0480ae542b0fd8b20d27f2359add3a4d20cac70c0fcc40",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02524-105",
+    "prediction_sha256": "99551b2a67826cab4f2883c30ed2e9280001e56a47123333dd001ad93b4806e7",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02531-100",
+    "prediction_sha256": "f2183c39017aab9592a28e70699cb9e06d7b99d9b9bd4e0afc22e3596e0251c5",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02546-100",
+    "prediction_sha256": "188e5328d79a605c71de061b3b29d861eeaa4f305faa65d23c38e62749287e24",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02548-101",
+    "prediction_sha256": "174cf8bb069c71e13fba824768a3286db1792e7dae13627a0d2a948f012c3c19",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02558-100",
+    "prediction_sha256": "c41959b080699b999815b53385274aa6d79e56bf2ffb00da8ec0a71a383643fa",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02598-102",
+    "prediction_sha256": "4613064ba06175b520369ac4a686a9f092b7b49e00710a0709efaf4224262ded",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02608-100",
+    "prediction_sha256": "410cdfbd4dcdc9adf54be26379e7c08087e4b3ef42b8d2123f21a63615a11834",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02609-103",
+    "prediction_sha256": "55f83c8ab02fa69f1a639bcfd62127f4bf173775da07183a7bd2bae792095271",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02631-100",
+    "prediction_sha256": "da637227b271e96d103e7331afbcd9c24c2f6b7dbde4fda53b5907e6676e94da",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02631-101",
+    "prediction_sha256": "801bd147c83dbd1be4df76226ed72465b5b26cb1560c9931c9833f46382585fa",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02637-101",
+    "prediction_sha256": "5ea4be1017009d342a937f902c5d2fd6b8440b12a0dfcf408b5babed53eaa3fb",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02648-100",
+    "prediction_sha256": "2a1ec13ee6263f8b82669f077627735ff33d09ae5ad9059381f7112a2c55d2f0",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02661-100",
+    "prediction_sha256": "09f0f06b0c4ae44c8e5105956426cbb684c4e213e1143cc4f8c1a9053245255a",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02662-100",
+    "prediction_sha256": "bbfac7d56c9c89a2220dc2eba988b416943b24671a045ed2deb833a414c49e7b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02665-100",
+    "prediction_sha256": "e1942963d4977b2f429106dd0e673bba32af9ac815ea9eb351bb81163f1d9edf",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02708-100",
+    "prediction_sha256": "59b5c6d5cb237f97884a33da994a8e60034b1b7d4e14c289dfb7ad7ea85b7ec9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02718-100",
+    "prediction_sha256": "34c7acff7d5e9d9a5f8c318e8e31b0679d5e0f3f6e00483986a23cda3796f299",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02727-100",
+    "prediction_sha256": "e6dcf1ec4505dbc6654e340ced76271ff184088f6633643e972400f435ff05ca",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02739-100",
+    "prediction_sha256": "9b62323f029b4b6d7a2fd5b32f6fcc2c8d0b17189b5a6e4b59ed7fc8e2401b66",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02740-100",
+    "prediction_sha256": "57e37db91334465763e5885954d68f6e1c0a2d1aacdaf39182cf8b5470ea3378",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02742-101",
+    "prediction_sha256": "b6235c0fee7bfd96a7addf5ca01d3f93b1f2d5990873bb1969e0bc8032dd6510",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02745-101",
+    "prediction_sha256": "a3f0a2e56e1c4c78ea0ed53e031c429e4b5d15ddfa68fc62c00d6501a257ad5c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02752-100",
+    "prediction_sha256": "88c48303c399951ec0a10f955ff6756503c909fccc28b3dcd19862d3fa190dac",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02752-101",
+    "prediction_sha256": "b1fe3f5708e89eea0b169f174200036fb972e038b74e7ea159d27145241d1981",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02758-100",
+    "prediction_sha256": "1791e37b5a67d63af50050c92b74bb40b5b280f5f55f2ba9061c10b85b8d5696",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02758-101",
+    "prediction_sha256": "2308f0eb1ba2f32f7d655fe36c9bfa40bc264a7b0ad7f0bef121b666be0535a1",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02764-101",
+    "prediction_sha256": "7008d89ae71669b2d1a495b452eaa17fb73ca17ec8d0a5362095e3c067be19f4",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02765-101",
+    "prediction_sha256": "91b949001b5ef6e7cca1b5ea79e809bb413224453a7866dc9bd6e03e2a998b94",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02769-100",
+    "prediction_sha256": "8e6acf7ab073de3814166c8c26853ea2524e4f3e2fc19cbde3d040b90d588de5",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02769-101",
+    "prediction_sha256": "61ddd56aedc4efca07542e8309bf666fb4f701f93ef8a29638880d3af5daa121",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02774-100",
+    "prediction_sha256": "bdbdf07247498ea831f0401c513ba8e61b6a23580c05878ecfdc87efb5ffc052",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02774-101",
+    "prediction_sha256": "ef524babcb67d3f3fa5c58e3f724b32ba3ce342215212a63792da1f65bff2937",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02780-101",
+    "prediction_sha256": "ba41238fb11da46419b89c5630ff5224d22d426ff2c8873835526dcf91460af2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02782-101",
+    "prediction_sha256": "966d7ff26cd92e83002e8eaeb201696fa38e957ce78cdb9f2e89a35bc5d12139",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02792-100",
+    "prediction_sha256": "cf275c619209e51637a1facb8b257480b9bfe53255eb406a125e37ab2d2457bb",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02796-101",
+    "prediction_sha256": "74e8def5cefb2159dce744a4d8a0c1238968b21278fb9cd5db6155220078b4fb",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02799-100",
+    "prediction_sha256": "baffb077551e6a0cedd84b71d1c43695c44f65637dd5acd9a413eca4a202322b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02802-101",
+    "prediction_sha256": "5293a32134b323942c560d76d5cddd9fa2ce335065221a8b6008439a88c92659",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02803-100",
+    "prediction_sha256": "1e1d33ea791111c657a1ce76d3504e28f1c10013e3b865f1a25289d5b8dac82e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02804-101",
+    "prediction_sha256": "bbcd9a9adb5cb116baf346f8a2f3933a06570927225339e0ca50764b4059f137",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02805-100",
+    "prediction_sha256": "c2b54b30263a8c65bd75b18c4754024e32a6e6984dc7fe89776604aa11727ce1",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02813-100",
+    "prediction_sha256": "2bfe65081738a1b0331e6bf95f1d705ece99bfec1afb105366d9a13edec38e74",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02813-101",
+    "prediction_sha256": "5d34e414f6188cc06514e358d8b37c7b8b6e56ca3f19144ddc182bd7f2d77232",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02817-100",
+    "prediction_sha256": "9f32f65b32cc2c14eaa37c6b5e936641f265f442d55f3294c2dcf4a01cc8660b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02818-100",
+    "prediction_sha256": "68fecaed7f439ae23c38ac8c14d75d47c651e83809aecd0678becd446a52838f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02824-100",
+    "prediction_sha256": "23a65c9d105e1f316204d1e375674c34a2852b6d78b1190d24077be7275d2927",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02827-100",
+    "prediction_sha256": "d96110a72a13d3dd852508a1fbe36e5734b645eb023fcc084fe2d6b216fbcb25",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02828-100",
+    "prediction_sha256": "135387004358afbe7c72205fd3c3c5743b97767fde3454463ba48ce48fb6a4dd",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02830-100",
+    "prediction_sha256": "17ec13fd1b9d16f0d04a8aaac7958e172dccbdb966afb96250c5557e216c1bf4",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02830-101",
+    "prediction_sha256": "b28cdafdad5de9f1de68740990347200ce00bdd63ca7d7631831344e4098c6a2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02833-100",
+    "prediction_sha256": "f9334a72670aaa62369c22256fcfb7e34e9d831c74eb114668dea7c1ddd47be0",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02834-101",
+    "prediction_sha256": "f1929cc09930185f07b23a75c8c02bada3d8e36147d9c9953d8cc9ac084ff49c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02835-100",
+    "prediction_sha256": "b0eedb7349be0bd9e3a7bdb5c0132b0f675ecec414d3f47d7f29284956a593de",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02838-100",
+    "prediction_sha256": "983227cdeb42fc1f1aef30c72f3b1aca56b496ae492e1fc6d5adafcda5000e24",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02838-101",
+    "prediction_sha256": "1ba897f849855da56afac89fbc4868399518792f09a60316affe4ef12c4ee434",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02840-100",
+    "prediction_sha256": "52dd59310b3c474fc9905fc1641c1234ca1d9a62fe3238ea8035a31994ea0a71",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02840-101",
+    "prediction_sha256": "64be2bf2a32e3ae17b6eb8109a8769b4fad18e414e8b4a52e1a7acf53d2678c9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02845-101",
+    "prediction_sha256": "2f2e91be600f4d60372c8f3409639b686f1b73a8656319acabe14985256ba334",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02846-100",
+    "prediction_sha256": "9f028f2ff9728c2f82c2cea8841af2de6340ed9d5a970a15cfe7e20dde10fd32",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02848-100",
+    "prediction_sha256": "b65e196963d9b6f73707b85cd52c3db6af570c5206c92ad61ec7a77343a1e083",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02852-100",
+    "prediction_sha256": "f587c792423d59e08385227515fc64e3c4a96783d811125941cb9a6f639c6fce",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02856-101",
+    "prediction_sha256": "c364572588bb3598f821bf6b9e94be810ad1ddcc0afa8cf492988036a4b207c8",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02857-101",
+    "prediction_sha256": "d2c8cd1728a4f1776d4ccf289c05b0d166918331c9e20a1e1d79fedb266a2d51",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02861-101",
+    "prediction_sha256": "79dd459fe3ed6d9f2ed74926a7760374fe2c94232e76274413219d869077328b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02863-100",
+    "prediction_sha256": "376737e3435c922c5309b90b73ad9b915bdf04c9c67c0ac80d6fbb09f9e0cfe4",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02869-100",
+    "prediction_sha256": "92b0948d92866f483d0d9073b6bbfea3c5c99fa6f3b407bcd798ec7f6b92e1cd",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02871-101",
+    "prediction_sha256": "289db1f02d240e43e2bb4683ed741e46f1703a9bb0724f73660ed59e9d3c4dc9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02873-101",
+    "prediction_sha256": "91905c68927b565c65e2665e47b8667109d53be8cb3bf2a7d3805f994385f045",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02875-100",
+    "prediction_sha256": "4030c0d9bf7edebe8933d3f7db9575a55b2962efab8f7f150b034c3b159b720d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02875-101",
+    "prediction_sha256": "a3ac91eccdf790b0a2daafa41861746db0418fa837d11e12c5e10a0bce1abcc2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02885-101",
+    "prediction_sha256": "a544580338328606f0c93c0358937f0f8ade6fd3243ba36ade1e2c98dd9efdfe",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02886-101",
+    "prediction_sha256": "e82f0e82f510b77d7b797148ca3f6c96fcbc2f4b78a6e941754d81f6629dab49",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02892-100",
+    "prediction_sha256": "606cbfaf7dd2be3b6d226e77991526118141c2492cedb9c6a2b60dee8569cdf9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02897-101",
+    "prediction_sha256": "47b07adf8914cc8a1ba33385385a509ec9ef828204532c01eb6082d75c79f086",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02898-100",
+    "prediction_sha256": "726704ced89b22c71cd9a32e8601515d9461fb7e2c1f9160531f559893423ed4",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02903-101",
+    "prediction_sha256": "5c8a0a246f62360618543fa995d28446f9f0599a1de38d2a130677fee868b40f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02909-101",
+    "prediction_sha256": "4ab305832eff36212d4c12a34f85adba1e394c7ec898352ea04e52f71fe738de",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02916-101",
+    "prediction_sha256": "84cf08559c3d3cc01cb4dc98765daf1c45f96645e2250825429f7810536fa886",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02917-101",
+    "prediction_sha256": "3bb30630d3a9cbc698a09a0631d4d92d2abaf0d976a480dfbe0869833ebfaa94",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02919-100",
+    "prediction_sha256": "b5a985fd9b4309a693e7d56bf2dc99f6d7bd41a35beaf19f98c6c98469db7d12",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02919-101",
+    "prediction_sha256": "7e0aca696843436a64c18c1fccdbd5af7fa46fc8c8785e361ce57af8816f135e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02920-101",
+    "prediction_sha256": "d643412086c91353f926b5946f4d5ed0e7a68678d5f11c78e288b5d3197be27a",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02922-100",
+    "prediction_sha256": "2aeffc72c033d28138bec8a6a7a5961f2e68ec1b9e4f63514c5e87e3cb8ac4e2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02923-100",
+    "prediction_sha256": "18901baa5b368576adb181a8fe240b011a8c70191395e4f4ea564cc92aa0a557",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02924-101",
+    "prediction_sha256": "3c1a3bf9bd6ef8ea4ea12eb2d05c70b7786eb7fb53ef052359159fb34b455c13",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02930-100",
+    "prediction_sha256": "5aa0196de0f96db516537a7e45bcd7826baa8b6a6e56a317252e6c3f2a84b51f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02930-101",
+    "prediction_sha256": "a81e97035701c178002fd6cdfb9bba0bf6db3bc1ec5411289cde2b593a3afc8b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02931-100",
+    "prediction_sha256": "8eb4ff0e06de7ffb428013ccaf57f5357eb579d7c0da66f19ac9a70a81d4ae34",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02933-100",
+    "prediction_sha256": "c629d92415c82e63fdda6e17f0b8d70f1db9dd40ae00edf0b31f60f7b8b07a6f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02933-101",
+    "prediction_sha256": "ed38556d6d61a6c54b25c3b8e8b0a324e3fb2c640c3404a806ac25b82dc092b3",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02934-100",
+    "prediction_sha256": "8a0df3bc8627b5f25b85f5f51aa6e45268ae0fbd868ab9b8a5c0490fc36cced2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02940-101",
+    "prediction_sha256": "079d4fb6aed04f1e2f6013254275c76bdb50c9a005bfdd2fe0ac91846efe0abf",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02943-100",
+    "prediction_sha256": "ace91a9ba9c293c0c00de4f1b4db43ce99c9a32eaad0598159791b71e577c611",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02947-100",
+    "prediction_sha256": "8b34cf00eefeb881c1f6a5d7141917d2a650cb9034c241235941f717b9adf1b9",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02949-100",
+    "prediction_sha256": "feed5132c36401ae82d11478847bc4e54a3feac9f781d0cda496d459af214eb1",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02952-101",
+    "prediction_sha256": "b2342d97904cf8e7d8e79f1835a37b9ae8459535a7029736d8605cebb00c5e19",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02955-101",
+    "prediction_sha256": "7be844d0741946e7f12dda02b8b7d88655b01a9ae9e92c1075fdf02e21e11eb2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02957-100",
+    "prediction_sha256": "4896ab932f91940dc14e1e6263f07ea5fcdafad815dc6096593b563cae75159d",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02958-101",
+    "prediction_sha256": "b3fd0cf74eef48c4887428c5fed80a2de24aa7dc26124f21efb94ff16bf656cf",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02959-100",
+    "prediction_sha256": "a569af23e67b5a20f4ef4886137b0897b5e049ccacf8a0635ef07724ccf9a04f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02962-101",
+    "prediction_sha256": "5275ef961cd13606c6bf3924346854d5c888ac30bd2dbaaf46bf584f0e9bd479",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02965-101",
+    "prediction_sha256": "099b2f2bc0a10c1e3795337e012142763e249986e3156179a7990302990fcb2f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02967-100",
+    "prediction_sha256": "e62585162485134dfea0074e66c4b7b51ea2721d0eda318140cf2d29db1517d7",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02969-100",
+    "prediction_sha256": "bf614bffca2219978c131b5ca5cfb305649d6b7d959c7420ab6c4ac345e2c553",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02970-101",
+    "prediction_sha256": "f167a5f1e5d414e86ac3e7adf2be4d96e78bf00fce3c40f25d095a968883782e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02973-101",
+    "prediction_sha256": "c72fae5ad264a819b5869d0f5c3bd343bb25e6f833df75a64fbf273f4f981234",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02977-100",
+    "prediction_sha256": "5433de161b2063824620606550ea18e0f99e0473f6e0a451f8c24dd59fae3b7e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02982-100",
+    "prediction_sha256": "82c0ae875a1ea150b48ea1ba24711901d066f4a96ee1591793912d27fdbcb232",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02984-100",
+    "prediction_sha256": "6fc405f8c4a9e1f807a4076a0a0af6fa9f33d6fc19b8252e23fd0f3cbf4c995c",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02988-101",
+    "prediction_sha256": "1d4fe8f7acf70e522feb154f4a01868a0cf3bc48d97b913f79a20484f97c6036",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02993-101",
+    "prediction_sha256": "8a2426145849f6595fa1aeb333b841fcfac5fdb0bda8f90ead9ec7dc71a24c10",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02994-101",
+    "prediction_sha256": "5aa1010f04a0f81b50cbb0c25b4ebf3c1727d672d6a692ce238c9654b788e3ae",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-02996-100",
+    "prediction_sha256": "7636d3377d01f48e83884b8b822a8a34e66348feb31497faa1423ab5574c15e4",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03000-101",
+    "prediction_sha256": "65779c422270b02af2e9d1223b5936af80d5056b417970fc8f19fb26a70d6773",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03011-101",
+    "prediction_sha256": "b2f15c6b4677a47dc45c18976f39b3b1fea41f39c66ec239a86b5a8be0ee0e1f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03015-101",
+    "prediction_sha256": "96dab8ddeaa077efcbcba5ec79a908f56009087f10bad11330fbd06cc075bf8b",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03017-101",
+    "prediction_sha256": "15cf2b5a27848c0458d6dbed6c281d0cd478a09001516181a477d76027b094d2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03027-100",
+    "prediction_sha256": "b12b8600865309693e5957de5900981d7acddd51eec7615f7d65c0efb7be6967",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03028-101",
+    "prediction_sha256": "7968d598e199c23618751fba33dc1949ffa012d541def809345b14673570b9dd",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03030-101",
+    "prediction_sha256": "48ce81ec046e4414ef271e27988635da2e1e479b43c2f4088a8c55d218ac8c9e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03031-101",
+    "prediction_sha256": "8b094e680e56e4c891d834cd4f11d5121672281b900b919a03468a4a965bd592",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03051-100",
+    "prediction_sha256": "ad23e232bdc5d5b09e90d89a36cd82ca56af6bb587887873d7945bdb19dad5e5",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03056-100",
+    "prediction_sha256": "7c6ef982c10ecb741440bd1ad3674688ceba4fff6484926ddea7ec418f3f305e",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03056-101",
+    "prediction_sha256": "674eca7479d1acf763f7189d1f3526988e5269b2f1c05497a2b3427f1d86dc6a",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03061-100",
+    "prediction_sha256": "2f7d4c0a4d473d9729c87c74a5035650cbcf8278b4f28f1b46303ee227dc0c7f",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03061-101",
+    "prediction_sha256": "2ebbc6154599fa945606d6821fc5ac815d3940f0202f0a3a30eb4db6554303c2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03061-102",
+    "prediction_sha256": "c2b1a63750aec249dad99b597698c587fa93537d3b91250870c0f3e4422d07e2",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03063-100",
+    "prediction_sha256": "ada18703291b74109fccefc45616107f31c0377dc106fe7418fa8eb3db880d00",
+    "integrity_passed": true
+  },
+  {
+    "case_id": "BraTS-GLI-03064-100",
+    "prediction_sha256": "26296fd210e612cfab588c24c2df25305638ec96621a41c09ec31dc886a9eb6b",
+    "integrity_passed": true
+  }
+]

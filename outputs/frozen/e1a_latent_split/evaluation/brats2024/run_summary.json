@@ -1,0 +1,20 @@
+{
+  "audit_only": false,
+  "requested_case_count": 270,
+  "successfully_exported_cases": 270,
+  "failed_cases": [],
+  "prediction_directory": "/home/friend/BrainTumorSeg/outputs/e1a_latent_split/evaluation/brats2024/predictions",
+  "overlap_audit_completed": true,
+  "official_evaluator_completed": true,
+  "official_output_paths": [
+    "/home/friend/BrainTumorSeg/outputs/e1a_latent_split/evaluation/brats2024/official_metrics.csv",
+    "/home/friend/BrainTumorSeg/outputs/e1a_latent_split/evaluation/brats2024/official_evaluation_summary.json"
+  ],
+  "inference_duration_seconds": 573.7117438860005,
+  "evaluation_duration_seconds": 405.3736988460005,
+  "total_duration_seconds": 1096.7224764700004,
+  "complete_validation_run": true,
+  "dataset_audit_passed": true,
+  "evaluator_audit_passed": true,
+  "prediction_integrity_passed": true
+}

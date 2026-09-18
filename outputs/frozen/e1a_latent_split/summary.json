@@ -1,0 +1,13 @@
+{
+  "total_epochs_completed": 30,
+  "best_epoch": 15,
+  "best_validation_metric": 0.6378065569645434,
+  "final_training_loss": 0.40333884232332584,
+  "final_validation_loss": 0.42630612254142763,
+  "total_run_duration": 27452.334836910013,
+  "train_case_count": 1080,
+  "validation_case_count": 270,
+  "model_parameter_count": 5971716,
+  "best_checkpoint_path": "outputs/e1a_latent_split/best.pt",
+  "latest_checkpoint_path": "outputs/e1a_latent_split/latest.pt"
+}

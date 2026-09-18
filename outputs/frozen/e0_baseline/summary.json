@@ -1,0 +1,13 @@
+{
+  "total_epochs_completed": 30,
+  "best_epoch": 10,
+  "best_validation_metric": 0.6049340746335133,
+  "final_training_loss": 0.4354650547658956,
+  "final_validation_loss": 0.4067133651563415,
+  "total_run_duration": 30227.638991108048,
+  "train_case_count": 1080,
+  "validation_case_count": 270,
+  "model_parameter_count": 5840132,
+  "best_checkpoint_path": "outputs/baseline_unet3d_full/best.pt",
+  "latest_checkpoint_path": "outputs/baseline_unet3d_full/latest.pt"
+}

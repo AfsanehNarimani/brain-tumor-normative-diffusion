@@ -1,0 +1,88 @@
+{
+  "dataset_name": "BraTS 2024 Adult Glioma Post-Treatment",
+  "declared_dataset_release": "v2",
+  "data_root": "/home/friend/data/training_data1_v2",
+  "release_authentication": "Declared identity only; no publisher-signed manifest was supplied.",
+  "expected_total_case_count": 1350,
+  "expected_train_case_count": 1080,
+  "expected_validation_case_count": 270,
+  "expected_modalities": [
+    "t1n",
+    "t1c",
+    "t2w",
+    "t2f",
+    "seg"
+  ],
+  "expected_label_values": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "missing_files": [],
+  "unexpected_files": [],
+  "geometry_mismatches": [],
+  "segmentation_errors": [],
+  "file_errors": [],
+  "duplicate_physical_cases": [],
+  "audit_passed": true,
+  "full_content_hashing": false,
+  "leakage_audit_scope": "Case-ID overlap and physical-directory alias checks only; patient-level independence is not verified.",
+  "fingerprint_scope": "structure/metadata identity (relative paths and sizes); NOT byte-level verification",
+  "train_split_path": "/home/friend/BrainTumorSeg/splits/train_cases.txt",
+  "train_split_sha256": "581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e",
+  "train_normalized_ids_sha256": "581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e",
+  "validation_split_path": "/home/friend/BrainTumorSeg/splits/val_cases.txt",
+  "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+  "validation_normalized_ids_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+  "duplicate_case_ids": {
+    "train": [],
+    "validation": []
+  },
+  "discovered_total_case_count": 1350,
+  "train_case_count": 1080,
+  "validation_case_count": 270,
+  "train_validation_intersection_count": 0,
+  "train_validation_union_count": 1350,
+  "overlapping_case_ids": [],
+  "missing_expected_cases": [],
+  "unexpected_cases": [],
+  "observed_filename_patterns": [
+    "<case>-seg.nii.gz",
+    "<case>-t1c.nii.gz",
+    "<case>-t1n.nii.gz",
+    "<case>-t2f.nii.gz",
+    "<case>-t2w.nii.gz"
+  ],
+  "observed_global_label_values": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "per_label_case_presence": {
+    "NETC": 565,
+    "SNFH": 1350,
+    "ET": 990,
+    "RC": 1150
+  },
+  "unique_shapes": [
+    [
+      182,
+      218,
+      182
+    ]
+  ],
+  "unique_voxel_spacings": [
+    [
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "geometry_mismatch_count": 0,
+  "manifest_sha256": "60e828597db4722e2df14fa41f513a26b9da274ef0fd0273571919e9c658dfd7",
+  "errors": []
+}
