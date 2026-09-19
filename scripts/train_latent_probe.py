@@ -1,4 +1,4 @@
-"""Train one E1-A frozen bottleneck accessibility probe; no E1-A updates."""
+"""Train a frozen E1-A or E1-B bottleneck accessibility probe."""
 import argparse
 import csv
 import hashlib
@@ -16,7 +16,7 @@ from evaluation.metrics import VALIDATION_METRIC_FIELDS, best_validation_metric
 from evaluation.tiled import validate
 from losses.segmentation_loss import SegmentationLoss
 from models.latent_probe import (FrozenLatentProbe, LatentProbeDecoder3D,
-                                 PROBE_ARCHITECTURE, SOURCE_SHA256, load_source, file_sha256)
+                                 PROBE_ARCHITECTURE, load_source, file_sha256)
 from scripts.train_baseline import make_dataset, seed_worker, synchronize
 from training.artifacts import environment_metadata, write_json
 from training.trainer import train_epoch
@@ -24,6 +24,11 @@ from training.trainer import train_epoch
 SELECTION_METRIC = "mean target-positive case Dice over NETC,SNFH,ET,RC,WT,TC; exclude regions with zero positive cases"
 FIELDS = ["epoch", "training_loss", "validation_loss", *VALIDATION_METRIC_FIELDS,
           "learning_rate", "epoch_duration_seconds", "training_duration_seconds", "validation_duration_seconds"]
+CONFIG_PAIRS = {
+    "e1a": ("configs/probe_anatomy.yaml", "configs/probe_disease.yaml"),
+    "e1b": ("configs/e1b_probe_anatomy.yaml", "configs/e1b_probe_disease.yaml"),
+}
+CONFIG_CHOICES = tuple(path for pair in CONFIG_PAIRS.values() for path in pair)
 
 
 def read_config(path):
@@ -39,11 +44,30 @@ def validate_pair(anatomy="configs/probe_anatomy.yaml", disease="configs/probe_d
         if config.get("latent_source") != source:
             raise ValueError("Probe config latent_source mismatch")
     ignore = {"experiment_name", "latent_source", "output_dir"}
+    a_experiment, d_experiment = a.get("source_experiment", "e1a"), d.get("source_experiment", "e1a")
+    if a_experiment != d_experiment:
+        raise ValueError("Anatomy and disease probes must use the same source experiment")
     if {k: v for k, v in a.items() if k not in ignore} != {k: v for k, v in d.items() if k not in ignore}:
         raise ValueError("Anatomy and disease protocol/config differ")
     if Path(a["output_dir"]).resolve() == Path(d["output_dir"]).resolve():
         raise ValueError("Probe output directories must be isolated")
     return a, d
+
+
+def select_config(path):
+    """Select one of the four supported protocols by exact configured path."""
+    selected = Path(path).resolve()
+    for experiment, pair in CONFIG_PAIRS.items():
+        for latent_source, candidate in zip(("anatomy", "disease"), pair):
+            if selected == Path(candidate).resolve():
+                config = read_config(candidate)
+                if config.get("latent_source") != latent_source:
+                    raise ValueError("Probe config latent_source mismatch")
+                if config.get("source_experiment", "e1a") != experiment:
+                    raise ValueError("Probe config source_experiment mismatch")
+                validate_pair(*pair)
+                return config
+    raise ValueError(f"Unsupported probe config: {path}")
 
 
 def save_probe_checkpoint(path, model, optimizer, epoch, best_metric, best_epoch, config, source_info):
@@ -53,7 +77,9 @@ def save_probe_checkpoint(path, model, optimizer, epoch, best_metric, best_epoch
     torch.save(dict(probe=model.probe.state_dict(), optimizer=optimizer.state_dict(), epoch=epoch,
                     best_metric=best_metric, best_epoch=best_epoch, config=config,
                     probe_architecture=PROBE_ARCHITECTURE, latent_source=model.latent_source,
-                    source_checkpoint={k: source_info[k] for k in ("path", "sha256", "epoch")}), temporary)
+                    source_checkpoint={k: source_info[k] for k in
+                                       ("path", "sha256", "epoch", "experiment", "model")
+                                       if k in source_info}), temporary)
     temporary.replace(path)
 
 
@@ -61,24 +87,25 @@ def load_probe_checkpoint(path, model, optimizer, config, source_info):
     state = torch.load(path, map_location="cpu", weights_only=True)
     expected_source = state["source_checkpoint"]
     if not Path(expected_source["path"]).is_file():
-        raise FileNotFoundError(f"Frozen E1-A source missing: {expected_source['path']}")
+        raise FileNotFoundError(f"Frozen source missing: {expected_source['path']}")
     if file_sha256(expected_source["path"]) != expected_source["sha256"]:
-        raise ValueError("Frozen E1-A source SHA256 mismatch")
+        raise ValueError("Frozen source SHA256 mismatch")
+    actual_source = {key: source_info.get(key) for key in expected_source}
     if (state["config"] != config or state["latent_source"] != model.latent_source
             or state["probe_architecture"] != PROBE_ARCHITECTURE
-            or state["source_checkpoint"] != {k: source_info[k] for k in ("path", "sha256", "epoch")}):
+            or state["source_checkpoint"] != actual_source):
         raise ValueError("Probe resume config, architecture, latent, or frozen source identity mismatch")
     # Check again at resume/evaluation time, including if the file changed since construction.
     if not Path(source_info["path"]).is_file() or file_sha256(source_info["path"]) != source_info["sha256"]:
-        raise ValueError("Frozen E1-A source missing or SHA256 mismatch")
+        raise ValueError("Frozen source missing or SHA256 mismatch")
     model.probe.load_state_dict(state["probe"], strict=True)
     if optimizer is not None:
         optimizer.load_state_dict(state["optimizer"])
     return state
 
 
-def run(config, *, resume=None, epochs=None, device=None, source_sha256=SOURCE_SHA256,
-        source_epoch=15):
+def run(config, *, resume=None, epochs=None, device=None, source_sha256=None,
+        source_epoch=None):
     config = dict(config)
     source_path = Path(config["source_checkpoint"]).expanduser().resolve()
     output = Path(config["output_dir"]).expanduser().resolve()
@@ -94,7 +121,9 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=SOURCE_S
     torch.manual_seed(seed)
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
-    source, source_info = load_source(source_path, expected_sha256=source_sha256, expected_epoch=source_epoch)
+    source_experiment = config.get("source_experiment", "e1a")
+    source, source_info = load_source(source_path, source_experiment=source_experiment,
+                                      expected_sha256=source_sha256, expected_epoch=source_epoch)
     model = FrozenLatentProbe(source, config["latent_source"])
     active_device = device or config["device"]
     model.to(active_device)
@@ -133,6 +162,9 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=SOURCE_S
                     selection_metric=SELECTION_METRIC, environment=environment)
     if state:
         previous = yaml.safe_load((output / "config.yaml").read_text())
+        previous_source = previous.get("source_checkpoint_info", {})
+        if source_experiment == "e1a" and "experiment" not in previous_source:
+            previous_source.update(experiment="e1a", model="latent_split_unet3d")
         if {k: v for k, v in previous.items() if k != "environment"} != {k: v for k, v in metadata.items() if k != "environment"}:
             raise ValueError("Resume artifact metadata mismatch")
     else:
@@ -182,14 +214,12 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=SOURCE_S
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", required=True, choices=["configs/probe_anatomy.yaml", "configs/probe_disease.yaml"])
+    parser.add_argument("--config", required=True, choices=CONFIG_CHOICES)
     parser.add_argument("--resume")
     parser.add_argument("--epochs", type=int)
     parser.add_argument("--device")
     args = parser.parse_args()
-    anatomy, disease = validate_pair()
-    run(anatomy if "anatomy" in args.config else disease,
-        resume=args.resume, epochs=args.epochs, device=args.device)
+    run(select_config(args.config), resume=args.resume, epochs=args.epochs, device=args.device)
 
 
 if __name__ == "__main__":

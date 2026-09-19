@@ -1,0 +1,15 @@
+experiment_name: E1-B anatomy/background latent pathology-accessibility probe
+source_experiment: e1b
+latent_source: anatomy
+output_dir: outputs/e1b_probes/anatomy
+source_checkpoint: outputs/e1b_joint_reconstruction/best.pt
+data_config: configs/data.yaml
+epochs: 30
+batch_size: 4
+learning_rate: 0.001
+weight_decay: 0.00001
+seed: 42
+num_workers: 4
+device: cuda
+validation_frequency: 1
+threshold: 0.5
