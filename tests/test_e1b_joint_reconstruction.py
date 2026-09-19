@@ -135,7 +135,7 @@ def test_e1b_config_keeps_e1a_training_conventions_and_unselected_lambda():
     for key in ('epochs', 'batch_size', 'learning_rate', 'weight_decay', 'seed',
                 'num_workers', 'device', 'validation_frequency', 'threshold'):
         assert e1b[key] == e1a[key]
-    assert e1b['reconstruction'] == {'enabled': True, 'loss_type': 'L1', 'lambda_rec': None}
+    assert e1b['reconstruction'] == {'enabled': True, 'loss_type': 'L1', 'lambda_rec': 1.0}
     assert e1b['segmentation_loss'] == 'Dice+BCE'
     data = read_config('configs/data.yaml')
     assert all(data[key] == value for key, value in e1b['data_protocol'].items())
