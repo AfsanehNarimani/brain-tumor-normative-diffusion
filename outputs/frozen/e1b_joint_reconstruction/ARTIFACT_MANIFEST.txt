@@ -1,0 +1,81 @@
+E1-B Joint Reconstruction — Frozen Scientific Artifact Manifest
+================================================================
+
+Experiment:
+E1-B Joint Reconstruction
+
+Model:
+joint_reconstruction_unet3d
+
+Selected checkpoint:
+best.pt
+
+Best epoch:
+13
+
+Best validation metric:
+0.6357437485995727
+
+Evaluation:
+Internal fixed-split full-volume presence-aware evaluation
+
+Evaluation case count:
+270
+
+Evaluation threshold:
+0.5
+
+Evaluation mean validation metric:
+0.6357434887473873
+
+Training/evaluation code commit:
+9fe2aa11e7b1d6b5938a7ebe8dc34d4c5116239d
+
+Validation split SHA256:
+ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca
+
+Train split SHA256:
+581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e
+
+Server evaluation Git state:
+dirty
+
+Reason:
+The only server-local Git modification was configs/data.yaml,
+where the dataset root was changed from the repository default
+
+~/datasets/BraTS2024/train/training_data1_v2
+
+to the machine-specific server path
+
+/home/friend/data/training_data1_v2
+
+No scientific preprocessing, split, augmentation, model, loss,
+threshold, or evaluation setting was changed by this override.
+
+Frozen artifact SHA256
+----------------------
+
+best.pt
+142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606
+
+config.yaml
+7a08176f0644ca2c5e1efdcf0de0f569511e780a00f510192892f6703ca2b3c6
+
+environment.json
+612626740ef5cb3f5b4c0d1b4317a2654fc17cd4e17f58e3378ac343a15b74d0
+
+history.csv
+185ff6a20830a5aab9538267cd9668d847cc408ecc1858f30ad003e8d42aadc0
+
+summary.json
+f554a84cec21c0416997a7e52afd029bc1c740315136e3b3ec63b6a969041265
+
+evaluation/per_case_metrics.csv
+f80bba75f63d26af9e8f0e8ebe8bbeda1deff75b1d65f5eaf32891805abc4502
+
+evaluation/aggregate_metrics.json
+27e7767fddd63ffac31b2d2ce340913ed42b1b1ecfbdf8c8a3380f72b06ecffa
+
+evaluation/evaluation_provenance.json
+536f6a0a4cc135f723f331be25fc17e579631c4c09e9efce2728c9854b373af1

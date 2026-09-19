@@ -1,0 +1,14 @@
+{
+  "python_version": "3.11.10",
+  "pytorch_version": "2.14.0+cu130",
+  "cuda_version": "13.0",
+  "cuda_available": true,
+  "gpu_name": "NVIDIA GeForce RTX 3090",
+  "mps_available": false,
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "hostname": "67b7338b8671",
+  "trainable_parameter_count": 8599304,
+  "timestamp": "2026-09-18T19:07:41.119290+00:00",
+  "git_commit": "09efe55eda1499af84be4861501157d80ef7fd0b",
+  "git_dirty": true
+}

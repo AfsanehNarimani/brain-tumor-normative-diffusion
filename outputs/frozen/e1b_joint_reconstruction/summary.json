@@ -1,0 +1,12 @@
+{
+  "total_epochs_completed": 30,
+  "best_epoch": 13,
+  "best_validation_metric": 0.6357437485995727,
+  "final_total_loss": 0.7261904677445138,
+  "final_segmentation_loss": 0.4880616773540775,
+  "final_reconstruction_loss": 0.23812879119758254,
+  "lambda_rec": 1.0,
+  "train_case_count": 1080,
+  "validation_case_count": 270,
+  "total_run_duration": 34067.739073206
+}

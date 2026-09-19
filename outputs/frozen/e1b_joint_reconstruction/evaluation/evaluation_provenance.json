@@ -1,0 +1,48 @@
+{
+  "experiment": "E1-B joint reconstruction",
+  "checkpoint_path": "/home/friend/BrainTumorSeg/outputs/e1b_joint_reconstruction/best.pt",
+  "checkpoint_sha256": "142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606",
+  "checkpoint_epoch": 13,
+  "checkpoint_best_epoch": 13,
+  "checkpoint_best_metric": 0.6357437485995727,
+  "seed": 42,
+  "lambda_rec": 1.0,
+  "threshold": 0.5,
+  "validation_case_count": 270,
+  "validation_split_path": "/home/friend/BrainTumorSeg/splits/val_cases.txt",
+  "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+  "data_config_path": "/home/friend/BrainTumorSeg/configs/data.yaml",
+  "data_config_sha256": "b7b620393635ce091231e166b79a3bc6f39388526dd312f5c7df7b83c61c4b99",
+  "model_identity": "joint_reconstruction_unet3d",
+  "model_config": {
+    "name": "joint_reconstruction_unet3d",
+    "in_channels": 4,
+    "out_channels": 4,
+    "base_channels": 32,
+    "latent_projection": "conv1x1x1",
+    "latent_channels": 256
+  },
+  "evaluation_settings": {
+    "tile_size": [
+      96,
+      96,
+      96
+    ],
+    "segmentation_output": "segmentation_only raw logits",
+    "protocol": "internal presence-aware Dice"
+  },
+  "evaluation_command": "python -m scripts.evaluate_e1b --checkpoint /home/friend/BrainTumorSeg/outputs/e1b_joint_reconstruction/best.pt --data-config /home/friend/BrainTumorSeg/configs/data.yaml --device cuda --output-dir /home/friend/BrainTumorSeg/outputs/e1b_joint_reconstruction/evaluation --expected-checkpoint-sha256 142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606",
+  "git_commit_sha": "9fe2aa11e7b1d6b5938a7ebe8dc34d4c5116239d",
+  "git_dirty": true,
+  "git_status_short": [
+    " M configs/data.yaml"
+  ],
+  "python_version": "3.11.10",
+  "pytorch_version": "2.14.0+cu130",
+  "device_requested": "cuda",
+  "cuda_available": true,
+  "cuda_version": "13.0",
+  "cuda_device_name": "NVIDIA GeForce RTX 3090",
+  "per_case_metrics_sha256": "f80bba75f63d26af9e8f0e8ebe8bbeda1deff75b1d65f5eaf32891805abc4502",
+  "aggregate_metrics_sha256": "27e7767fddd63ffac31b2d2ce340913ed42b1b1ecfbdf8c8a3380f72b06ecffa"
+}
