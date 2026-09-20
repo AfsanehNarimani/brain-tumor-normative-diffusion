@@ -86,3 +86,87 @@ Resume checkpoint retained outside frozen Git archive
 -----------------------------------------------------
 latest.pt SHA256:
 1291c1a8e58e0eb482a570791d6f45a071cc1f5b618dc8e71d7da4b1da428c1b
+
+Independent full-volume evaluation
+----------------------------------
+Evaluation type: internal fixed-split full-volume evaluation
+Official BraTS challenge evaluation: no
+Validation cases: 270
+Unique cases: 270
+Duplicate cases: 0
+Threshold: 0.5
+Tile size: 96 x 96 x 96
+
+Evaluator code commit:
+4fea26a8f93fe4fc9b074ba0265159eb96c773b0
+
+Probe checkpoint epoch: 28
+Probe checkpoint SHA256:
+45815cb293dad6cf38b999caa06d73a730696f43a1ff46fc47cee8a887d641da
+
+Frozen E1-B source epoch: 13
+Frozen E1-B source SHA256:
+142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606
+
+Validation split SHA256:
+ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca
+
+Data config SHA256:
+b7b620393635ce091231e166b79a3bc6f39388526dd312f5c7df7b83c61c4b99
+
+Independent evaluation mean validation metric:
+0.44591266641479027
+
+Presence-aware evaluation
+-------------------------
+Region  Positive cases  Case Dice           Dataset Dice
+NETC    114             0.19499980243563186 0.2240937842536287
+SNFH    270             0.6504866892411546  0.7057175022104685
+ET      198             0.26501955655185894 0.4105056766815775
+RC      230             0.5655150123962971  0.6870189743893601
+WT      270             0.7040040128204661  0.7731216118290253
+TC      200             0.295450925043333   0.4549372017791754
+
+Per-case audit
+--------------
+Rows: 270
+Unique case IDs: 270
+Duplicate case IDs: 0
+
+Target-present counts:
+NETC: 114
+SNFH: 270
+ET: 198
+RC: 230
+WT: 270
+TC: 200
+
+For target-absent regions, the per-case Dice field is empty rather than being
+assigned an artificial Dice of 1.0. This is consistent with the project's
+presence-aware evaluation protocol.
+
+Evaluation environment / repository state
+-----------------------------------------
+Git commit:
+4fea26a8f93fe4fc9b074ba0265159eb96c773b0
+
+The evaluation working tree was dirty only because configs/data.yaml contained
+the server-local dataset root. This machine-specific path was intentionally
+not committed.
+
+Python: 3.11.10
+PyTorch: 2.14.0+cu130
+NumPy: 2.2.6
+nibabel: 5.4.2
+Requested device: cuda
+
+Evaluation artifact SHA256
+--------------------------
+evaluation/per_case_metrics.csv
+55e657b7671712291fe1ef2d671240b397b82b3de0eb745972f23f03fc14d7a9
+
+evaluation/aggregate_metrics.json
+4699f248424b120c635c3d1edfff474cae988fd85a9d0cdebf278d338bd62287
+
+evaluation/evaluation_provenance.json
+56aedfc34881b9b7f8aa18f88301cc8af086c91fc23fad8ee3c52caee02dd147
