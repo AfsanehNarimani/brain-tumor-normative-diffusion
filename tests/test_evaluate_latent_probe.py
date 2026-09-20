@@ -34,7 +34,8 @@ def setup_evaluation(tmp_path, monkeypatch):
     data_config = {"val_cases": str(split), "patch_size": [8, 9, 10]}
     read_config = MagicMock(side_effect=lambda path: data_config if Path(path) == data_path else config)
     monkeypatch.setattr(script, "read_config", read_config)
-    source_info = {"path": str(source.resolve()), "sha256": file_sha256(source), "epoch": 15}
+    source_info = {"path": str(source.resolve()), "sha256": file_sha256(source), "epoch": 15,
+                   "experiment": "e1a", "model": "latent_split_unet3d"}
     load_source = MagicMock(return_value=(object(), source_info))
     monkeypatch.setattr(script, "load_source", load_source)
     model = MagicMock()
@@ -72,6 +73,33 @@ def test_latent_source_mismatch_is_rejected(setup_evaluation):
     with pytest.raises(ValueError, match="latent_source mismatch"):
         script.evaluate("configs/probe_anatomy.yaml")
     setup_evaluation["load_source"].assert_not_called()
+
+
+def test_source_experiment_mismatch_is_rejected(setup_evaluation):
+    setup_evaluation["config"]["source_experiment"] = "e1b"
+    with pytest.raises(ValueError, match="source_experiment mismatch"):
+        script.evaluate("configs/probe_anatomy.yaml")
+    setup_evaluation["load_source"].assert_not_called()
+
+
+def test_loaded_source_identity_mismatch_is_rejected(setup_evaluation):
+    setup_evaluation["source_info"]["experiment"] = "e1b"
+    with pytest.raises(ValueError, match="source experiment identity mismatch"):
+        script.evaluate("configs/probe_anatomy.yaml")
+    setup_evaluation["load_checkpoint"].assert_not_called()
+
+    setup_evaluation["source_info"].update(experiment="e1a", model="joint_reconstruction_unet3d")
+    with pytest.raises(ValueError, match="source model identity mismatch"):
+        script.evaluate("configs/probe_anatomy.yaml")
+    setup_evaluation["load_checkpoint"].assert_not_called()
+
+
+def test_unsupported_config_is_rejected_even_with_supported_basename(setup_evaluation, tmp_path):
+    unsupported = tmp_path / "probe_anatomy.yaml"
+    unsupported.write_text("latent_source: anatomy\n")
+    with pytest.raises(ValueError, match="Unsupported probe config"):
+        script.evaluate(unsupported)
+    setup_evaluation["read_config"].assert_not_called()
 
 
 def test_validation_split_and_dataset_must_each_have_270_cases(setup_evaluation):
@@ -123,7 +151,7 @@ def test_strict_loading_full_dataset_artifacts_and_provenance(setup_evaluation):
     values = setup_evaluation
     result = script.evaluate("configs/probe_anatomy.yaml", save_predictions=["case-001"])
     assert result == {"case_count": 270}
-    values["load_source"].assert_called_once_with(values["source"].resolve())
+    values["load_source"].assert_called_once_with(values["source"].resolve(), source_experiment="e1a")
     values["construct_model"].assert_called_once_with(values["load_source"].return_value[0], "anatomy")
     values["load_checkpoint"].assert_called_once_with(
         values["checkpoint"].resolve(), values["model"], None,
@@ -138,6 +166,8 @@ def test_strict_loading_full_dataset_artifacts_and_provenance(setup_evaluation):
     provenance = json.loads((values["checkpoint"].parent / "evaluation" /
                              "evaluation_provenance.json").read_text())
     assert provenance["latent_source"] == "anatomy"
+    assert provenance["source_experiment"] == "e1a"
+    assert provenance["source_model_identity"] == "latent_split_unet3d"
     assert provenance["probe_checkpoint_sha256"] == file_sha256(values["checkpoint"])
     assert provenance["validation_split_sha256"] == file_sha256(values["split"])
     assert provenance["data_config_sha256"] == file_sha256(values["data_path"])
@@ -145,6 +175,33 @@ def test_strict_loading_full_dataset_artifacts_and_provenance(setup_evaluation):
     assert provenance["probe_checkpoint_best_epoch"] == 10
     assert provenance["probe_architecture"] == PROBE_ARCHITECTURE
     assert provenance["git_dirty"] is True
+
+
+@pytest.mark.parametrize(("config_path", "experiment", "latent_source", "model_identity"), [
+    ("configs/probe_anatomy.yaml", "e1a", "anatomy", "latent_split_unet3d"),
+    ("configs/probe_disease.yaml", "e1a", "disease", "latent_split_unet3d"),
+    ("configs/e1b_probe_anatomy.yaml", "e1b", "anatomy", "joint_reconstruction_unet3d"),
+    ("configs/e1b_probe_disease.yaml", "e1b", "disease", "joint_reconstruction_unet3d"),
+])
+def test_explicit_supported_protocols(setup_evaluation, config_path, experiment,
+                                      latent_source, model_identity):
+    values = setup_evaluation
+    values["config"]["latent_source"] = latent_source
+    values["model"].latent_source = latent_source
+    values["state"]["latent_source"] = latent_source
+    if experiment == "e1b":
+        values["config"]["source_experiment"] = "e1b"
+        values["source_info"].update(experiment="e1b", model=model_identity, epoch=13)
+    assert script.evaluate(config_path) == {"case_count": 270}
+    values["load_source"].assert_called_once_with(values["source"].resolve(),
+                                                   source_experiment=experiment)
+    values["construct_model"].assert_called_once_with(
+        values["load_source"].return_value[0], latent_source)
+    provenance = json.loads((values["checkpoint"].parent / "evaluation" /
+                             "evaluation_provenance.json").read_text())
+    assert provenance["source_experiment"] == experiment
+    assert provenance["source_model_identity"] == model_identity
+    assert provenance["latent_source"] == latent_source
 
 
 @pytest.mark.parametrize("name", script.EVALUATION_FILES)

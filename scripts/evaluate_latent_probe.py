@@ -1,4 +1,4 @@
-"""Evaluate one frozen E1-A latent probe on the fixed paired validation split."""
+"""Evaluate one frozen E1-A or E1-B probe on the fixed validation split."""
 
 import argparse
 from pathlib import Path
@@ -16,7 +16,13 @@ from scripts.train_latent_probe import load_probe_checkpoint, read_config
 from training.artifacts import write_json
 
 
-CONFIG_CHOICES = ("configs/probe_anatomy.yaml", "configs/probe_disease.yaml")
+CONFIG_PROTOCOLS = {
+    "configs/probe_anatomy.yaml": ("e1a", "anatomy", "latent_split_unet3d"),
+    "configs/probe_disease.yaml": ("e1a", "disease", "latent_split_unet3d"),
+    "configs/e1b_probe_anatomy.yaml": ("e1b", "anatomy", "joint_reconstruction_unet3d"),
+    "configs/e1b_probe_disease.yaml": ("e1b", "disease", "joint_reconstruction_unet3d"),
+}
+CONFIG_CHOICES = tuple(CONFIG_PROTOCOLS)
 EVALUATION_FILES = ("per_case_metrics.csv", "aggregate_metrics.json", "evaluation_provenance.json")
 
 
@@ -49,15 +55,24 @@ def git_provenance():
     }
 
 
+def resolve_protocol(config_path):
+    """Resolve only an explicitly supported config, without filename inference."""
+    resolved = Path(config_path).resolve()
+    for supported, protocol in CONFIG_PROTOCOLS.items():
+        if resolved == Path(supported).resolve():
+            return protocol
+    raise ValueError(f"Unsupported probe config: {config_path}")
+
+
 def evaluate(config_path, *, checkpoint=None, device=None, output_dir=None, save_predictions=()):
     config_path = Path(config_path)
-    expected_sources = {"probe_anatomy.yaml": "anatomy", "probe_disease.yaml": "disease"}
-    if config_path.name not in expected_sources:
-        raise ValueError(f"Unsupported probe config: {config_path}")
-    expected_latent = expected_sources[config_path.name]
+    expected_experiment, expected_latent, expected_model = resolve_protocol(config_path)
     config = read_config(config_path)
     if config.get("latent_source") != expected_latent:
         raise ValueError("Probe config latent_source mismatch")
+    resolved_experiment = config.get("source_experiment", "e1a")
+    if resolved_experiment != expected_experiment:
+        raise ValueError("Probe config source_experiment mismatch")
 
     checkpoint_path, output = resolve_paths(config, checkpoint, output_dir)
     source_path = Path(config["source_checkpoint"]).expanduser().resolve()
@@ -72,7 +87,11 @@ def evaluate(config_path, *, checkpoint=None, device=None, output_dir=None, save
     if len(validation_ids) != 270:
         raise ValueError(f"Expected exactly 270 validation IDs; found {len(validation_ids)}")
 
-    source, source_info = load_source(source_path)
+    source, source_info = load_source(source_path, source_experiment=resolved_experiment)
+    if source_info.get("experiment") != resolved_experiment:
+        raise ValueError("Loaded frozen source experiment identity mismatch")
+    if source_info.get("model") != expected_model:
+        raise ValueError("Loaded frozen source model identity mismatch")
     model = FrozenLatentProbe(source, config["latent_source"])
     saved_config = {key: value for key, value in config.items() if key != "epochs"}
     state = load_probe_checkpoint(checkpoint_path, model, None, saved_config, source_info)
@@ -111,6 +130,8 @@ def evaluate(config_path, *, checkpoint=None, device=None, output_dir=None, save
                                 tile_size, save_predictions)
 
     provenance = {
+        "source_experiment": source_info["experiment"],
+        "source_model_identity": source_info["model"],
         "latent_source": config["latent_source"],
         "probe_checkpoint": str(checkpoint_path),
         "probe_checkpoint_sha256": file_sha256(checkpoint_path),
