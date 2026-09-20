@@ -1,0 +1,33 @@
+{
+  "experiment": "E1-C anatomy/background reconstruction constraint",
+  "lambda_rec": 1.0,
+  "lambda_anat": 0.5,
+  "selection_stage": "pre-training",
+  "validation_performance_used_for_selection": false,
+  "diagnostic": {
+    "batch_count": 10,
+    "reference_lambda_rec": 1.0,
+    "reference_lambda_anat": 1.0,
+    "verified_mean_losses_and_fractions": {
+      "segmentation_loss": 1.762925,
+      "reconstruction_loss": 0.571010,
+      "anatomy_loss": 0.552752,
+      "abnormal_voxel_fraction": 0.083534,
+      "non_abnormal_voxel_fraction": 0.916466
+    }
+  },
+  "selected_weight_analysis": {
+    "weighted_anatomy_contribution": 0.276376,
+    "weighted_anatomy_to_segmentation_loss_ratio": 0.1567712750116993,
+    "weighted_anatomy_to_reconstruction_loss_ratio": 0.48401253918495296
+  },
+  "scientific_caveats": [
+    "The valid mask raw_mask == 0 includes non-annotated brain and image background.",
+    "The auxiliary objective is a non-abnormal anatomy/background reconstruction constraint; it is not a pseudo-healthy target.",
+    "This constraint does not prove pathology exclusion from the anatomy/background representation Za.",
+    "Za is not yet a normative latent.",
+    "Latent-probe evaluation remains required."
+  ],
+  "implementation_provenance_fix_commit": "1237d7383c4a2b64956adb88babc1bb5de16a56c",
+  "diagnostic_artifact_note": "The original server diagnostic JSON will be transferred separately so its exact bytes and SHA256 can be preserved."
+}

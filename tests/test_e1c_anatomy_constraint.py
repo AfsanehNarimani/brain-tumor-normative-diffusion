@@ -203,7 +203,7 @@ def test_e1c_config_is_minimum_difference_from_e1b():
                 'segmentation_loss', 'data_protocol'):
         assert e1c[key] == e1b[key]
     assert e1c['reconstruction'] == e1b['reconstruction']
-    assert e1c['anatomy_reconstruction']['lambda_anat'] is None
+    assert e1c['anatomy_reconstruction']['lambda_anat'] == 0.5
     assert read_config('configs/model_e1c.yaml')['name'] == \
         'anatomy_constrained_joint_reconstruction_unet3d'
 

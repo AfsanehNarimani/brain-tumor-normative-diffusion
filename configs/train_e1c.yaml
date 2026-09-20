@@ -33,4 +33,4 @@ anatomy_reconstruction:
   target: observed normalized MRI
   loss_type: masked L1
   valid_mask: raw_mask == 0
-  lambda_anat: null
+  lambda_anat: 0.5
