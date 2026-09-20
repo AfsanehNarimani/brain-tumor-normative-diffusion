@@ -75,3 +75,78 @@ The E1-B Z_a and Z_d probes use the same batch size (4) and controlled
 probe protocol, allowing their paired E1-B comparison. Direct numerical
 comparison with E1-A probe training is confounded by the different probe
 batch size used in E1-A.
+
+Independent full-volume evaluation
+----------------------------------
+Evaluation type: internal fixed-split full-volume evaluation
+Official BraTS challenge evaluation: no
+Validation cases: 270
+Unique cases: 270
+Duplicate cases: 0
+Threshold: 0.5
+Tile size: 96 x 96 x 96
+
+Evaluator code commit:
+4fea26a8f93fe4fc9b074ba0265159eb96c773b0
+
+Probe checkpoint epoch: 29
+Probe checkpoint SHA256:
+7462fcfdd6116033764efd2c827a0d9ff42ca7acf2f1a73d47f899b101fb05d6
+
+Frozen E1-B source epoch: 13
+Frozen E1-B source SHA256:
+142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606
+
+Validation split SHA256:
+ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca
+
+Independent evaluation mean validation metric:
+0.446649144479255
+
+Presence-aware evaluation
+-------------------------
+Region  Positive cases  Case Dice           Dataset Dice
+NETC    114             0.1975589947237096  0.23398141661665198
+SNFH    270             0.6458358089543051  0.6991090205334491
+ET      198             0.27201140701120063 0.4094281286706741
+RC      230             0.5649341420685549  0.6928458341603904
+WT      270             0.7001165608565013  0.7679518794427681
+TC      200             0.2994379532612584  0.46226654030872033
+
+Per-case audit
+--------------
+Rows: 270
+Unique case IDs: 270
+Duplicate case IDs: 0
+
+Target-present counts:
+NETC: 114
+SNFH: 270
+ET: 198
+RC: 230
+WT: 270
+TC: 200
+
+For target-absent regions, per-case Dice is excluded from the
+presence-aware case-level metric rather than being assigned an artificial
+Dice of 1.0.
+
+Evaluation environment / repository state
+-----------------------------------------
+Git commit:
+4fea26a8f93fe4fc9b074ba0265159eb96c773b0
+
+The evaluation working tree was dirty only because configs/data.yaml contained
+the server-local dataset root. This machine-specific path was intentionally
+not committed.
+
+Evaluation artifact SHA256
+--------------------------
+evaluation/per_case_metrics.csv
+f07908bc963626217bb354f54f9b03ddb7d4a578e679a9b443c784acc4438492
+
+evaluation/aggregate_metrics.json
+b9150485f468f3aeeea305f677e028a5dc69d63c301b03a5c7455d8827a0f04d
+
+evaluation/evaluation_provenance.json
+086dec78c4dde6e1fa688d53719b284886c305414b8ce7b7862c0aeaf5304aec

@@ -1,0 +1,37 @@
+{
+  "case_count": 270,
+  "threshold": 0.5,
+  "mean_validation_metric": 0.446649144479255,
+  "regions": {
+    "NETC": {
+      "positive_case_count": 114,
+      "case_dice": 0.1975589947237096,
+      "dataset_dice": 0.23398141661665198
+    },
+    "SNFH": {
+      "positive_case_count": 270,
+      "case_dice": 0.6458358089543051,
+      "dataset_dice": 0.6991090205334491
+    },
+    "ET": {
+      "positive_case_count": 198,
+      "case_dice": 0.27201140701120063,
+      "dataset_dice": 0.4094281286706741
+    },
+    "RC": {
+      "positive_case_count": 230,
+      "case_dice": 0.5649341420685549,
+      "dataset_dice": 0.6928458341603904
+    },
+    "WT": {
+      "positive_case_count": 270,
+      "case_dice": 0.7001165608565013,
+      "dataset_dice": 0.7679518794427681
+    },
+    "TC": {
+      "positive_case_count": 200,
+      "case_dice": 0.2994379532612584,
+      "dataset_dice": 0.46226654030872033
+    }
+  }
+}
