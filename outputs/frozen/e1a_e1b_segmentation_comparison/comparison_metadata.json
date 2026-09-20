@@ -1,0 +1,32 @@
+{
+  "analysis_timestamp_utc": "2026-09-20T19:22:34.014752+00:00",
+  "e1a_input_path": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1a_internal_evaluation/per_case_metrics.csv",
+  "e1b_input_path": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1b_joint_reconstruction/evaluation/per_case_metrics.csv",
+  "e1a_input_sha256": "be8c2a8422a0ae2c335a062f4041d845ce3aa49f301e01a429cee310d6c27886",
+  "e1b_input_sha256": "f80bba75f63d26af9e8f0e8ebe8bbeda1deff75b1d65f5eaf32891805abc4502",
+  "git_commit_sha": "2b2e090807e983a790bf0f5ea227a0b2aabbc475",
+  "git_dirty": false,
+  "git_status_short": [],
+  "python_version": "3.11.15",
+  "numpy_version": "2.2.6",
+  "pandas_version": "2.3.3",
+  "scipy_version": "1.17.1",
+  "statistical_settings": {
+    "bootstrap_seed": 20260917,
+    "bootstrap_resamples": 10000,
+    "bootstrap_ci_method": "paired percentile bootstrap of mean E1-B-minus-E1-A Dice; 2.5th and 97.5th percentiles",
+    "wilcoxon_parameters": {
+      "zero_method": "wilcox",
+      "correction": false,
+      "alternative": "two-sided",
+      "method": "auto",
+      "axis": 0,
+      "nan_policy": "raise",
+      "keepdims": false
+    },
+    "all_zero_wilcoxon_policy": "p = 1.0 only when all raw paired differences are exactly zero",
+    "multiple_comparison_correction": "Holm step-down across six regional Wilcoxon tests",
+    "tie_tolerance": 1e-08,
+    "delta_definition": "E1-B Dice minus E1-A Dice"
+  }
+}

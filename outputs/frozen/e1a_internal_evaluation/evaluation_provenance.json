@@ -1,0 +1,47 @@
+{
+  "experiment": "E1-A latent-split segmentation",
+  "checkpoint_path": "/home/friend/BrainTumorSeg_runtime/checkpoints/e1a_best.pt",
+  "checkpoint_sha256": "f8f3fea793f96a2e05eacfc16c1ba09ab2fabd5588c9e93d02cc3eb28b6c61b8",
+  "checkpoint_epoch": 15,
+  "checkpoint_best_epoch": 15,
+  "checkpoint_best_metric": 0.6378065569645434,
+  "seed": 42,
+  "threshold": 0.5,
+  "validation_case_count": 270,
+  "validation_split_path": "/home/friend/BrainTumorSeg/splits/val_cases.txt",
+  "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+  "data_config_path": "/home/friend/BrainTumorSeg/configs/data.yaml",
+  "data_config_sha256": "b7b620393635ce091231e166b79a3bc6f39388526dd312f5c7df7b83c61c4b99",
+  "model_identity": "latent_split_unet3d",
+  "model_config": {
+    "name": "latent_split_unet3d",
+    "in_channels": 4,
+    "out_channels": 4,
+    "base_channels": 32,
+    "latent_projection": "conv1x1x1",
+    "latent_channels": 256
+  },
+  "evaluation_settings": {
+    "tile_size": [
+      96,
+      96,
+      96
+    ],
+    "segmentation_output": "LatentSplitUNet3D forward raw logits",
+    "protocol": "internal presence-aware Dice"
+  },
+  "evaluation_command": "python -m scripts.evaluate_e1a_internal --checkpoint /home/friend/BrainTumorSeg_runtime/checkpoints/e1a_best.pt --data-config /home/friend/BrainTumorSeg/configs/data.yaml --device cuda --output-dir /home/friend/BrainTumorSeg/outputs/e1a_internal_evaluation --expected-checkpoint-sha256 f8f3fea793f96a2e05eacfc16c1ba09ab2fabd5588c9e93d02cc3eb28b6c61b8",
+  "git_commit_sha": "316fa71136e40aa9f831525fb23c045c6a1da84f",
+  "git_dirty": true,
+  "git_status_short": [
+    " M configs/data.yaml"
+  ],
+  "python_version": "3.11.10",
+  "pytorch_version": "2.14.0+cu130",
+  "device_requested": "cuda",
+  "cuda_available": true,
+  "cuda_version": "13.0",
+  "cuda_device_name": "NVIDIA GeForce RTX 3090",
+  "per_case_metrics_sha256": "be8c2a8422a0ae2c335a062f4041d845ce3aa49f301e01a429cee310d6c27886",
+  "aggregate_metrics_sha256": "6691d70310b73a2564c29bc0923faaca448e70be5d9fadc0d488438ffff5ac51"
+}
