@@ -1,0 +1,36 @@
+experiment_name: E1-C anatomy/background reconstruction constraint
+data_config: configs/data.yaml
+data_protocol:
+  train_cases: splits/train_cases.txt
+  val_cases: splits/val_cases.txt
+  normalize: true
+  patch_size: [96, 96, 96]
+  foreground_sampling_probability: 0.7
+  augmentation:
+    enabled: true
+    flip: {enabled: true, probability: 0.5}
+    intensity_scale: {enabled: true, min: 0.9, max: 1.1}
+    intensity_shift: {enabled: true, min: -0.1, max: 0.1}
+    gaussian_noise: {enabled: true, std_min: 0.0, std_max: 0.05}
+epochs: 30
+batch_size: 1
+learning_rate: 0.001
+weight_decay: 0.00001
+seed: 42
+num_workers: 4
+device: cuda
+output_dir: outputs/e1c_anatomy_constraint
+validation_frequency: 1
+threshold: 0.5
+segmentation_loss: Dice+BCE
+reconstruction:
+  enabled: true
+  loss_type: L1
+  lambda_rec: 1.0
+anatomy_reconstruction:
+  enabled: true
+  source: Za only
+  target: observed normalized MRI
+  loss_type: masked L1
+  valid_mask: raw_mask == 0
+  lambda_anat: null
