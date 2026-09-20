@@ -1,0 +1,119 @@
+Experiment: E1-B Za-vs-Zd paired latent-probe statistical analysis
+Status: Frozen scientific analysis artifact
+
+Scientific question:
+Does E1-B joint reconstruction induce preferential pathology accessibility
+from the disease representation (Z_d) relative to the anatomy/background
+representation (Z_a)?
+
+Comparison:
+- anatomy representation: Z_a
+- disease representation: Z_d
+- delta definition: Z_d Dice - Z_a Dice
+- positive delta favors greater pathology accessibility from Z_d
+
+Inputs:
+- frozen E1-B Z_a per-case evaluation
+- frozen E1-B Z_d per-case evaluation
+
+Input SHA256:
+Z_a per_case_metrics.csv:
+55e657b7671712291fe1ef2d671240b397b82b3de0eb745972f23f03fc14d7a9
+
+Z_d per_case_metrics.csv:
+f07908bc963626217bb354f54f9b03ddb7d4a578e679a9b443c784acc4438492
+
+Pairing and presence protocol:
+- validation cases: 270
+- pairing key: case_id
+- target-negative cases excluded from each region's paired Dice analysis
+- target-presence identity required between Z_a and Z_d evaluations
+- paired target-positive observations: 1282
+
+Target-positive counts:
+- NETC: 114
+- SNFH: 270
+- ET: 198
+- RC: 230
+- WT: 270
+- TC: 200
+
+Statistical protocol:
+- bootstrap type: paired percentile bootstrap of mean Z_d-minus-Z_a Dice
+- bootstrap seed: 20260917
+- bootstrap resamples: 10000
+- confidence interval: 2.5th and 97.5th percentiles
+- Wilcoxon signed-rank: two-sided
+- zero_method: wilcox
+- correction: false
+- method: auto
+- all-zero Wilcoxon policy: p = 1.0
+- multiple-comparison correction: Holm step-down across six regions
+- win/tie tolerance: 1e-8
+
+The E1-B analysis reuses the exact statistical implementation previously used
+for the frozen E1-A latent-probe paired analysis.
+
+Analysis code commit:
+a5ddb1cc75215bc7190b01df0f23a4a3e4510ef6
+
+Working tree at analysis time:
+clean
+
+Software:
+- Python: 3.11.15
+- NumPy: 2.2.6
+- SciPy: 1.17.1
+
+Results:
+Region  N    Z_a Dice  Z_d Dice  Delta(Z_d-Z_a)  95% CI                 Raw p       Holm p
+NETC    114  0.1950    0.1976    +0.0026         [-0.0074, +0.0121]     0.466       1
+SNFH    270  0.6505    0.6458    -0.0047         [-0.0075, -0.0017]     4.42e-05    0.000221
+ET      198  0.2650    0.2720    +0.0070         [-0.0027, +0.0173]     0.511       1
+RC      230  0.5655    0.5649    -0.0006         [-0.0092, +0.0086]     0.144       0.577
+WT      270  0.7040    0.7001    -0.0039         [-0.0068, -0.0009]     7.55e-06    4.53e-05
+TC      200  0.2955    0.2994    +0.0040         [-0.0046, +0.0135]     0.780       1
+
+Win/tie/loss counts:
+Region  Z_d wins  Ties  Z_a wins
+NETC    57        14    43
+SNFH    106       0     164
+ET      95        16    87
+RC      97        9     124
+WT      93        0     177
+TC      92        16    92
+
+Scientific interpretation:
+Under identical E1-B latent-probe conditions, joint reconstruction did not
+induce the desired preferential accessibility of pathology information from
+Z_d. No evaluated region showed a statistically significant Z_d advantage
+after Holm correction.
+
+For SNFH and WT, Z_a instead showed significantly higher probe performance
+than Z_d after Holm correction.
+
+This result supports the narrower conclusion that joint reconstruction alone
+was insufficient to induce the desired latent specialization. It does not
+demonstrate or disprove semantic disentanglement in a general sense.
+
+Cross-experiment caution:
+The E1-B Z_a and Z_d probes use the same batch size (4), so their within-E1-B
+paired comparison is controlled under the probe protocol. Direct numerical
+comparison of E1-A and E1-B probe performance magnitudes is confounded by the
+different probe batch size used for E1-A.
+
+Frozen analysis artifact SHA256:
+analysis_provenance.json:
+f4238336c669a40fc10756c3843cdba9ef5d9a3c899a3335d24f6f7a46f7799b
+
+analysis_summary.json:
+ac378db0c607ae2151db8dff59ce70cadd7b0a28c9cf4d5df98775e21f36f8da
+
+paired_differences.csv:
+7db880ff266f28b1cc910d240d6e602057e280b4bdfb9e5677e4cbb9cb3d00d3
+
+paired_statistics.csv:
+4d29d0cc9cdfb4d7736af13dfa9255135efc884f40f8a6796b32d62d75310445
+
+paper_table.csv:
+ac114de27d33420021dae84bb178be916ec2c0ba613b1927dc50353f5f219542
