@@ -20,7 +20,8 @@ from models.anatomy_constrained_joint_reconstruction_unet3d import AnatomyConstr
 from scripts.train_baseline import make_dataset, read_case_ids, read_config, seed_worker, synchronize
 from training.artifacts import environment_metadata, snapshot, write_json
 from training.checkpointing import load_checkpoint, save_checkpoint
-from training.e1c_anatomy import diagnose_loss_magnitudes, train_e1c_epoch
+from training.e1c_anatomy import (compute_anatomy_constrained_loss,
+                                  diagnose_loss_magnitudes, train_e1c_epoch)
 
 
 SELECTION_METRIC = 'mean target-positive case Dice over NETC,SNFH,ET,RC,WT,TC; exclude regions with zero positive cases'
@@ -30,6 +31,7 @@ HISTORY_FIELDS = ['epoch', 'total_loss', 'segmentation_loss', 'reconstruction_lo
                   'learning_rate', 'epoch_duration_seconds', 'training_duration_seconds',
                   'validation_duration_seconds']
 DEFAULT_DIAGNOSTIC_OUTPUT = 'outputs/e1c_anatomy_constraint_diagnostic'
+DEFAULT_SANITY_OUTPUT = 'outputs/e1c_anatomy_constraint_sanity'
 
 
 def _run_git(*args):
@@ -92,6 +94,81 @@ def write_diagnostic_artifact(output_dir, rows, model, model_config, train, data
     return artifact
 
 
+def _sanity_artifact_path(output_dir, scientific_output):
+    output = Path(output_dir).expanduser().resolve()
+    scientific = Path(scientific_output).expanduser().resolve()
+    frozen = Path('outputs/frozen').resolve()
+    protected = (frozen, scientific, Path('outputs/e1b_joint_reconstruction').resolve(),
+                 Path('outputs/e1a_latent_split').resolve())
+    if any(output == path or path in output.parents for path in protected):
+        raise ValueError('E1-C sanity output must be separate from scientific and frozen outputs')
+    artifact = output / 'sanity_training.json'
+    if artifact.exists():
+        raise FileExistsError(f'E1-C sanity artifact already exists: {artifact}')
+    return artifact
+
+
+def run_sanity_steps(model, loader, optimizer, criterion, steps,
+                     lambda_rec, lambda_anat, device):
+    """Run exactly N real E1-C optimizer steps without validation or checkpoints."""
+    if steps < 1:
+        raise ValueError('sanity_steps must be positive')
+    model.train()
+    iterator = iter(loader)
+    rows, parameter_changed = [], False
+    for step in range(1, steps + 1):
+        try:
+            batch = next(iterator)
+        except StopIteration:
+            iterator = iter(loader)
+            try:
+                batch = next(iterator)
+            except StopIteration as error:
+                raise ValueError('Sanity training loader is empty') from error
+        image, target = batch['image'].to(device), batch['target'].to(device)
+        raw_mask = batch['raw_mask'].to(device)
+        optimizer.zero_grad(set_to_none=True)
+        losses = compute_anatomy_constrained_loss(
+            model(image), image, target, raw_mask, criterion, lambda_rec, lambda_anat)
+        values = {name: getattr(losses, name) for name in
+                  ('total_loss', 'segmentation_loss', 'reconstruction_loss', 'anatomy_loss')}
+        if not all(torch.isfinite(value) for value in values.values()):
+            raise RuntimeError(f'Non-finite E1-C sanity loss at step {step}')
+        losses.total_loss.backward()
+        gradients = [parameter for parameter in model.parameters() if parameter.grad is not None]
+        if not gradients or any(not torch.isfinite(parameter.grad).all() for parameter in gradients):
+            raise RuntimeError(f'Missing or non-finite E1-C sanity gradients at step {step}')
+        tracked = next((parameter for parameter in gradients
+                        if bool(parameter.grad.abs().sum() > 0)), None)
+        before = tracked.detach().clone() if tracked is not None else None
+        optimizer.step()
+        if before is not None and not torch.equal(before, tracked.detach()):
+            parameter_changed = True
+        rows.append(dict(step=step, segmentation_loss=values['segmentation_loss'].item(),
+                         reconstruction_loss=values['reconstruction_loss'].item(),
+                         anatomy_loss=values['anatomy_loss'].item(),
+                         total_loss=values['total_loss'].item(), finite_losses=True))
+    if not parameter_changed:
+        raise RuntimeError('E1-C sanity optimizer did not change model parameters')
+    return rows
+
+
+def write_sanity_artifact(output_dir, scientific_output, rows, train, steps,
+                          lambda_rec, lambda_anat):
+    artifact = _sanity_artifact_path(output_dir, scientific_output)
+    metadata = environment_metadata(0)
+    result = dict(purpose='non-scientific integration sanity check',
+                  experiment='E1-C anatomy/background reconstruction constraint',
+                  timestamp=metadata['timestamp'], **_diagnostic_git_provenance(),
+                  optimizer_steps_requested=steps, optimizer_steps_performed=len(rows),
+                  lambda_rec=lambda_rec, lambda_anat=lambda_anat,
+                  finite_loss_status=all(row['finite_losses'] for row in rows),
+                  device=train['device'], seed=train['seed'], steps=rows)
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    write_json(artifact, result)
+    return artifact
+
+
 class SegmentationView(nn.Module):
     """Expose only raw E1-A-equivalent logits to existing tiled validation."""
 
@@ -138,8 +215,10 @@ def _validate_protocol(train, model_config, data, lambda_rec, lambda_anat):
 
 def run_training(train, model_config, data, *, lambda_rec=None, lambda_anat=None,
                  diagnostic_batches=0, diagnostic_output_dir=DEFAULT_DIAGNOSTIC_OUTPUT,
-                 resume=None):
+                 sanity_steps=0, sanity_output_dir=DEFAULT_SANITY_OUTPUT, resume=None):
     train, model_config = dict(train), dict(model_config)
+    if sanity_steps and (lambda_rec is not None or lambda_anat is not None):
+        raise ValueError('Sanity mode uses the frozen lambda values from the E1-C config')
     selected_lambda = lambda_rec if lambda_rec is not None else train['reconstruction']['lambda_rec']
     selected_anat = (lambda_anat if lambda_anat is not None
                      else train['anatomy_reconstruction']['lambda_anat'])
@@ -147,8 +226,10 @@ def run_training(train, model_config, data, *, lambda_rec=None, lambda_anat=None
     train['reconstruction'] = {**train['reconstruction'], 'lambda_rec': selected_lambda}
     train['anatomy_reconstruction'] = {
         **train['anatomy_reconstruction'], 'lambda_anat': selected_anat}
-    if diagnostic_batches < 0:
-        raise ValueError('Diagnostic batch count must be nonnegative')
+    if diagnostic_batches < 0 or sanity_steps < 0:
+        raise ValueError('Diagnostic batch count and sanity steps must be nonnegative')
+    if diagnostic_batches and sanity_steps:
+        raise ValueError('Diagnostic and sanity modes are mutually exclusive')
     if diagnostic_batches:
         _diagnostic_artifact_path(diagnostic_output_dir)
     output = Path(train['output_dir']).expanduser().resolve()
@@ -157,6 +238,8 @@ def run_training(train, model_config, data, *, lambda_rec=None, lambda_anat=None
                  Path('outputs/baseline_unet3d_full').resolve())
     if any(output == path or path in output.parents for path in protected):
         raise ValueError('E1-C output must be separate from frozen and earlier experiments')
+    if sanity_steps:
+        _sanity_artifact_path(sanity_output_dir, output)
 
     seed = train['seed']
     random.seed(seed)
@@ -181,6 +264,16 @@ def run_training(train, model_config, data, *, lambda_rec=None, lambda_anat=None
             diagnostic_batches, selected_lambda, selected_anat)
         print(json.dumps({'diagnostic_artifact': str(artifact), 'batches': rows}, indent=2))
         return rows
+
+    if sanity_steps:
+        optimizer = torch.optim.AdamW(model.parameters(), lr=train['learning_rate'],
+                                      weight_decay=train['weight_decay'])
+        rows = run_sanity_steps(model, train_loader, optimizer, criterion, sanity_steps,
+                                selected_lambda, selected_anat, train['device'])
+        artifact = write_sanity_artifact(sanity_output_dir, output, rows, train,
+                                         sanity_steps, selected_lambda, selected_anat)
+        print(json.dumps({'sanity_artifact': str(artifact), 'steps': rows}, indent=2))
+        return artifact
 
     val_loader = DataLoader(val_data, batch_size=1, shuffle=False,
                             num_workers=train['num_workers'], worker_init_fn=seed_worker,
@@ -272,6 +365,8 @@ def main():
     parser.add_argument('--lambda-anat', type=float)
     parser.add_argument('--diagnostic-batches', type=int, default=0)
     parser.add_argument('--diagnostic-output-dir', default=DEFAULT_DIAGNOSTIC_OUTPUT)
+    parser.add_argument('--sanity-steps', type=int, default=0)
+    parser.add_argument('--sanity-output-dir', default=DEFAULT_SANITY_OUTPUT)
     parser.add_argument('--device')
     parser.add_argument('--output-dir')
     parser.add_argument('--resume')
@@ -286,7 +381,9 @@ def main():
     run_training(train, model_config, data, lambda_rec=args.lambda_rec,
                  lambda_anat=args.lambda_anat,
                  diagnostic_batches=args.diagnostic_batches,
-                 diagnostic_output_dir=args.diagnostic_output_dir, resume=args.resume)
+                 diagnostic_output_dir=args.diagnostic_output_dir,
+                 sanity_steps=args.sanity_steps,
+                 sanity_output_dir=args.sanity_output_dir, resume=args.resume)
 
 
 if __name__ == '__main__':

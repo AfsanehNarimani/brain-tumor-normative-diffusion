@@ -1,5 +1,6 @@
 """E1-C architecture, masked objective, diagnostic, and protocol contracts."""
 import json
+import inspect
 from types import SimpleNamespace
 
 import pytest
@@ -213,3 +214,66 @@ def test_checkpoint_selection_remains_segmentation_based():
     metrics = {f'{region}_positive_cases': 1 for region in EVALUATION_REGIONS}
     metrics.update({f'{region}_case_dice': 0.6 for region in EVALUATION_REGIONS})
     assert select_checkpoint(metrics, 0.5, 3) == (pytest.approx(0.6), 3, True)
+
+
+def test_sanity_runs_exact_optimizer_steps_changes_parameters_and_uses_frozen_objective():
+    class CountingSGD(torch.optim.SGD):
+        def __init__(self, parameters):
+            super().__init__(parameters, lr=0.1)
+            self.steps = 0
+
+        def step(self, closure=None):
+            self.steps += 1
+            return super().step(closure)
+
+    model = TinyE1C()
+    before = model.weight.detach().clone()
+    batch = {'image': torch.ones(1, 4, 2, 2, 2),
+             'target': torch.zeros(1, 4, 2, 2, 2),
+             'raw_mask': torch.zeros(1, 2, 2, 2, dtype=torch.long)}
+    optimizer = CountingSGD(model.parameters())
+    rows = train_script.run_sanity_steps(
+        model, [batch], optimizer, SegmentationLoss(), 3, 1.0, 0.5, 'cpu')
+    assert optimizer.steps == len(rows) == 3
+    assert not torch.equal(model.weight, before)
+    for row in rows:
+        assert row['total_loss'] == pytest.approx(
+            row['segmentation_loss'] + row['reconstruction_loss'] + 0.5 * row['anatomy_loss'])
+        assert row['finite_losses'] is True
+
+
+def test_sanity_artifact_and_output_protection(tmp_path, monkeypatch):
+    sha = 'a' * 40
+    monkeypatch.setattr(train_script, 'environment_metadata',
+                        lambda _count: {'timestamp': '2026-09-20T00:00:00+00:00'})
+    monkeypatch.setattr(train_script, '_diagnostic_git_provenance', lambda: {
+        'git_commit': sha, 'git_commit_sha': sha, 'git_dirty': True,
+        'git_status': [' M configs/data.yaml'], 'git_status_short': [' M configs/data.yaml'],
+        'git_provenance_errors': None})
+    rows = [{'step': 1, 'segmentation_loss': 2.0, 'reconstruction_loss': 1.0,
+             'anatomy_loss': 0.5, 'total_loss': 3.25, 'finite_losses': True}]
+    train = {'device': 'cpu', 'seed': 42}
+    scientific = tmp_path / 'scientific'
+    artifact = train_script.write_sanity_artifact(
+        tmp_path / 'sanity', scientific, rows, train, 1, 1.0, 0.5)
+    payload = json.loads(artifact.read_text())
+    assert payload['purpose'] == 'non-scientific integration sanity check'
+    assert payload['optimizer_steps_requested'] == payload['optimizer_steps_performed'] == 1
+    assert payload['steps'] == rows and payload['finite_loss_status'] is True
+    assert payload['lambda_rec'] == 1.0 and payload['lambda_anat'] == 0.5
+    with pytest.raises(FileExistsError, match='already exists'):
+        train_script.write_sanity_artifact(
+            tmp_path / 'sanity', scientific, rows, train, 1, 1.0, 0.5)
+    with pytest.raises(ValueError, match='separate'):
+        train_script._sanity_artifact_path(scientific, scientific)
+    with pytest.raises(ValueError, match='separate'):
+        train_script._sanity_artifact_path('outputs/frozen/e1c-sanity', scientific)
+
+
+def test_sanity_mode_is_disabled_by_default():
+    assert inspect.signature(train_script.run_training).parameters['sanity_steps'].default == 0
+
+
+def test_sanity_mode_rejects_lambda_overrides_before_dataset_setup():
+    with pytest.raises(ValueError, match='frozen lambda values'):
+        train_script.run_training({}, {}, {}, sanity_steps=1, lambda_anat=0.25)
