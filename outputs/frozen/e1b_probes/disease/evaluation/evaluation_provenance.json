@@ -1,0 +1,46 @@
+{
+  "source_experiment": "e1b",
+  "source_model_identity": "joint_reconstruction_unet3d",
+  "latent_source": "disease",
+  "probe_checkpoint": "/home/friend/BrainTumorSeg/outputs/e1b_probes/disease/best.pt",
+  "probe_checkpoint_sha256": "7462fcfdd6116033764efd2c827a0d9ff42ca7acf2f1a73d47f899b101fb05d6",
+  "probe_checkpoint_epoch": 29,
+  "probe_checkpoint_best_epoch": 29,
+  "probe_checkpoint_best_metric": 0.44664735325468685,
+  "frozen_source_checkpoint": "/home/friend/BrainTumorSeg/outputs/e1b_joint_reconstruction/best.pt",
+  "frozen_source_sha256": "142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606",
+  "frozen_source_epoch": 13,
+  "validation_split": "/home/friend/BrainTumorSeg/splits/val_cases.txt",
+  "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+  "validation_case_count": 270,
+  "threshold": 0.5,
+  "tile_size": [
+    96,
+    96,
+    96
+  ],
+  "data_config": "/home/friend/BrainTumorSeg/configs/data.yaml",
+  "data_config_sha256": "b7b620393635ce091231e166b79a3bc6f39388526dd312f5c7df7b83c61c4b99",
+  "git_commit_sha": "4fea26a8f93fe4fc9b074ba0265159eb96c773b0",
+  "git_dirty": true,
+  "git_status_short": [
+    " M configs/data.yaml"
+  ],
+  "python_version": "3.11.10",
+  "pytorch_version": "2.14.0+cu130",
+  "numpy_version": "2.2.6",
+  "nibabel_version": "5.4.2",
+  "device_requested": "cuda",
+  "probe_architecture": {
+    "name": "latent_probe_decoder3d",
+    "in_channels": 256,
+    "widths": [
+      128,
+      64,
+      32
+    ],
+    "out_channels": 4,
+    "interpolation": "trilinear",
+    "convolution": "two Conv3d+GroupNorm+ReLU per block"
+  }
+}

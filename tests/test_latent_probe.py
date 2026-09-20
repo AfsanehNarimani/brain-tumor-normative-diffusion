@@ -7,10 +7,12 @@ import torch
 
 from losses.segmentation_loss import SegmentationLoss
 from models.latent_probe import (FrozenLatentProbe, LatentProbeDecoder3D, PROBE_ARCHITECTURE,
-                                 SOURCE_MODEL, load_source)
+                                 E1B_SOURCE_MODEL, SOURCE_MODEL, load_source)
+from models.joint_reconstruction_unet3d import JointReconstructionUNet3D
 from models.latent_split_unet3d import LatentSplitUNet3D
 from scripts.train_latent_probe import (load_probe_checkpoint, read_config,
-                                        save_probe_checkpoint, validate_pair)
+                                        CONFIG_CHOICES, save_probe_checkpoint, select_config,
+                                        validate_pair)
 
 
 @pytest.fixture
@@ -58,6 +60,43 @@ def test_source_checkpoint_is_strict(source_checkpoint, tmp_path):
     torch.save(broken, bad)
     with pytest.raises(RuntimeError):
         load_source(bad, expected_sha256=hashlib.sha256(bad.read_bytes()).hexdigest())
+
+
+def test_e1b_source_checkpoint_identity_freezing_and_extraction(tmp_path):
+    source = JointReconstructionUNet3D()
+    path = tmp_path / "e1b.pt"
+    torch.save(dict(model=source.state_dict(), epoch=13,
+                    config={"model": E1B_SOURCE_MODEL}), path)
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    loaded, info = load_source(path, source_experiment="e1b", expected_sha256=digest)
+    assert isinstance(loaded, JointReconstructionUNet3D)
+    assert info["experiment"] == "e1b" and info["model"] == "joint_reconstruction_unet3d"
+    assert info["epoch"] == 13 and all(not parameter.requires_grad for parameter in loaded.parameters())
+    assert not loaded.training and all(not module.training for module in loaded.modules())
+
+    loaded.decoder.register_forward_pre_hook(
+        lambda *_: (_ for _ in ()).throw(AssertionError("segmentation decoder called")))
+    loaded.reconstruction_decoder.register_forward_pre_hook(
+        lambda *_: (_ for _ in ()).throw(AssertionError("reconstruction decoder called")))
+    image = torch.randn(1, 4, 8, 8, 8)
+    probes = {name: FrozenLatentProbe(loaded, name) for name in ("anatomy", "disease")}
+    latents = {name: probe.extract_latent(image) for name, probe in probes.items()}
+    assert all(value.shape == (1, 256, 1, 1, 1) for value in latents.values())
+    assert not torch.equal(latents["anatomy"], latents["disease"])
+    assert all(parameter.requires_grad for probe in probes.values()
+               for parameter in probe.probe.parameters())
+    assert all(not parameter.requires_grad for parameter in loaded.parameters())
+
+    with pytest.raises(ValueError, match="SHA256"):
+        load_source(path, source_experiment="e1b", expected_sha256="0" * 64)
+    with pytest.raises(ValueError, match="epoch"):
+        load_source(path, source_experiment="e1b", expected_sha256=digest, expected_epoch=12)
+    bad = tmp_path / "wrong-model.pt"
+    torch.save(dict(model=source.state_dict(), epoch=13,
+                    config={"model": {**E1B_SOURCE_MODEL, "name": "other"}}), bad)
+    with pytest.raises(ValueError, match="architecture/config"):
+        load_source(bad, source_experiment="e1b",
+                    expected_sha256=hashlib.sha256(bad.read_bytes()).hexdigest())
 
 
 @pytest.mark.parametrize("latent_source", ["anatomy", "disease"])
@@ -165,3 +204,32 @@ def test_default_source_absence_is_clear():
     config = read_config("configs/probe_anatomy.yaml")
     assert config["source_checkpoint"] == "outputs/e1a_latent_split/best.pt"
     assert config["threshold"] == 0.5
+
+
+def test_e1b_pair_protocol_and_explicit_config_selection():
+    anatomy, disease = validate_pair("configs/e1b_probe_anatomy.yaml",
+                                     "configs/e1b_probe_disease.yaml")
+    ignored = {"experiment_name", "latent_source", "output_dir"}
+    assert {key: value for key, value in anatomy.items() if key not in ignored} == {
+        key: value for key, value in disease.items() if key not in ignored}
+    assert anatomy["batch_size"] == disease["batch_size"] == 4
+    assert anatomy["source_experiment"] == disease["source_experiment"] == "e1b"
+    assert select_config("configs/e1b_probe_anatomy.yaml")["latent_source"] == "anatomy"
+    assert select_config("configs/e1b_probe_disease.yaml")["latent_source"] == "disease"
+    assert set(CONFIG_CHOICES) == {"configs/probe_anatomy.yaml", "configs/probe_disease.yaml",
+                                   "configs/e1b_probe_anatomy.yaml", "configs/e1b_probe_disease.yaml"}
+    with pytest.raises(ValueError, match="Unsupported probe config"):
+        select_config("configs/anatomy-but-unsupported.yaml")
+    with pytest.raises(ValueError, match="same source experiment"):
+        validate_pair("configs/probe_anatomy.yaml", "configs/e1b_probe_disease.yaml")
+
+
+def test_e1a_configs_remain_original_protocol():
+    anatomy, disease = validate_pair()
+    for config, latent, output in ((anatomy, "anatomy", "outputs/e1a_probes/anatomy"),
+                                   (disease, "disease", "outputs/e1a_probes/disease")):
+        assert "source_experiment" not in config
+        assert config["latent_source"] == latent
+        assert config["output_dir"] == output
+        assert config["source_checkpoint"] == "outputs/e1a_latent_split/best.pt"
+        assert config["batch_size"] == 1

@@ -1,0 +1,152 @@
+Experiment: E1-B disease latent pathology-accessibility probe
+Status: Frozen scientific training artifact
+
+Latent source: Z_d (disease projection)
+Probe architecture: latent_probe_decoder3d
+Probe trainable parameters: 1,742,852
+Frozen source parameters: 8,599,304
+
+Training protocol:
+- epochs: 30
+- batch size: 4
+- learning rate: 0.001
+- weight decay: 0.00001
+- seed: 42
+- validation threshold: 0.5
+
+Best epoch: 29
+Best validation metric: 0.44664735325468685
+
+Source model:
+- experiment: E1-B joint reconstruction
+- model: joint_reconstruction_unet3d
+- source epoch: 13
+- source checkpoint SHA256: 142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606
+
+Dataset splits:
+- train cases: 1080
+- validation cases: 270
+- train split SHA256: 581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e
+- validation split SHA256: ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca
+
+Training integrity:
+- history rows: 30
+- epochs: continuous 1 through 30
+- missing epochs: none
+- duplicate epochs: none
+
+Scientific source code commit:
+1a8e71a10e5c9013349694aa5a9499004c802e16
+
+Server working-tree exception:
+configs/data.yaml was locally modified only to point to the server-specific
+BraTS dataset root. This machine-specific absolute path is intentionally not
+committed.
+
+Frozen artifact SHA256:
+best.pt:
+7462fcfdd6116033764efd2c827a0d9ff42ca7acf2f1a73d47f899b101fb05d6
+
+config.yaml:
+d97800115e4e4a52ae0a77af14f872d3288b2e1f9ca06be61321553bc95480e8
+
+environment.json:
+f391ecac1e0837d7ff1d9c37ad16dd1846fa14e123a11a399b13f942ea9afed8
+
+history.csv:
+c160017d586447757742e83eb528c79fdaaa489db95652f02db9cc30e395eed4
+
+summary.json:
+587447130ded5317f92242b0d1b45a3da87c91d54be061cf3a38712a23b0cebf
+
+train.log:
+5e2e27511b8659fd1ffcb56058a3e78a199ffb734877458a115aac2abf8576a5
+
+latest.pt was intentionally not included in the frozen Git archive.
+It remains preserved in transfer staging with SHA256:
+b3571c0b35f3f7c389af34c8fb2cc76c0477d0a43199e9b7ae51882d4d8ef0f1
+
+Interpretation note:
+This probe measures pathology-accessible information in Z_d.
+It does not by itself demonstrate semantic disentanglement.
+
+Comparison note:
+The E1-B Z_a and Z_d probes use the same batch size (4) and controlled
+probe protocol, allowing their paired E1-B comparison. Direct numerical
+comparison with E1-A probe training is confounded by the different probe
+batch size used in E1-A.
+
+Independent full-volume evaluation
+----------------------------------
+Evaluation type: internal fixed-split full-volume evaluation
+Official BraTS challenge evaluation: no
+Validation cases: 270
+Unique cases: 270
+Duplicate cases: 0
+Threshold: 0.5
+Tile size: 96 x 96 x 96
+
+Evaluator code commit:
+4fea26a8f93fe4fc9b074ba0265159eb96c773b0
+
+Probe checkpoint epoch: 29
+Probe checkpoint SHA256:
+7462fcfdd6116033764efd2c827a0d9ff42ca7acf2f1a73d47f899b101fb05d6
+
+Frozen E1-B source epoch: 13
+Frozen E1-B source SHA256:
+142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606
+
+Validation split SHA256:
+ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca
+
+Independent evaluation mean validation metric:
+0.446649144479255
+
+Presence-aware evaluation
+-------------------------
+Region  Positive cases  Case Dice           Dataset Dice
+NETC    114             0.1975589947237096  0.23398141661665198
+SNFH    270             0.6458358089543051  0.6991090205334491
+ET      198             0.27201140701120063 0.4094281286706741
+RC      230             0.5649341420685549  0.6928458341603904
+WT      270             0.7001165608565013  0.7679518794427681
+TC      200             0.2994379532612584  0.46226654030872033
+
+Per-case audit
+--------------
+Rows: 270
+Unique case IDs: 270
+Duplicate case IDs: 0
+
+Target-present counts:
+NETC: 114
+SNFH: 270
+ET: 198
+RC: 230
+WT: 270
+TC: 200
+
+For target-absent regions, per-case Dice is excluded from the
+presence-aware case-level metric rather than being assigned an artificial
+Dice of 1.0.
+
+Evaluation environment / repository state
+-----------------------------------------
+Git commit:
+4fea26a8f93fe4fc9b074ba0265159eb96c773b0
+
+The evaluation working tree was dirty only because configs/data.yaml contained
+the server-local dataset root. This machine-specific path was intentionally
+not committed.
+
+Evaluation artifact SHA256
+--------------------------
+evaluation/per_case_metrics.csv
+f07908bc963626217bb354f54f9b03ddb7d4a578e679a9b443c784acc4438492
+
+evaluation/aggregate_metrics.json
+b9150485f468f3aeeea305f677e028a5dc69d63c301b03a5c7455d8827a0f04d
+
+evaluation/evaluation_provenance.json
+086dec78c4dde6e1fa688d53719b284886c305414b8ce7b7862c0aeaf5304aec
