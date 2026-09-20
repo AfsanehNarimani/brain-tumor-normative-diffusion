@@ -1,0 +1,88 @@
+Experiment: E1-B anatomy/background latent pathology-accessibility probe
+Experiment family: E1-B joint reconstruction latent probes
+Latent source: anatomy/background (Z_a)
+
+Training protocol
+-----------------
+Epochs: 30
+Batch size: 4
+Learning rate: 0.001
+Weight decay: 0.00001
+Seed: 42
+Validation threshold: 0.5
+
+Training completion
+-------------------
+History rows: 30
+First epoch: 1
+Last epoch: 30
+Unique epochs: 30
+Missing epochs: none
+Duplicate epochs: none
+History continuity: PASS
+
+Best model
+----------
+Best epoch: 28
+Best selection metric: 0.44591034886936365
+
+Source model
+------------
+Experiment: E1-B joint reconstruction
+Model: joint_reconstruction_unet3d
+Source epoch: 13
+Source checkpoint SHA256:
+142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606
+
+Source code
+-----------
+Server training commit:
+1a8e71a10e5c9013349694aa5a9499004c802e16
+
+Server working tree exception:
+configs/data.yaml was modified only to point to the server-local dataset root.
+This machine-specific absolute path was intentionally not committed.
+
+Interruption / resume
+---------------------
+Training was interrupted after epoch 20 and resumed from latest.pt.
+The checkpoint restored the probe, optimizer, epoch, and best-state information.
+Explicit RNG states were not present in the inspected checkpoint metadata.
+Therefore, bitwise equivalence to an uninterrupted 30-epoch run is not claimed.
+
+Scientific interpretation
+-------------------------
+This probe measures pathology-accessible information in Z_a.
+It does not establish that Z_a is a pure healthy representation and does not
+by itself demonstrate disentanglement.
+
+The E1-B Z_a and Z_d probes use the same batch size and protocol and therefore
+form the primary controlled latent comparison.
+
+Direct numerical comparison with E1-A latent probes is not fully controlled
+because E1-A probes used batch size 1 whereas E1-B probes use batch size 4.
+
+Artifact SHA256
+---------------
+best.pt
+45815cb293dad6cf38b999caa06d73a730696f43a1ff46fc47cee8a887d641da
+
+config.yaml
+5d390e8c6421de2c43280e443b3ef342cba93807277f9e1168a9f96db4d0c970
+
+environment.json
+874b288b6526b0b996f836424cbc8f5ca441a7c314ca223b25068b3dd1f39874
+
+history.csv
+f3eb2162b8adb216bca24a26445dc589c5f969773c640a4d9a4a1dfd14ab563d
+
+summary.json
+79fa6499bb287362993023eb06361caaf57738edb2d666b7251f2d1143f74939
+
+train.log
+8acbaf283b74ce5695b7ae5d9df9eacb8f69b994a9ae4d511af2f7bf1e79a35d
+
+Resume checkpoint retained outside frozen Git archive
+-----------------------------------------------------
+latest.pt SHA256:
+1291c1a8e58e0eb482a570791d6f45a071cc1f5b618dc8e71d7da4b1da428c1b
