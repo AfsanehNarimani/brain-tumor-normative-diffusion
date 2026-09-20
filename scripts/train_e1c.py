@@ -32,13 +32,31 @@ HISTORY_FIELDS = ['epoch', 'total_loss', 'segmentation_loss', 'reconstruction_lo
 DEFAULT_DIAGNOSTIC_OUTPUT = 'outputs/e1c_anatomy_constraint_diagnostic'
 
 
-def _git_status_short():
+def _run_git(*args):
+    return subprocess.run(
+        ['git', *args], cwd=Path(__file__).resolve().parents[1],
+        capture_output=True, text=True, check=True, timeout=5).stdout.strip()
+
+
+def _diagnostic_git_provenance():
+    """Collect HEAD and worktree status independently, retaining explicit errors."""
+    errors = {}
     try:
-        value = subprocess.check_output(
-            ['git', 'status', '--short'], stderr=subprocess.DEVNULL, timeout=5).decode()
-        return [line for line in value.splitlines() if line]
-    except (OSError, subprocess.SubprocessError):
-        return None
+        commit = _run_git('rev-parse', '--verify', 'HEAD')
+        if len(commit) != 40:
+            raise ValueError(f'expected 40-character HEAD SHA, got {commit!r}')
+    except (OSError, subprocess.SubprocessError, ValueError) as error:
+        commit = None
+        errors['commit'] = str(error)
+    try:
+        status = [line for line in _run_git('status', '--short').splitlines() if line]
+        dirty = bool(status)
+    except (OSError, subprocess.SubprocessError) as error:
+        status, dirty = None, None
+        errors['status'] = str(error)
+    return dict(git_commit=commit, git_commit_sha=commit, git_dirty=dirty,
+                git_status=status, git_status_short=status,
+                git_provenance_errors=errors or None)
 
 
 def _diagnostic_artifact_path(output_dir):
@@ -58,11 +76,11 @@ def write_diagnostic_artifact(output_dir, rows, model, model_config, train, data
     artifact = _diagnostic_artifact_path(output_dir)
     metadata = environment_metadata(sum(parameter.numel() for parameter in model.parameters()
                                         if parameter.requires_grad))
+    git = _diagnostic_git_provenance()
     result = dict(
         purpose='Forward-only E1-C loss-scale diagnostic for explicit lambda_anat selection',
         experiment='E1-C anatomy/background reconstruction constraint',
-        timestamp=metadata['timestamp'], git_commit_sha=metadata['git_commit'],
-        git_dirty=metadata['git_dirty'], git_status_short=_git_status_short(),
+        timestamp=metadata['timestamp'], **git,
         model_config=model_config, training_config=train, data_config=data,
         data_protocol=train.get('data_protocol'), seed=train['seed'], device=train['device'],
         diagnostic_batch_count=diagnostic_batches, lambda_rec=lambda_rec,

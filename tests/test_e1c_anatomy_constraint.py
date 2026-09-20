@@ -141,9 +141,12 @@ def test_diagnostic_artifact_preserves_rows_provenance_and_refuses_overwrite(
              'total_loss': 3.375, 'abnormal_voxel_fraction': 0.25,
              'non_abnormal_voxel_fraction': 0.75}]
     monkeypatch.setattr(train_script, 'environment_metadata', lambda _count: {
-        'timestamp': '2026-09-20T00:00:00+00:00', 'git_commit': 'abc123',
-        'git_dirty': True})
-    monkeypatch.setattr(train_script, '_git_status_short', lambda: [' M configs/data.yaml'])
+        'timestamp': '2026-09-20T00:00:00+00:00'})
+    sha = 'a' * 40
+    monkeypatch.setattr(train_script, '_diagnostic_git_provenance', lambda: {
+        'git_commit': sha, 'git_commit_sha': sha, 'git_dirty': True,
+        'git_status': [' M configs/data.yaml'],
+        'git_status_short': [' M configs/data.yaml'], 'git_provenance_errors': None})
     train = {'seed': 42, 'device': 'cpu', 'data_protocol': {'normalize': True},
              'reconstruction': {'lambda_rec': 1.0},
              'anatomy_reconstruction': {'lambda_anat': 0.5}}
@@ -156,12 +159,41 @@ def test_diagnostic_artifact_preserves_rows_provenance_and_refuses_overwrite(
     assert payload['lambda_rec'] == 1.0 and payload['lambda_anat'] == 0.5
     assert payload['diagnostic_batch_count'] == 1
     assert payload['model_mode'] == 'train' and payload['optimizer_steps_performed'] is False
-    assert payload['git_commit_sha'] == 'abc123' and payload['git_dirty'] is True
+    assert payload['git_commit'] == payload['git_commit_sha'] == sha
+    assert payload['git_dirty'] is True
+    assert payload['git_status'] == [' M configs/data.yaml']
     assert payload['git_status_short'] == [' M configs/data.yaml']
     assert torch.equal(model.weight, before)
     with pytest.raises(FileExistsError, match='already exists'):
         train_script.write_diagnostic_artifact(
             tmp_path / 'diagnostic', rows, model, model_config, train, data, 1, 1.0, 0.5)
+
+
+@pytest.mark.parametrize(('status', 'dirty'), [('', False), (' M configs/data.yaml', True)])
+def test_diagnostic_git_commit_is_independent_of_worktree_status(monkeypatch, status, dirty):
+    sha = 'd66fce181d46ff920a5b912a51c9c329475c83fa'
+    monkeypatch.setattr(train_script, '_run_git',
+                        lambda *args: sha if args[0] == 'rev-parse' else status)
+    provenance = train_script._diagnostic_git_provenance()
+    assert provenance['git_commit'] == provenance['git_commit_sha'] == sha
+    assert provenance['git_dirty'] is dirty
+    assert provenance['git_status'] == ([status] if status else [])
+    assert provenance['git_status_short'] == ([status] if status else [])
+    assert provenance['git_provenance_errors'] is None
+
+
+def test_diagnostic_git_failure_is_explicit_and_does_not_imply_clean(monkeypatch):
+    def git(*args):
+        if args[0] == 'rev-parse':
+            raise OSError('git unavailable for HEAD')
+        return ' M configs/data.yaml'
+    monkeypatch.setattr(train_script, '_run_git', git)
+    provenance = train_script._diagnostic_git_provenance()
+    assert provenance['git_commit'] is provenance['git_commit_sha'] is None
+    assert provenance['git_dirty'] is True
+    assert provenance['git_status'] == [' M configs/data.yaml']
+    assert provenance['git_status_short'] == [' M configs/data.yaml']
+    assert 'git unavailable for HEAD' in provenance['git_provenance_errors']['commit']
 
 
 def test_e1c_config_is_minimum_difference_from_e1b():
