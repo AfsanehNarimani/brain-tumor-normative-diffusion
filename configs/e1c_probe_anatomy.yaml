@@ -1,0 +1,17 @@
+experiment_name: E1-C anatomy/background representation pathology-accessibility probe
+source_experiment: e1c
+source_model_identity: anatomy_constrained_joint_reconstruction_unet3d
+latent_source: anatomy
+output_dir: outputs/e1c_probes/anatomy
+source_checkpoint: outputs/frozen/e1c_anatomy_constraint/training/best.pt
+expected_source_checkpoint_sha256: cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53
+data_config: configs/data.yaml
+epochs: 30
+batch_size: 4
+learning_rate: 0.001
+weight_decay: 0.00001
+seed: 42
+num_workers: 4
+device: cuda
+validation_frequency: 1
+threshold: 0.5

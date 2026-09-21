@@ -1,9 +1,10 @@
-"""Train a frozen E1-A or E1-B bottleneck accessibility probe."""
+"""Train a frozen E1-A, E1-B, or E1-C bottleneck accessibility probe."""
 import argparse
 import csv
 import hashlib
 import json
 import random
+import subprocess
 import time
 from pathlib import Path
 
@@ -16,7 +17,8 @@ from evaluation.metrics import VALIDATION_METRIC_FIELDS, best_validation_metric
 from evaluation.tiled import validate
 from losses.segmentation_loss import SegmentationLoss
 from models.latent_probe import (FrozenLatentProbe, LatentProbeDecoder3D,
-                                 PROBE_ARCHITECTURE, load_source, file_sha256)
+                                 PROBE_ARCHITECTURE, SOURCE_SPECS, E1C_SOURCE_SHA256,
+                                 load_source, file_sha256)
 from scripts.train_baseline import make_dataset, seed_worker, synchronize
 from training.artifacts import environment_metadata, write_json
 from training.trainer import train_epoch
@@ -26,6 +28,7 @@ FIELDS = ["epoch", "training_loss", "validation_loss", *VALIDATION_METRIC_FIELDS
           "learning_rate", "epoch_duration_seconds", "training_duration_seconds", "validation_duration_seconds"]
 CONFIG_PAIRS = {
     "e1a": ("configs/probe_anatomy.yaml", "configs/probe_disease.yaml"),
+    "e1c": ("configs/e1c_probe_anatomy.yaml", "configs/e1c_probe_disease.yaml"),
     "e1b": ("configs/e1b_probe_anatomy.yaml", "configs/e1b_probe_disease.yaml"),
 }
 CONFIG_CHOICES = tuple(path for pair in CONFIG_PAIRS.values() for path in pair)
@@ -54,8 +57,30 @@ def validate_pair(anatomy="configs/probe_anatomy.yaml", disease="configs/probe_d
     return a, d
 
 
+def validate_source_config(config):
+    """Require explicit E1-C source identity without changing older config defaults."""
+    experiment = config.get("source_experiment", "e1a")
+    if experiment not in SOURCE_SPECS:
+        raise ValueError(f"Unsupported frozen source experiment: {experiment}")
+    identity = config.get("source_model_identity")
+    if (identity is not None or experiment == "e1c") and identity != SOURCE_SPECS[experiment]["model"]["name"]:
+        raise ValueError("Probe source experiment/model identity mismatch")
+    if config.get("latent_source") not in ("anatomy", "disease"):
+        raise ValueError("latent_source must be anatomy or disease")
+    if experiment == "e1c":
+        if config.get("expected_source_checkpoint_sha256") != E1C_SOURCE_SHA256:
+            raise ValueError("E1-C config source SHA256 must match the scientific checkpoint")
+        # Lock both E1-C probes to the existing E1-B training protocol.
+        protocol = dict(epochs=30, batch_size=4, learning_rate=0.001, weight_decay=0.00001,
+                        seed=42, num_workers=4, validation_frequency=1, threshold=0.5,
+                        data_config="configs/data.yaml")
+        for key, expected in protocol.items():
+            if config.get(key) != expected:
+                raise ValueError(f"E1-C probe protocol requires {key}={expected}")
+
+
 def select_config(path):
-    """Select one of the four supported protocols by exact configured path."""
+    """Select one of the supported protocols by exact configured path."""
     selected = Path(path).resolve()
     for experiment, pair in CONFIG_PAIRS.items():
         for latent_source, candidate in zip(("anatomy", "disease"), pair):
@@ -66,6 +91,7 @@ def select_config(path):
                 if config.get("source_experiment", "e1a") != experiment:
                     raise ValueError("Probe config source_experiment mismatch")
                 validate_pair(*pair)
+                validate_source_config(config)
                 return config
     raise ValueError(f"Unsupported probe config: {path}")
 
@@ -107,11 +133,21 @@ def load_probe_checkpoint(path, model, optimizer, config, source_info):
 def run(config, *, resume=None, epochs=None, device=None, source_sha256=None,
         source_epoch=None):
     config = dict(config)
+    validate_source_config(config)
+    is_e1c = config.get("source_experiment") == "e1c"
+    if is_e1c and epochs is not None and epochs != config["epochs"]:
+        raise ValueError("E1-C probes require 30 epochs")
     source_path = Path(config["source_checkpoint"]).expanduser().resolve()
     output = Path(config["output_dir"]).expanduser().resolve()
     protected = [Path("outputs/e1a_latent_split").resolve(), Path("outputs/baseline_unet3d_full").resolve()]
     if any(output == p or p in output.parents for p in protected) or output == source_path.parent:
         raise ValueError("Probe output must be separate from frozen source artifacts")
+    if is_e1c:
+        frozen = Path(__file__).resolve().parents[1] / "outputs" / "frozen"
+        if output == frozen or frozen in output.parents or source_path.parent in output.parents:
+            raise ValueError("Probe output must be separate from frozen source artifacts")
+        if not resume and (output.exists() or Path(config["output_dir"]).expanduser().is_symlink()):
+            raise FileExistsError("Probe output directory already exists")
     data = read_config(config["data_config"])
     if len(Path(data["train_cases"]).read_text().splitlines()) != 1080 or len(Path(data["val_cases"]).read_text().splitlines()) != 270:
         raise ValueError("Expected fixed 1080/270 split")
@@ -122,8 +158,21 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=None,
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     source_experiment = config.get("source_experiment", "e1a")
+    if is_e1c:
+        if source_sha256 is not None and source_sha256 != config["expected_source_checkpoint_sha256"]:
+            raise ValueError("E1-C source SHA256 override is not permitted")
+        source_sha256 = config["expected_source_checkpoint_sha256"]
     source, source_info = load_source(source_path, source_experiment=source_experiment,
                                       expected_sha256=source_sha256, expected_epoch=source_epoch)
+    if is_e1c:
+        if (source_info.get("experiment") != "e1c" or
+                source_info.get("model") != config["source_model_identity"] or
+                source_info.get("sha256") != E1C_SOURCE_SHA256):
+            raise ValueError("Loaded E1-C source identity/SHA256 mismatch")
+        if any(parameter.requires_grad for parameter in source.parameters()):
+            raise ValueError("E1-C source has unexpected trainable parameters")
+        if any(module.training for module in source.modules()):
+            raise ValueError("E1-C source must remain in eval mode")
     model = FrozenLatentProbe(source, config["latent_source"])
     active_device = device or config["device"]
     model.to(active_device)
@@ -139,7 +188,7 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=None,
     train_data, val_data = make_dataset(data, "train"), make_dataset(data, "val")
     if {r["subject_id"] for r in train_data.records} & {r["subject_id"] for r in val_data.records}:
         raise ValueError("Training and validation splits overlap")
-    output.mkdir(parents=True, exist_ok=True)
+    output.mkdir(parents=True, exist_ok=not is_e1c or bool(resume))
     history = output / "history.csv"
     if not state and any((output / name).exists() for name in ("config.yaml", "history.csv", "best.pt", "latest.pt")):
         raise FileExistsError("Probe output already contains a run")
@@ -152,7 +201,14 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=None,
                             num_workers=config["num_workers"], worker_init_fn=seed_worker,
                             generator=torch.Generator().manual_seed(seed + 1))
     count = sum(p.numel() for p in model.probe.parameters())
+    if is_e1c and (count != 1742852 or any(not p.requires_grad for p in model.probe.parameters())):
+        raise ValueError("E1-C probe must have exactly 1,742,852 trainable parameters")
     environment = environment_metadata(count)
+    if is_e1c:
+        environment["device_requested"] = active_device
+        environment["git_status_short"] = subprocess.run(
+            ["git", "status", "--short"], cwd=Path(__file__).resolve().parents[1],
+            capture_output=True, text=True, check=True).stdout.splitlines()
     splits = {f"{part}_split_sha256": hashlib.sha256(Path(data[part + "_cases"]).read_bytes()).hexdigest()
               for part in ("train", "val")}
     metadata = dict(**config, data=data, **splits, source_checkpoint_info=source_info,
@@ -170,6 +226,13 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=None,
     else:
         (output / "config.yaml").write_text(yaml.safe_dump(metadata, sort_keys=False))
         write_json(output / "environment.json", environment)
+    if is_e1c:
+        # Append-only launch history complements latest.pt after an interruption.
+        with (output / "run_events.jsonl").open("a") as events:
+            events.write(json.dumps(dict(event="started", start_epoch=start,
+                requested_epochs=desired_epochs, resume_checkpoint=str(Path(resume).resolve()) if resume else None,
+                resume_checkpoint_sha256=file_sha256(resume) if resume else None,
+                environment=environment)) + "\n")
     best, best_epoch = (state["best_metric"], state["best_epoch"]) if state else (None, None)
     criterion = SegmentationLoss()
     started = time.perf_counter()
@@ -210,6 +273,10 @@ def run(config, *, resume=None, epochs=None, device=None, source_sha256=None,
                probe_parameter_count=count, frozen_source_parameter_count=source_info["parameter_count"],
                best_epoch=best_epoch, best_validation_metric=best, total_epochs_completed=desired_epochs,
                duration_seconds=time.perf_counter() - started, **splits))
+
+    if is_e1c:
+        with (output / "run_events.jsonl").open("a") as events:
+            events.write(json.dumps(dict(event="completed", total_epochs_completed=desired_epochs)) + "\n")
 
 
 def main():

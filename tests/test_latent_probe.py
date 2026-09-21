@@ -217,7 +217,8 @@ def test_e1b_pair_protocol_and_explicit_config_selection():
     assert select_config("configs/e1b_probe_anatomy.yaml")["latent_source"] == "anatomy"
     assert select_config("configs/e1b_probe_disease.yaml")["latent_source"] == "disease"
     assert set(CONFIG_CHOICES) == {"configs/probe_anatomy.yaml", "configs/probe_disease.yaml",
-                                   "configs/e1b_probe_anatomy.yaml", "configs/e1b_probe_disease.yaml"}
+                                   "configs/e1b_probe_anatomy.yaml", "configs/e1b_probe_disease.yaml",
+                                   "configs/e1c_probe_anatomy.yaml", "configs/e1c_probe_disease.yaml"}
     with pytest.raises(ValueError, match="Unsupported probe config"):
         select_config("configs/anatomy-but-unsupported.yaml")
     with pytest.raises(ValueError, match="same source experiment"):
