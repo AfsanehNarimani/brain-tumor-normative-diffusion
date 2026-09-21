@@ -1,0 +1,33 @@
+{
+  "experiment": "E1-C anatomy/background reconstruction constraint",
+  "artifact_type": "full_training",
+  "scientific_status": "frozen",
+  "source_git_commit": "d67ae6e7c7c33504173af69fa1d4c2fbd0d34a89",
+  "source_git_dirty": true,
+  "source_git_dirty_reason": "Machine-specific dataset root in configs/data.yaml only; not committed.",
+  "epochs_completed": 30,
+  "best_epoch": 11,
+  "best_validation_metric": 0.6349685445865519,
+  "train_case_count": 1080,
+  "validation_case_count": 270,
+  "lambda_rec": 1.0,
+  "lambda_anat": 0.5,
+  "checkpoint_selection": "mean presence-aware case Dice across regions with positive validation cases",
+  "artifacts": {
+    "best.pt": {
+      "sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53"
+    },
+    "config.yaml": {
+      "sha256": "1e2f068fab8ccfabd2316f1bd386d38a5a6c4e02a5db1733606aa19bdfbfbdd1"
+    },
+    "environment.json": {
+      "sha256": "81b8e5ffba8bd42fed3b385d7913a589579c330e15f2956b27a25e12bfb8a903"
+    },
+    "history.csv": {
+      "sha256": "ace107c3dc4cbebbd95338f6d7c8d84894227feaa8cd365184466844bc38aa9b"
+    },
+    "summary.json": {
+      "sha256": "ef80929cb9c59ae5c494f6f3250f7e49f9c13202e57ad495aa4292bbc2b2059f"
+    }
+  }
+}

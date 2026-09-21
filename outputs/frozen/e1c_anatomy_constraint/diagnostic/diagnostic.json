@@ -1,0 +1,293 @@
+{
+  "purpose": "Forward-only E1-C loss-scale diagnostic for explicit lambda_anat selection",
+  "experiment": "E1-C anatomy/background reconstruction constraint",
+  "timestamp": "2026-09-20T20:04:29.718565+00:00",
+  "git_commit": "1237d7383c4a2b64956adb88babc1bb5de16a56c",
+  "git_commit_sha": "1237d7383c4a2b64956adb88babc1bb5de16a56c",
+  "git_dirty": true,
+  "git_status": [
+    "M configs/data.yaml"
+  ],
+  "git_status_short": [
+    "M configs/data.yaml"
+  ],
+  "git_provenance_errors": null,
+  "model_config": {
+    "name": "anatomy_constrained_joint_reconstruction_unet3d",
+    "in_channels": 4,
+    "out_channels": 4,
+    "base_channels": 32,
+    "latent_projection": "conv1x1x1",
+    "latent_channels": 256
+  },
+  "training_config": {
+    "experiment_name": "E1-C anatomy/background reconstruction constraint",
+    "data_config": "configs/data.yaml",
+    "data_protocol": {
+      "train_cases": "splits/train_cases.txt",
+      "val_cases": "splits/val_cases.txt",
+      "normalize": true,
+      "patch_size": [
+        96,
+        96,
+        96
+      ],
+      "foreground_sampling_probability": 0.7,
+      "augmentation": {
+        "enabled": true,
+        "flip": {
+          "enabled": true,
+          "probability": 0.5
+        },
+        "intensity_scale": {
+          "enabled": true,
+          "min": 0.9,
+          "max": 1.1
+        },
+        "intensity_shift": {
+          "enabled": true,
+          "min": -0.1,
+          "max": 0.1
+        },
+        "gaussian_noise": {
+          "enabled": true,
+          "std_min": 0.0,
+          "std_max": 0.05
+        }
+      }
+    },
+    "epochs": 30,
+    "batch_size": 1,
+    "learning_rate": 0.001,
+    "weight_decay": 1e-05,
+    "seed": 42,
+    "num_workers": 4,
+    "device": "cuda",
+    "output_dir": "outputs/e1c_anatomy_constraint",
+    "validation_frequency": 1,
+    "threshold": 0.5,
+    "segmentation_loss": "Dice+BCE",
+    "reconstruction": {
+      "enabled": true,
+      "loss_type": "L1",
+      "lambda_rec": 1.0
+    },
+    "anatomy_reconstruction": {
+      "enabled": true,
+      "source": "Za only",
+      "target": "observed normalized MRI",
+      "loss_type": "masked L1",
+      "valid_mask": "raw_mask == 0",
+      "lambda_anat": 1.0
+    }
+  },
+  "data_config": {
+    "release": "BraTS2024-GLI-post-treatment",
+    "root": "/home/friend/data/training_data1_v2",
+    "train_manifest": null,
+    "val_manifest": null,
+    "normalize": true,
+    "patch_size": [
+      96,
+      96,
+      96
+    ],
+    "foreground_sampling_probability": 0.7,
+    "train_cases": "splits/train_cases.txt",
+    "val_cases": "splits/val_cases.txt",
+    "augmentation": {
+      "enabled": true,
+      "flip": {
+        "enabled": true,
+        "probability": 0.5
+      },
+      "intensity_scale": {
+        "enabled": true,
+        "min": 0.9,
+        "max": 1.1
+      },
+      "intensity_shift": {
+        "enabled": true,
+        "min": -0.1,
+        "max": 0.1
+      },
+      "gaussian_noise": {
+        "enabled": true,
+        "std_min": 0.0,
+        "std_max": 0.05
+      }
+    }
+  },
+  "data_protocol": {
+    "train_cases": "splits/train_cases.txt",
+    "val_cases": "splits/val_cases.txt",
+    "normalize": true,
+    "patch_size": [
+      96,
+      96,
+      96
+    ],
+    "foreground_sampling_probability": 0.7,
+    "augmentation": {
+      "enabled": true,
+      "flip": {
+        "enabled": true,
+        "probability": 0.5
+      },
+      "intensity_scale": {
+        "enabled": true,
+        "min": 0.9,
+        "max": 1.1
+      },
+      "intensity_shift": {
+        "enabled": true,
+        "min": -0.1,
+        "max": 0.1
+      },
+      "gaussian_noise": {
+        "enabled": true,
+        "std_min": 0.0,
+        "std_max": 0.05
+      }
+    }
+  },
+  "seed": 42,
+  "device": "cuda",
+  "diagnostic_batch_count": 10,
+  "lambda_rec": 1.0,
+  "lambda_anat": 1.0,
+  "model_mode": "train",
+  "optimizer_steps_performed": false,
+  "batches": [
+    {
+      "batch": 1,
+      "segmentation_loss": 1.743957281112671,
+      "reconstruction_loss": 0.5915142893791199,
+      "anatomy_loss": 0.5308669805526733,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.5915142893791199,
+      "weighted_anatomy_loss": 0.5308669805526733,
+      "total_loss": 2.8663387298583984,
+      "abnormal_voxel_fraction": 0.13438811898231506,
+      "non_abnormal_voxel_fraction": 0.8656118810176849
+    },
+    {
+      "batch": 2,
+      "segmentation_loss": 1.7002689838409424,
+      "reconstruction_loss": 0.6072095036506653,
+      "anatomy_loss": 0.5250390768051147,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.6072095036506653,
+      "weighted_anatomy_loss": 0.5250390768051147,
+      "total_loss": 2.832517623901367,
+      "abnormal_voxel_fraction": 0.170559361577034,
+      "non_abnormal_voxel_fraction": 0.829440638422966
+    },
+    {
+      "batch": 3,
+      "segmentation_loss": 1.8058061599731445,
+      "reconstruction_loss": 0.47108861804008484,
+      "anatomy_loss": 0.5537318587303162,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.47108861804008484,
+      "weighted_anatomy_loss": 0.5537318587303162,
+      "total_loss": 2.8306267261505127,
+      "abnormal_voxel_fraction": 0.014290139079093933,
+      "non_abnormal_voxel_fraction": 0.9857098609209061
+    },
+    {
+      "batch": 4,
+      "segmentation_loss": 1.80696439743042,
+      "reconstruction_loss": 0.5096994638442993,
+      "anatomy_loss": 0.5301582217216492,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.5096994638442993,
+      "weighted_anatomy_loss": 0.5301582217216492,
+      "total_loss": 2.8468220233917236,
+      "abnormal_voxel_fraction": 0.0187038853764534,
+      "non_abnormal_voxel_fraction": 0.9812961146235466
+    },
+    {
+      "batch": 5,
+      "segmentation_loss": 1.7285871505737305,
+      "reconstruction_loss": 0.7201967835426331,
+      "anatomy_loss": 0.6364517211914062,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.7201967835426331,
+      "weighted_anatomy_loss": 0.6364517211914062,
+      "total_loss": 3.085235595703125,
+      "abnormal_voxel_fraction": 0.15977534651756287,
+      "non_abnormal_voxel_fraction": 0.8402246534824371
+    },
+    {
+      "batch": 6,
+      "segmentation_loss": 1.7538731098175049,
+      "reconstruction_loss": 0.615777313709259,
+      "anatomy_loss": 0.5968045592308044,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.615777313709259,
+      "weighted_anatomy_loss": 0.5968045592308044,
+      "total_loss": 2.9664549827575684,
+      "abnormal_voxel_fraction": 0.10335399210453033,
+      "non_abnormal_voxel_fraction": 0.8966460078954697
+    },
+    {
+      "batch": 7,
+      "segmentation_loss": 1.7938945293426514,
+      "reconstruction_loss": 0.5633257031440735,
+      "anatomy_loss": 0.583175539970398,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.5633257031440735,
+      "weighted_anatomy_loss": 0.583175539970398,
+      "total_loss": 2.9403958320617676,
+      "abnormal_voxel_fraction": 0.01854790560901165,
+      "non_abnormal_voxel_fraction": 0.9814520943909883
+    },
+    {
+      "batch": 8,
+      "segmentation_loss": 1.772620677947998,
+      "reconstruction_loss": 0.5773065686225891,
+      "anatomy_loss": 0.5599279999732971,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.5773065686225891,
+      "weighted_anatomy_loss": 0.5599279999732971,
+      "total_loss": 2.9098551273345947,
+      "abnormal_voxel_fraction": 0.0505201555788517,
+      "non_abnormal_voxel_fraction": 0.9494798444211483
+    },
+    {
+      "batch": 9,
+      "segmentation_loss": 1.7497694492340088,
+      "reconstruction_loss": 0.5204983353614807,
+      "anatomy_loss": 0.49904435873031616,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.5204983353614807,
+      "weighted_anatomy_loss": 0.49904435873031616,
+      "total_loss": 2.7693121433258057,
+      "abnormal_voxel_fraction": 0.10724329203367233,
+      "non_abnormal_voxel_fraction": 0.8927567079663277
+    },
+    {
+      "batch": 10,
+      "segmentation_loss": 1.7735108137130737,
+      "reconstruction_loss": 0.5334835648536682,
+      "anatomy_loss": 0.5123239159584045,
+      "lambda_rec": 1.0,
+      "lambda_anat": 1.0,
+      "weighted_reconstruction_loss": 0.5334835648536682,
+      "weighted_anatomy_loss": 0.5123239159584045,
+      "total_loss": 2.8193182945251465,
+      "abnormal_voxel_fraction": 0.0579562708735466,
+      "non_abnormal_voxel_fraction": 0.9420437291264534
+    }
+  ]
+}
