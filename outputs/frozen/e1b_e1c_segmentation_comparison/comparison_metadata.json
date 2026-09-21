@@ -1,0 +1,52 @@
+{
+  "comparison_identity": "E1-B vs E1-C",
+  "delta_definition": "E1-C Dice minus E1-B Dice",
+  "case_identity_validation": {
+    "case_count_per_input": 270,
+    "unique_case_count_per_input": 270,
+    "identical_case_id_sets": true,
+    "target_presence_agrees": true,
+    "paired_case_region_rows": 1620,
+    "target_present_paired_rows": 1282,
+    "sorted_case_ids_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca"
+  },
+  "target_positive_counts": {
+    "NETC": 114,
+    "SNFH": 270,
+    "ET": 198,
+    "RC": 230,
+    "WT": 270,
+    "TC": 200
+  },
+  "statistical_core": "analysis.e1a_e1b_segmentation_statistics.statistics",
+  "analysis_timestamp_utc": "2026-09-21T05:23:51.012928+00:00",
+  "e1b_input_path": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1b_joint_reconstruction/evaluation/per_case_metrics.csv",
+  "e1c_input_path": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1c_anatomy_constraint/evaluation/per_case_metrics.csv",
+  "e1b_input_sha256": "f80bba75f63d26af9e8f0e8ebe8bbeda1deff75b1d65f5eaf32891805abc4502",
+  "e1c_input_sha256": "2878b70f1d1a0d366d50388465cc46169eede0654b0f0dd11ba6d1f56210bcdc",
+  "git_commit_sha": "fe13e0cc27170e4d5e1eac2e1d2d2611a4f727fc",
+  "git_dirty": false,
+  "git_status_short": [],
+  "python_version": "3.11.15",
+  "numpy_version": "2.2.6",
+  "pandas_version": "2.3.3",
+  "scipy_version": "1.17.1",
+  "statistical_settings": {
+    "bootstrap_seed": 20260917,
+    "bootstrap_resamples": 10000,
+    "bootstrap_ci_method": "paired percentile bootstrap of mean E1-C-minus-E1-B Dice; 2.5th and 97.5th percentiles",
+    "wilcoxon_parameters": {
+      "zero_method": "wilcox",
+      "correction": false,
+      "alternative": "two-sided",
+      "method": "auto",
+      "axis": 0,
+      "nan_policy": "raise",
+      "keepdims": false
+    },
+    "all_zero_wilcoxon_policy": "p = 1.0 only when all raw paired differences are exactly zero",
+    "multiple_comparison_correction": "Holm step-down across six regional Wilcoxon tests",
+    "tie_tolerance": 1e-08,
+    "delta_definition": "E1-C Dice minus E1-B Dice"
+  }
+}
