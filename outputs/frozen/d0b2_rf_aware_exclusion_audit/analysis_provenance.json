@@ -1,0 +1,64 @@
+{
+  "schema": "d0b2_rf_aware_exclusion_audit",
+  "schema_version": 1,
+  "audit_name": "D0-B2 Receptive-Field-Aware Abnormal Exclusion Audit",
+  "runtime_git_commit": "25cbc929c88f6b8c781eb1341c2e004e7ad33798",
+  "git_dirty": true,
+  "experiment_base_commit": "7c0fcd74f04cfee82a0c0f24e7d4d350d24e6ce9",
+  "train_split_path": "/home/friend/BrainTumorSeg/splits/train_cases.txt",
+  "train_split_sha256": "581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e",
+  "d0b0_patch_manifest_path": "/home/friend/BrainTumorSeg/outputs/frozen/d0b_support_mask_audit/patch_manifest.csv",
+  "d0b0_patch_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+  "d0b1_frozen_summary_path": "/home/friend/BrainTumorSeg/outputs/frozen/d0b1_abnormal_occupancy_audit/abnormal_occupancy_summary.json",
+  "d0b1_frozen_summary_sha256": "d0345c9c6c9e06241c9906082bd91e02ee57e036e4d66996e2f85934d9425da7",
+  "data_config_path": "/home/friend/BrainTumorSeg/configs/data.yaml",
+  "data_config_sha256": "b7b620393635ce091231e166b79a3bc6f39388526dd312f5c7df7b83c61c4b99",
+  "dataset_root": "/home/friend/data/training_data1_v2",
+  "case_count": 1080,
+  "patch_count": 21600,
+  "patch_shape": [
+    96,
+    96,
+    96
+  ],
+  "latent_shape": [
+    12,
+    12,
+    12
+  ],
+  "block_shape": [
+    8,
+    8,
+    8
+  ],
+  "encoder_geometry": {
+    "input_size": 96,
+    "output_size": 12,
+    "effective_stride": 8,
+    "theoretical_rf_size": 68
+  },
+  "raw_abnormal_labels": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "support_definition": "Raw MRI support is ANY modality nonzero before normalization, mapped by exact 8x8x8 occupancy; valid support requires occupancy >= 0.50.",
+  "direct_abnormal_rule": "Any raw abnormal voxel in the corresponding 8x8x8 input block.",
+  "rf_contamination": "Any raw abnormal voxel in the clipped real-input theoretical receptive-field box.",
+  "support_threshold": 0.5,
+  "eligibility": "valid_support AND NOT rf_contaminated",
+  "validation_data_used": false,
+  "model_training_performed": false,
+  "diffusion_model_loaded": false,
+  "new_random_sampling_performed": false,
+  "rejection_sampling_used": false,
+  "augmentation_used": false,
+  "final_corruption_strategy_selected": false,
+  "final_abnormal_policy_selected": false,
+  "python_version": "3.11.10",
+  "numpy_version": "2.2.6",
+  "pytorch_version": "2.14.0+cu130",
+  "nibabel_version": "5.4.2",
+  "timestamp_utc": "2026-09-22T13:11:47.085961+00:00"
+}
