@@ -1,0 +1,82 @@
+{
+  "schema": "d0b_support_mask_decision",
+  "version": 1,
+  "scientific_scope": "Train-only support audit used to define spatial sampling and latent support handling for D0-B diffusion.",
+  "training_sampling": {
+    "case_balanced": true,
+    "patch_shape": [
+      96,
+      96,
+      96
+    ],
+    "spatial_sampling": "random",
+    "tumor_centered_oversampling": false,
+    "support_based_patch_rejection": false,
+    "validation_derived_sampling": false
+  },
+  "support_definition": {
+    "source": "raw_multimodal_mri_before_normalization",
+    "rule": "any_modality_nonzero",
+    "segmentation_used": false,
+    "latent_mapping": "mean occupancy of each non-overlapping 8x8x8 input block",
+    "latent_shape": [
+      12,
+      12,
+      12
+    ]
+  },
+  "primary_latent_support_rule": {
+    "occupancy_threshold": 0.5,
+    "comparison_operator": ">=",
+    "rationale": "Geometric majority-support criterion: at least half of the corresponding 8x8x8 input block contains MRI support.",
+    "empirically_optimized": false,
+    "validation_used_for_selection": false
+  },
+  "planned_sensitivity_thresholds": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "audit_evidence": {
+    "case_count": 1080,
+    "total_patch_count": 21600,
+    "input_support_fraction": {
+      "count": 21600,
+      "mean": 0.5704054857837483,
+      "std": 0.1659686911379975,
+      "min": 0.0697948314525463,
+      "max": 0.9866807725694444,
+      "p01": 0.20300053349247685,
+      "p05": 0.2974990844726562,
+      "p25": 0.45187801784939235,
+      "p50": 0.5695410834418403,
+      "p75": 0.6885528564453125,
+      "p95": 0.8495783487955729,
+      "p99": 0.9203635999891492
+    },
+    "latent_fraction_ge_0_50": {
+      "count": 21600,
+      "mean": 0.5706997492283952,
+      "std": 0.16699063982124296,
+      "min": 0.07233796296296297,
+      "max": 0.9890046296296297,
+      "p01": 0.2025462962962963,
+      "p05": 0.296875,
+      "p25": 0.45124421296296297,
+      "p50": 0.5694444444444444,
+      "p75": 0.6898148148148148,
+      "p95": 0.8524305555555556,
+      "p99": 0.9236168981481473
+    }
+  },
+  "interpretation": "The train-only audit did not show that random spatial sampling was dominated by near-empty background patches. Therefore D0-B will not introduce support-based patch rejection. The 0.50 latent support threshold is a pre-specified geometric majority rule, not an empirically optimized threshold.",
+  "not_decided_here": [
+    "abnormal-region handling during diffusion training",
+    "diffusion loss formulation",
+    "diffusion architecture",
+    "noise schedule",
+    "inference operating point",
+    "DDIM reconstruction settings",
+    "deviation-map evaluation"
+  ]
+}
