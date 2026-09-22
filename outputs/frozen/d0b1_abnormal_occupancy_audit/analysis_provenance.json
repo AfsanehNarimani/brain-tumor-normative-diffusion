@@ -1,0 +1,64 @@
+{
+  "schema": "d0b1_abnormal_occupancy_audit",
+  "schema_version": 1,
+  "analysis_identity": "D0-B1 latent abnormal occupancy audit",
+  "experiment_base_commit": "12738979614d4268a8f2e42774808758317db4dc",
+  "runtime_git_commit": "8bcebc9afb170b444c523d6a6beb51144ce7358a",
+  "git_dirty": true,
+  "train_split_sha256": "581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e",
+  "patch_manifest_path": "/home/friend/BrainTumorSeg/outputs/frozen/d0b_support_mask_audit/patch_manifest.csv",
+  "patch_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+  "case_count": 1080,
+  "patch_count": 21600,
+  "patch_shape": [
+    96,
+    96,
+    96
+  ],
+  "latent_shape": [
+    12,
+    12,
+    12
+  ],
+  "block_shape": [
+    8,
+    8,
+    8
+  ],
+  "raw_abnormal_labels": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "support_definition": "D0-B0 raw MRI support: ANY modality nonzero before normalization",
+  "locked_support_threshold": 0.5,
+  "candidate_abnormal_thresholds": [
+    0.0,
+    0.01,
+    0.05,
+    0.1,
+    0.25,
+    0.5
+  ],
+  "validation_data_used": false,
+  "model_training_performed": false,
+  "augmentation_used": false,
+  "new_random_sampling_performed": false,
+  "rejection_sampling_used": false,
+  "segmentation_used": true,
+  "segmentation_purpose": "Ground-truth labels are used only to audit a future training exclusion policy, never as an inference input.",
+  "final_abnormal_threshold_selected": false,
+  "statistics_convention": "population standard deviation, ddof=0",
+  "no_model_loaded": true,
+  "no_diffusion_model_loaded": true,
+  "no_rejection_sampling": true,
+  "python_version": "3.11.10",
+  "numpy_version": "2.2.6",
+  "pytorch_version": "2.14.0+cu130",
+  "nibabel_version": "5.4.2",
+  "data_config_path": "/home/friend/BrainTumorSeg/configs/data.yaml",
+  "data_config_sha256": "b7b620393635ce091231e166b79a3bc6f39388526dd312f5c7df7b83c61c4b99",
+  "dataset_root": "/home/friend/data/training_data1_v2",
+  "timestamp_utc": "2026-09-22T11:53:45.023954+00:00"
+}
