@@ -1,0 +1,51 @@
+{
+  "analysis_timestamp_utc": "2026-09-22T06:02:45.572701+00:00",
+  "anatomy_input": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1c_probes/anatomy/evaluation/per_case_metrics.csv",
+  "disease_input": "/Users/afsaneh/Work/brain-tumor-normative-diffusion/outputs/frozen/e1c_probes/disease/evaluation/per_case_metrics.csv",
+  "anatomy_input_sha256": "d1328d3b800490cf56ee44532d185c9fd2e76cb9ca470fa713df809607212880",
+  "disease_input_sha256": "f68053782d926051c06ea2b6619652c3ee95f9f366f0065b163764d32515185b",
+  "case_count": 270,
+  "anatomy_case_count": 270,
+  "disease_case_count": 270,
+  "target_positive_counts": {
+    "NETC": 114,
+    "SNFH": 270,
+    "ET": 198,
+    "RC": 230,
+    "WT": 270,
+    "TC": 200
+  },
+  "expected_positive_counts": {
+    "NETC": 114,
+    "SNFH": 270,
+    "ET": 198,
+    "RC": 230,
+    "WT": 270,
+    "TC": 200
+  },
+  "bootstrap_seed": 20260917,
+  "bootstrap_resamples": 10000,
+  "bootstrap_ci_method": "paired percentile bootstrap of mean disease-minus-anatomy Dice; 2.5th and 97.5th percentiles",
+  "wilcoxon_parameters": {
+    "zero_method": "wilcox",
+    "correction": false,
+    "alternative": "two-sided",
+    "method": "auto",
+    "axis": 0,
+    "nan_policy": "raise",
+    "keepdims": false
+  },
+  "all_zero_wilcoxon_policy": "p = 1.0 when all paired differences are zero",
+  "multiple_comparison_correction": "Holm step-down across six regional Wilcoxon p-values",
+  "win_tie_tolerance": 1e-08,
+  "paper_table_format": "Dice, delta, CI: four decimals; p-values: three significant digits; source CSV/JSON retain full precision.",
+  "git_commit_sha": "56ca6715266aad2b82637d95067f80da1128fc24",
+  "git_dirty": false,
+  "python_version": "3.11.15",
+  "numpy_version": "2.2.6",
+  "scipy_version": "1.17.1",
+  "interpretation": "Relative pathology accessibility under identical probes; does not establish disentanglement.",
+  "analysis_name": "E1-C latent-probe paired comparison",
+  "delta_direction": "Zd - Za",
+  "confidence_level": 0.95
+}
