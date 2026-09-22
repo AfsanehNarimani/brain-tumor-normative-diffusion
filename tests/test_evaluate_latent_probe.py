@@ -228,3 +228,136 @@ def test_protected_output_directories_are_rejected(setup_evaluation, protected):
     with pytest.raises(ValueError, match="Evaluation output must be separate"):
         script.evaluate("configs/probe_anatomy.yaml", output_dir=output)
     values["evaluate_artifacts"].assert_not_called()
+
+
+@pytest.fixture(params=["anatomy", "disease"])
+def e1c_evaluation(setup_evaluation, request):
+    values = setup_evaluation
+    latent = request.param
+    values["config"].update(
+        latent_source=latent, source_experiment="e1c",
+        source_model_identity="anatomy_constrained_joint_reconstruction_unet3d",
+        expected_source_checkpoint_sha256=script.E1C_SOURCE_SHA256,
+    )
+    values["source_info"].update(
+        experiment="e1c", model=values["config"]["source_model_identity"],
+        sha256=script.E1C_SOURCE_SHA256, epoch=11,
+    )
+    values["model"].latent_source = latent
+    values["state"]["latent_source"] = latent
+    values["config_path"] = f"configs/e1c_probe_{latent}.yaml"
+    return values
+
+
+def test_e1c_evaluation_flow_and_provenance(e1c_evaluation):
+    values = e1c_evaluation
+    assert values["config_path"] in script.CONFIG_CHOICES
+    assert script.evaluate(values["config_path"]) == {"case_count": 270}
+    values["load_source"].assert_called_once_with(values["source"].resolve(), source_experiment="e1c")
+    values["construct_model"].assert_called_once_with(
+        values["load_source"].return_value[0], values["config"]["latent_source"])
+    values["load_checkpoint"].assert_called_once_with(
+        values["checkpoint"].resolve(), values["model"], None,
+        {key: value for key, value in values["config"].items() if key != "epochs"},
+        values["source_info"],
+    )
+    values["make_dataset"].assert_called_once_with(values["data_config"], "val")
+    output = values["checkpoint"].parent / "evaluation"
+    values["evaluate_artifacts"].assert_called_once_with(
+        values["model"], values["dataset"], output, "cpu", 0.5, (8, 9, 10), (),
+    )
+    provenance = json.loads((output / "evaluation_provenance.json").read_text())
+    expected = {
+        "source_experiment": "e1c",
+        "source_model_identity": "anatomy_constrained_joint_reconstruction_unet3d",
+        "latent_source": values["config"]["latent_source"],
+        "probe_checkpoint": str(values["checkpoint"].resolve()),
+        "probe_checkpoint_sha256": file_sha256(values["checkpoint"]),
+        "probe_checkpoint_epoch": 12, "probe_checkpoint_best_epoch": 10,
+        "probe_checkpoint_best_metric": 0.61,
+        "frozen_source_checkpoint": str(values["source"].resolve()),
+        "frozen_source_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+        "frozen_source_epoch": 11,
+        "validation_split": str(values["split"].resolve()),
+        "validation_split_sha256": file_sha256(values["split"]),
+        "validation_case_count": 270, "threshold": 0.5,
+        "git_commit_sha": "abc123", "git_dirty": True,
+        "git_status_short": [" M configs/data.yaml"], "device_requested": "cpu",
+    }
+    assert expected.items() <= provenance.items()
+    assert {"python_version", "pytorch_version", "numpy_version", "nibabel_version"} <= provenance.keys()
+    assert not (output / "predictions").exists()
+
+
+@pytest.mark.parametrize("key,value,match", [
+    ("latent_source", "invalid", "latent_source mismatch"),
+    ("source_experiment", "e1b", "source_experiment mismatch"),
+    ("source_model_identity", "joint_reconstruction_unet3d", "model identity mismatch"),
+    ("source_model_identity", None, "model identity mismatch"),
+    ("expected_source_checkpoint_sha256", "0" * 64, "SHA256"),
+    ("expected_source_checkpoint_sha256", None, "SHA256"),
+])
+def test_e1c_config_identity_rejected(e1c_evaluation, key, value, match):
+    values = e1c_evaluation
+    values["config"][key] = value
+    with pytest.raises(ValueError, match=match):
+        script.evaluate(values["config_path"])
+    values["load_source"].assert_not_called()
+
+
+@pytest.mark.parametrize("key,value", [
+    ("experiment", "e1b"), ("model", "joint_reconstruction_unet3d"),
+])
+def test_e1c_loaded_source_identity_rejected(e1c_evaluation, key, value):
+    values = e1c_evaluation
+    values["source_info"][key] = value
+    with pytest.raises(ValueError, match="identity mismatch"):
+        script.evaluate(values["config_path"])
+    values["load_checkpoint"].assert_not_called()
+
+
+def test_e1c_config_path_must_be_exact(e1c_evaluation, tmp_path):
+    values = e1c_evaluation
+    with pytest.raises(ValueError, match="Unsupported probe config"):
+        script.evaluate(tmp_path / Path(values["config_path"]).name)
+    values["read_config"].assert_not_called()
+
+
+@pytest.mark.parametrize("name", script.EVALUATION_FILES)
+def test_e1c_overwrite_protection(e1c_evaluation, name):
+    values = e1c_evaluation
+    output = values["checkpoint"].parent / "evaluation"
+    output.mkdir()
+    artifact = output / name
+    artifact.write_text("existing result")
+    with pytest.raises(FileExistsError, match="already exists"):
+        script.evaluate(values["config_path"])
+    assert artifact.read_text() == "existing result"
+    values["evaluate_artifacts"].assert_not_called()
+
+
+@pytest.mark.parametrize("field,value", [
+    ("config", {}), ("latent_source", "invalid"), ("probe_architecture", {}),
+    ("source_checkpoint", {"experiment": "e1b"}),
+])
+def test_e1c_strict_probe_checkpoint_rejected(e1c_evaluation, monkeypatch, field, value):
+    from scripts import train_latent_probe
+
+    values = e1c_evaluation
+    # Use the real checkpoint validator; only deserialize a synthetic state.
+    state = {
+        **values["state"],
+        "config": {k: v for k, v in values["config"].items() if k != "epochs"},
+        "source_checkpoint": {k: values["source_info"][k]
+                              for k in ("path", "sha256", "epoch", "experiment", "model")},
+    }
+    if field == "source_checkpoint":
+        state[field].update(value)
+    else:
+        state[field] = value
+    monkeypatch.setattr(train_latent_probe.torch, "load", lambda *a, **kw: state)
+    monkeypatch.setattr(train_latent_probe, "file_sha256", lambda path: script.E1C_SOURCE_SHA256)
+    monkeypatch.setattr(script, "load_probe_checkpoint", train_latent_probe.load_probe_checkpoint)
+    with pytest.raises(ValueError, match="identity mismatch"):
+        script.evaluate(values["config_path"])
+    values["evaluate_artifacts"].assert_not_called()

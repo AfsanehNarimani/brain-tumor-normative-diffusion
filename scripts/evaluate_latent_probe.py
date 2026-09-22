@@ -1,4 +1,4 @@
-"""Evaluate one frozen E1-A or E1-B probe on the fixed validation split."""
+"""Evaluate one frozen E1-A, E1-B, or E1-C probe on the fixed validation split."""
 
 import argparse
 from pathlib import Path
@@ -10,7 +10,7 @@ import numpy as np
 import torch
 
 from evaluation.artifacts import evaluate_artifacts
-from models.latent_probe import FrozenLatentProbe, PROBE_ARCHITECTURE, file_sha256, load_source
+from models.latent_probe import E1C_SOURCE_SHA256, FrozenLatentProbe, PROBE_ARCHITECTURE, file_sha256, load_source
 from scripts.train_baseline import make_dataset, read_case_ids
 from scripts.train_latent_probe import load_probe_checkpoint, read_config
 from training.artifacts import write_json
@@ -21,6 +21,8 @@ CONFIG_PROTOCOLS = {
     "configs/probe_disease.yaml": ("e1a", "disease", "latent_split_unet3d"),
     "configs/e1b_probe_anatomy.yaml": ("e1b", "anatomy", "joint_reconstruction_unet3d"),
     "configs/e1b_probe_disease.yaml": ("e1b", "disease", "joint_reconstruction_unet3d"),
+    "configs/e1c_probe_anatomy.yaml": ("e1c", "anatomy", "anatomy_constrained_joint_reconstruction_unet3d"),
+    "configs/e1c_probe_disease.yaml": ("e1c", "disease", "anatomy_constrained_joint_reconstruction_unet3d"),
 }
 CONFIG_CHOICES = tuple(CONFIG_PROTOCOLS)
 EVALUATION_FILES = ("per_case_metrics.csv", "aggregate_metrics.json", "evaluation_provenance.json")
@@ -73,6 +75,12 @@ def evaluate(config_path, *, checkpoint=None, device=None, output_dir=None, save
     resolved_experiment = config.get("source_experiment", "e1a")
     if resolved_experiment != expected_experiment:
         raise ValueError("Probe config source_experiment mismatch")
+
+    if expected_experiment == "e1c":
+        if config.get("source_model_identity") != expected_model:
+            raise ValueError("Probe config source model identity mismatch")
+        if config.get("expected_source_checkpoint_sha256") != E1C_SOURCE_SHA256:
+            raise ValueError("E1-C config source SHA256 must match the scientific checkpoint")
 
     checkpoint_path, output = resolve_paths(config, checkpoint, output_dir)
     source_path = Path(config["source_checkpoint"]).expanduser().resolve()

@@ -6,6 +6,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
+from models.anatomy_constrained_joint_reconstruction_unet3d import AnatomyConstrainedJointReconstructionUNet3D
 from models.encoder import conv_block
 from models.latent_split_unet3d import LatentSplitUNet3D
 from models.joint_reconstruction_unet3d import JointReconstructionUNet3D
@@ -17,9 +18,15 @@ SOURCE_MODEL = dict(name="latent_split_unet3d", in_channels=4, out_channels=4,
 E1B_SOURCE_SHA256 = "142166a90ff3fb652fbc776ad98e1b33fe56988e8796ef87334ab91d86228606"
 E1B_SOURCE_MODEL = dict(name="joint_reconstruction_unet3d", in_channels=4, out_channels=4,
                         base_channels=32, latent_projection="conv1x1x1", latent_channels=256)
+E1C_SOURCE_SHA256 = "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53"
+E1C_SOURCE_MODEL = dict(name="anatomy_constrained_joint_reconstruction_unet3d", in_channels=4,
+                        out_channels=4, base_channels=32, latent_projection="conv1x1x1", latent_channels=256)
+E1C_SOURCE_EXPERIMENT = "E1-C anatomy/background reconstruction constraint"
 SOURCE_SPECS = {
     "e1a": dict(label="E1-A", sha256=SOURCE_SHA256, epoch=15,
                 model=SOURCE_MODEL, constructor=LatentSplitUNet3D),
+    "e1c": dict(label="E1-C", sha256=E1C_SOURCE_SHA256, epoch=11,
+                model=E1C_SOURCE_MODEL, constructor=AnatomyConstrainedJointReconstructionUNet3D),
     "e1b": dict(label="E1-B", sha256=E1B_SOURCE_SHA256, epoch=13,
                 model=E1B_SOURCE_MODEL, constructor=JointReconstructionUNet3D),
 }
@@ -43,6 +50,11 @@ def load_source(path: str | Path, *, source_experiment: str = "e1a",
     if source_experiment not in SOURCE_SPECS:
         raise ValueError(f"Unsupported frozen source experiment: {source_experiment}")
     spec = SOURCE_SPECS[source_experiment]
+    if source_experiment == "e1c":
+        if expected_sha256 is not None and expected_sha256 != E1C_SOURCE_SHA256:
+            raise ValueError("Frozen E1-C source SHA256 must match the scientific checkpoint")
+        if expected_epoch is not None and expected_epoch != 11:
+            raise ValueError("Frozen E1-C source epoch must be 11")
     expected_sha256 = spec["sha256"] if expected_sha256 is None else expected_sha256
     expected_epoch = spec["epoch"] if expected_epoch is None else expected_epoch
     path = Path(path).expanduser().resolve()
@@ -57,6 +69,8 @@ def load_source(path: str | Path, *, source_experiment: str = "e1a",
     config = state.get("config")
     if not isinstance(config, dict) or config.get("model") != spec["model"]:
         raise ValueError(f"Frozen {spec['label']} source model architecture/config mismatch")
+    if source_experiment == "e1c" and config.get("experiment_name") != E1C_SOURCE_EXPERIMENT:
+        raise ValueError("Frozen E1-C source experiment identity mismatch")
     model = spec["constructor"](**{k: v for k, v in spec["model"].items() if k != "name"})
     model.load_state_dict(state["model"], strict=True)
     model.requires_grad_(False)
@@ -104,6 +118,11 @@ class FrozenLatentProbe(nn.Module):
     def extract_latent(self, image: torch.Tensor) -> torch.Tensor:
         if image.ndim != 5 or image.shape[1] != self.source.in_channels or min(image.shape[2:]) < 8:
             raise ValueError("Expected [B,4,D,H,W] with each spatial dimension >= 8")
+        if isinstance(self.source, AnatomyConstrainedJointReconstructionUNet3D):
+            if any(parameter.requires_grad for parameter in self.source.parameters()):
+                raise ValueError("E1-C source has unexpected trainable parameters")
+            if any(module.training for module in self.source.modules()):
+                raise ValueError("E1-C source must remain in eval mode")
         # Do not call forward_with_latents: that also runs the original decoder.
         with torch.no_grad():
             bottleneck = self.source.encoder(image)[-1]
