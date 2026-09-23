@@ -1,0 +1,262 @@
+{
+  "contract_version": 1,
+  "stage": "D0-B4",
+  "status": "COMPLETE_DESIGN_FROZEN_PRE_TRAINING",
+  "scientific_training_started": false,
+  "training_results_observed": false,
+  "validation_results_observed": false,
+  "diffusion_checkpoint_exists": false,
+  "purpose": "Single authoritative provenance record proving that architecture, training, validation, inference, sampling, and development-validation choices were frozen before scientific diffusion training.",
+  "freeze_branch": "experiment/d0b4-diffusion-design",
+  "freeze_base_commit": "6d25105965d4fbb4badca4ed6447926887e20266",
+  "d0b4a": {
+    "commit": "6772b023ab9c1d870f258f45d030b958d1f9b19b",
+    "path": "outputs/frozen/d0b4a_diffusion_memory_preflight/decision/microbatch_decision.json",
+    "sha256": "07c268d97c7a39f389548344be7245cee4eba3a390a91d29b6533ab466c5254b",
+    "sha256_verified": true,
+    "locked_values": {
+      "physical_microbatch": 8,
+      "gradient_accumulation_steps": 1,
+      "effective_batch_size": 8,
+      "selected_peak_reserved_fraction": 0.16406770176197644,
+      "selection_rule": "largest passing physical microbatch with peak_reserved_fraction <= 0.90"
+    }
+  },
+  "d0b4b": {
+    "commit": "cf5985fdee2546a8d609d3abe76121951749f851",
+    "path": "configs/d0b4b_inference_contract.json",
+    "sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4",
+    "sha256_verified": true,
+    "locked_values": {
+      "primary_timestep": 495,
+      "sensitivity_timesteps": [
+        327,
+        663
+      ],
+      "ddim_eta": 0.0,
+      "ddim_model_evaluations": 50,
+      "primary_noise_replicates": 4,
+      "inference_global_seed": 20260923,
+      "primary_deltaz": "mean_replicates(mean_channels(abs(z0_supported - Zprior_k)))",
+      "z0_supported": "z0 * support_mask",
+      "final_support_masking": "DeltaZ = DeltaZ * support_mask",
+      "zprior_zero_outside_support": true,
+      "source_aggregation": "mean_replicates(mean_channels(abs(z0-Zprior_k) * support_mask)) * support_mask",
+      "aggregation_equivalence": "Equivalent to the frozen B4b masked absolute-difference formula because Zprior_k is zero outside support; absolute difference precedes replicate averaging.",
+      "gt_at_inference": false,
+      "pathology_corruption_at_inference": false
+    }
+  },
+  "d0b4c": {
+    "commit": "cb4d830a6ce777fab7935ae77eeb75ca321db5de",
+    "path": "configs/d0b4c_training_validation_contract.json",
+    "sha256": "861ea070f7bfa2677b9345403905e70400190012e56efac722ccbb892af21f75",
+    "sha256_verified": true,
+    "locked_values": {
+      "train_cases": 1080,
+      "validation_cases": 270,
+      "max_epochs": 100,
+      "samples_per_epoch": 1080,
+      "physical_batch_size": 8,
+      "gradient_accumulation_steps": 1,
+      "effective_batch_size": 8,
+      "optimizer_steps_per_epoch": 135,
+      "max_optimizer_steps": 13500,
+      "optimizer": "AdamW",
+      "learning_rate": 0.0001,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "epsilon": 1e-08,
+      "weight_decay": 0.0001,
+      "lr_scheduler": "none",
+      "gradient_clip": 1.0,
+      "prediction_type": "epsilon",
+      "T": 1000,
+      "cosine_offset": 0.008,
+      "max_beta": 0.999,
+      "ema": true,
+      "ema_decay": 0.999,
+      "validation_human_facing_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ],
+      "primary_checkpoint_selection_metric": "mean case-level validation support-masked epsilon MSE",
+      "validation_role": "DEVELOPMENT_VALIDATION",
+      "independent_final_evaluation": "separate/TBD"
+    }
+  },
+  "d0b4d": {
+    "commit": "6d25105965d4fbb4badca4ed6447926887e20266",
+    "directory": "outputs/frozen/d0b4d_validation_manifest",
+    "artifacts": {
+      "validation_manifest.csv": {
+        "commit": "6d25105965d4fbb4badca4ed6447926887e20266",
+        "path": "outputs/frozen/d0b4d_validation_manifest/validation_manifest.csv",
+        "sha256": "2a3a10d0d7b6b34bc412cfee5e30f45912161528ff509e69193f3516af3baee4",
+        "sha256_verified": true
+      },
+      "validation_manifest_audit.csv": {
+        "commit": "6d25105965d4fbb4badca4ed6447926887e20266",
+        "path": "outputs/frozen/d0b4d_validation_manifest/validation_manifest_audit.csv",
+        "sha256": "fe9b055b64c51fa1dafddbe6cb260c73310ef7468ef10ccb6e80477a3cdf2257",
+        "sha256_verified": true
+      },
+      "validation_manifest_summary.json": {
+        "commit": "6d25105965d4fbb4badca4ed6447926887e20266",
+        "path": "outputs/frozen/d0b4d_validation_manifest/validation_manifest_summary.json",
+        "sha256": "a109cd877adb18cd6a7d4c2741ffa1017df6593b16aa79ac8b3248f8351b1883",
+        "sha256_verified": true
+      },
+      "provenance.json": {
+        "commit": "6d25105965d4fbb4badca4ed6447926887e20266",
+        "path": "outputs/frozen/d0b4d_validation_manifest/provenance.json",
+        "sha256": "02ba95bb4cd53fc3fa906e1a44c02974ccbf3e5eb45897cf1e5c0260678f370f",
+        "sha256_verified": true
+      }
+    },
+    "manifest_path": "outputs/frozen/d0b4d_validation_manifest/MANIFEST.sha256",
+    "manifest_sha256": "5dc557a37a0d8d637afee7217ca907cb6fab56c406e55d57fea22f297c8e3a95",
+    "manifest_integrity_verified": true,
+    "semantic_integrity_verified": true,
+    "verification_method": "scripts.freeze_d0b4d_validation_manifest --verify-only; no writes or MRI/GT loading",
+    "locked_values": {
+      "case_count": 270,
+      "patches_per_case": 4,
+      "total_patches": 1080,
+      "zero_support_patch_count": 0,
+      "validation_global_seed": 20260923,
+      "support_threshold": 0.5,
+      "corruption_operator": "local_empirical_resample"
+    }
+  },
+  "root_scientific_provenance": {
+    "train_split": {
+      "path": "splits/train_cases.txt",
+      "sha256": "581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e",
+      "sha256_verified": true
+    },
+    "validation_split": {
+      "path": "splits/val_cases.txt",
+      "sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+      "sha256_verified": true
+    },
+    "e1c_checkpoint": {
+      "path": "outputs/frozen/e1c_anatomy_constraint/training/best.pt",
+      "sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+      "sha256_verified": true
+    },
+    "d0a_normalization_contract": {
+      "path": "outputs/frozen/d0_latent_distribution_audit/d0_za_normalization_contract.json",
+      "sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+      "sha256_verified": true
+    },
+    "d0b0_manifest": {
+      "path": "outputs/frozen/d0b_support_mask_audit/patch_manifest.csv",
+      "sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+      "sha256_verified": true
+    },
+    "d0b3_corruption_decision": {
+      "path": "outputs/frozen/d0b3_corruption_operator_audit/decision/corruption_operator_decision.json",
+      "sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+      "sha256_verified": true
+    }
+  },
+  "architecture": {
+    "model": "LatentDiffusionUNet3D",
+    "parameter_count": 22825280,
+    "latent_shape": [
+      256,
+      12,
+      12,
+      12
+    ],
+    "base_widths": [
+      64,
+      128,
+      256
+    ],
+    "attention": false,
+    "dropout": 0,
+    "conditioning": "none",
+    "za_source": "Frozen E1-C Encoder + P_a provide Za.",
+    "za_description": "anatomy/background representation"
+  },
+  "scientific_interpretation": {
+    "Za_is_proven_healthy": false,
+    "Za_is_proven_pathology_free": false,
+    "groupnorm_caveat": "GroupNorm introduces spatial statistical coupling beyond local Conv/Pool receptive fields; this caveat remains applicable to interpretation of E1-C latent representations.",
+    "corruption_caveat": "D0-B3 corruption reduces direct pathology information at the MRI input, but does not prove pathology-free latent representations.",
+    "diffusion_prior_terminology": "anatomy/background latent diffusion prior",
+    "proven_healthy_or_normal_brain_prior_claim_allowed": false
+  },
+  "no_post_hoc_tuning": {
+    "frozen_before_scientific_training": true,
+    "locked_items": [
+      "architecture",
+      "source model",
+      "Za normalization",
+      "training split",
+      "validation split",
+      "training crop generation",
+      "training case ordering",
+      "training corruption",
+      "support semantics",
+      "diffusion schedule",
+      "prediction type",
+      "optimizer",
+      "learning rate",
+      "batch size",
+      "AMP",
+      "EMA",
+      "training duration",
+      "validation manifest",
+      "validation randomness",
+      "validation frequency",
+      "checkpoint metric",
+      "checkpoint selection",
+      "primary inference timestep",
+      "sensitivity timesteps",
+      "DDIM schedule",
+      "DDIM eta",
+      "noise replicates",
+      "seed semantics",
+      "DeltaZ aggregation",
+      "development-validation interpretation"
+    ],
+    "future_changes_require_new_protocol_version": true,
+    "future_changes_require_separate_provenance": true,
+    "silent_replacement_of_frozen_primary_protocol_allowed": false
+  },
+  "training_start_gate": {
+    "scientific_diffusion_training_allowed": true,
+    "required_frozen_verified_stages": [
+      "D0-B4a",
+      "D0-B4b",
+      "D0-B4c",
+      "D0-B4d"
+    ],
+    "all_prerequisites_frozen_and_verified": true,
+    "training_has_not_started_at_freeze_time": true,
+    "meaning": "Prerequisites are satisfied; this gate does not mean training occurred."
+  }
+}
