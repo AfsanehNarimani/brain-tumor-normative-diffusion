@@ -1,0 +1,50 @@
+{
+  "case_count": 270,
+  "coordinate_generation_version": 1,
+  "corruption_executability_audited": true,
+  "corruption_operator": "local_empirical_resample",
+  "donor_fallback_modality_count": 0,
+  "donor_fallback_patch_count": 0,
+  "gt_use": "Only to audit the already-frozen corruption operation.",
+  "gt_used_for_coordinate_selection": false,
+  "independent_final_test": false,
+  "latent_shape": [
+    12,
+    12,
+    12
+  ],
+  "model_selection_performed": false,
+  "patch_shape": [
+    96,
+    96,
+    96
+  ],
+  "patches_per_case": 4,
+  "required_zero_support_patch_count": 0,
+  "scientific_training_started": false,
+  "stage": "D0-B4d",
+  "statistics_semantics": "Descriptive only; population std; linear percentiles; no sampling or selection changes.",
+  "status": "CLOSED_FROZEN_PRE_TRAINING",
+  "support_fraction_statistics": {
+    "max": 0.96875,
+    "mean": 0.5747513717421125,
+    "min": 0.12037037037037036,
+    "p01": 0.19642939814814817,
+    "p05": 0.2881655092592592,
+    "p25": 0.45515046296296297,
+    "p50": 0.5729166666666666,
+    "p75": 0.6996527777777778,
+    "p95": 0.8726851851851852,
+    "p99": 0.9272048611111112,
+    "std": 0.17347382247110849
+  },
+  "support_mapping": "exact 8x8x8 occupancy",
+  "support_threshold": 0.5,
+  "total_patches": 1080,
+  "validation_global_seed": 20260923,
+  "validation_manifest_audit_sha256": "fe9b055b64c51fa1dafddbe6cb260c73310ef7468ef10ccb6e80477a3cdf2257",
+  "validation_manifest_sha256": "2a3a10d0d7b6b34bc412cfee5e30f45912161528ff509e69193f3516af3baee4",
+  "validation_results_observed": false,
+  "validation_role": "DEVELOPMENT_VALIDATION",
+  "zero_support_patch_count": 0
+}
