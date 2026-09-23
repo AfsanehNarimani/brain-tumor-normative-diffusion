@@ -325,3 +325,84 @@ def test_source_hash_mismatch_precedes_cuda(tmp_path, monkeypatch, invalid_sourc
     for guard in guards:
         guard.assert_not_called()
     assert not output.exists()
+
+
+def test_prepare_microbatch_uses_frozen_crop_raw_support(monkeypatch):
+    from unittest.mock import Mock
+    import scripts.preflight_d0b4_diffusion_memory as pf
+    image = torch.zeros(4, 100, 104, 108)
+    # Constant raw foreground becomes zero after normalization, so using
+    # normalized MRI for support would give a different answer.
+    image[2, 2:98, 3:99, 5:53] = 7
+    raw_mask = torch.zeros(100, 104, 108, dtype=torch.int64)
+    raw_mask[2, 3, 5:11] = torch.tensor([0, 1, 2, 3, 4, 5])
+    row = dict(case_id='case_support', patch_index=17,
+               crop_start_d=2, crop_stop_d=98, crop_start_h=3, crop_stop_h=99,
+               crop_start_w=5, crop_stop_w=101)
+    original_row = row.copy()
+    expected_patch = image[:, 2:98, 3:99, 5:101].clone()
+    expected_abnormal = torch.isin(raw_mask[2:98, 3:99, 5:101], torch.tensor([1, 2, 3, 4]))
+    load = Mock(return_value=(image, raw_mask))
+    monkeypatch.setattr(pf, 'load_case', load)
+    normalize = Mock(wraps=pf.normalize_nonzero)
+    monkeypatch.setattr(pf, 'normalize_nonzero', normalize)
+    frozen_support = pf.support_mask
+    observed = {}
+    def support(patch):
+        normalize.assert_called_once()
+        assert normalize.call_args.args[0] is image
+        assert patch.shape == (4, 96, 96, 96)
+        assert torch.equal(patch, expected_patch)
+        observed['support'] = frozen_support(patch)
+        return observed['support']
+    support_spy = Mock(side_effect=support)
+    monkeypatch.setattr(pf, 'support_mask', support_spy)
+    pools = object()
+    def donors(patch, abnormal, raw_support):
+        assert torch.equal(patch, expected_patch)
+        assert torch.equal(abnormal, expected_abnormal)
+        assert raw_support is observed['support']
+        return pools, None
+    donor_spy = Mock(side_effect=donors)
+    monkeypatch.setattr(pf, 'donor_pools', donor_spy)
+    def corrupt(patch, abnormal, donor_values, operator, **kwargs):
+        assert patch.shape == (4, 96, 96, 96)
+        assert torch.count_nonzero(patch) == 0
+        assert torch.equal(abnormal, expected_abnormal)
+        assert donor_values is pools
+        assert operator == 'local_empirical_resample'
+        assert kwargs == dict(global_seed=pf.PREFLIGHT_SEED, case_id=row['case_id'], patch_index=17)
+        return patch
+    corrupt_spy = Mock(side_effect=corrupt)
+    monkeypatch.setattr(pf, 'corrupt_input', corrupt_spy)
+    frozen_occupancy = pf.block_occupancy
+    def occupancy(mask):
+        assert mask is observed['support']
+        assert mask.shape == (96, 96, 96)
+        return frozen_occupancy(mask)
+    occupancy_spy = Mock(side_effect=occupancy)
+    monkeypatch.setattr(pf, 'block_occupancy', occupancy_spy)
+    monkeypatch.setattr(pf, 'extract_za', lambda source, batch: torch.zeros(batch.shape[0], 256, 12, 12, 12))
+    z, latent_support = pf.prepare_microbatch([row], 'dataset', object(), torch.zeros(256), torch.ones(256), 'cpu')
+    load.assert_called_once_with('dataset', 'case_support')
+    for spy in (support_spy, donor_spy, corrupt_spy, occupancy_spy):
+        spy.assert_called_once()
+    assert row == original_row
+    assert z.shape == (1, 256, 12, 12, 12)
+    assert latent_support[0].shape == (1, 12, 12, 12)
+    expected_support = torch.zeros(1, 1, 12, 12, 12)
+    expected_support[..., :6] = 1
+    assert torch.equal(latent_support, expected_support)
+
+
+def test_prepare_microbatch_rejects_incomplete_raw_patch(monkeypatch):
+    from unittest.mock import Mock
+    import scripts.preflight_d0b4_diffusion_memory as pf
+    monkeypatch.setattr(pf, 'load_case', lambda *a: (torch.zeros(4, 96, 96, 96), torch.zeros(96, 96, 96)))
+    support = Mock(side_effect=AssertionError('Malformed patch reached support helper'))
+    monkeypatch.setattr(pf, 'support_mask', support)
+    row = dict(case_id='case', crop_start_d=1, crop_stop_d=97,
+               crop_start_h=0, crop_stop_h=96, crop_start_w=0, crop_stop_w=96)
+    with pytest.raises(ValueError, match='Expected raw MRI patch'):
+        pf.prepare_microbatch([row], 'dataset', object(), torch.zeros(256), torch.ones(256), 'cpu')
+    support.assert_not_called()

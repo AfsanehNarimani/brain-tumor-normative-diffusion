@@ -155,16 +155,18 @@ def prepare_microbatch(rows, dataset_root, source, means, stds, device):
     patches, supports = [], []
     for row in rows:
         image, raw_mask = load_case(dataset_root, row["case_id"])
-        raw_support = support_mask(image)
         normalized = normalize_nonzero(image)
         slices = tuple(slice(int(row[f"crop_start_{axis}"]), int(row[f"crop_stop_{axis}"])) for axis in "dhw")
         raw_patch = image[(slice(None), *slices)]
+        if tuple(raw_patch.shape) != (4, 96, 96, 96):
+            raise ValueError(f"Expected raw MRI patch [4,96,96,96]; got {tuple(raw_patch.shape)}")
+        raw_support = support_mask(raw_patch)
         abnormal = torch.isin(raw_mask[slices], torch.tensor([1, 2, 3, 4]))
-        pools, _ = donor_pools(raw_patch, abnormal, raw_support[slices])
+        pools, _ = donor_pools(raw_patch, abnormal, raw_support)
         patches.append(corrupt_input(normalized[(slice(None), *slices)], abnormal, pools,
                                      "local_empirical_resample", global_seed=PREFLIGHT_SEED,
                                      case_id=row["case_id"], patch_index=int(row["patch_index"])))
-        supports.append(block_occupancy(raw_support[slices]).ge(0.50))
+        supports.append(block_occupancy(raw_support).ge(0.50))
     with torch.no_grad():
         za = extract_za(source, torch.stack(patches).float().to(device))
         z0 = (za.float() - means[None, :, None, None, None]) / stds[None, :, None, None, None]
