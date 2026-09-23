@@ -1,0 +1,603 @@
+{
+  "contract_version": 1,
+  "stage": "D0-B4c",
+  "status": "DESIGN_LOCKED_PRE_TRAINING",
+  "purpose": "Pre-specify scientific latent-diffusion training, deterministic sampling, validation, EMA, checkpoint selection, and reproducibility before any scientific diffusion training begins.",
+  "artifact_type": "final pre-training methodological design lock, not an experiment result",
+  "scientific_training_started": false,
+  "training_results_observed": false,
+  "validation_results_observed": false,
+  "hyperparameters_selected_from_validation_results": false,
+  "source_provenance": {
+    "train_split_sha256": "581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e",
+    "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+    "e1c_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+    "d0a_normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+    "d0b0_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+    "d0b3_corruption_decision_sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+    "d0b4a_microbatch_decision_sha256": "07c268d97c7a39f389548344be7245cee4eba3a390a91d29b6533ab466c5254b",
+    "d0b4a_freeze_commit": "6772b023ab9c1d870f258f45d030b958d1f9b19b",
+    "d0b4b_contract_path": "configs/d0b4b_inference_contract.json",
+    "d0b4b_contract_sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4",
+    "d0b4b_design_lock_commit": "cf5985fdee2546a8d609d3abe76121951749f851"
+  },
+  "model": {
+    "implementation": "models.latent_diffusion_unet3d.LatentDiffusionUNet3D",
+    "architecture": "compact 3D residual U-Net",
+    "latent_input_shape": [
+      "B",
+      256,
+      12,
+      12,
+      12
+    ],
+    "latent_output_shape": [
+      "B",
+      256,
+      12,
+      12,
+      12
+    ],
+    "parameter_count": 22825280,
+    "channel_widths": [
+      64,
+      128,
+      256
+    ],
+    "resblocks_per_encoder_level": 2,
+    "middle_resblocks": 2,
+    "resblocks_per_decoder_level": 2,
+    "groupnorm_groups": 32,
+    "activation": "SiLU",
+    "dropout": 0,
+    "attention": "none",
+    "timestep_embedding": {
+      "sinusoidal_dimension": 64,
+      "mlp_dimension": 256
+    },
+    "final_output": {
+      "type": "Conv3d",
+      "channels": 256,
+      "zero_initialized": true
+    },
+    "prediction_type": "epsilon",
+    "conditioning": "none",
+    "support_mask_learned_conditioning": false
+  },
+  "source_path": {
+    "pipeline": [
+      "raw multimodal MRI",
+      "existing full-volume nonzero normalization",
+      "deterministic 96^3 crop",
+      "exact frozen D0-B3 local_empirical_resample corruption",
+      "frozen E1-C Encoder",
+      "frozen P_a anatomy projector",
+      "Za",
+      "fixed D0-A per-channel standardization",
+      "z0"
+    ],
+    "production_preprocessing_modified": false,
+    "frozen_e1c_and_pa": {
+      "mode": "eval",
+      "requires_grad": false,
+      "precision": "FP32",
+      "context": "torch.no_grad()"
+    },
+    "diffusion_model_trainable": true,
+    "gt_allowed_use": "training/validation corruption only",
+    "gt_permissions": {
+      "condition_diffusion": false,
+      "define_mri_support": false,
+      "model_input": false,
+      "diffusion_target": false
+    }
+  },
+  "support": {
+    "raw_definition": "any raw modality nonzero",
+    "source": "raw cropped multimodal MRI before normalization",
+    "raw_patch_shape": [
+      4,
+      96,
+      96,
+      96
+    ],
+    "raw_data_retention": "Normalize the full volume with the existing helper; compute support from the separately retained unnormalized raw crop at the same coordinates.",
+    "latent_mapping": "exact non-overlapping 8x8x8 occupancy",
+    "occupancy_threshold": 0.5,
+    "occupancy_comparison": ">=",
+    "shape": [
+      "B",
+      1,
+      12,
+      12,
+      12
+    ],
+    "computational_masking_only": true,
+    "learned_conditioning": false,
+    "zero_valid_latent_support": "HARD_ERROR_PER_SAMPLE",
+    "silently_resample_or_reject": false
+  },
+  "stable_hashing": {
+    "algorithm": "SHA256",
+    "encoding": "UTF-8",
+    "serialization": "Ordered JSON arrays, separators=(',', ':'), ensure_ascii=false, no whitespace or trailing newline. Seeds, indices and coordinates are integers; case_id, axis and purpose are exact strings.",
+    "hash_integer": "int.from_bytes(SHA256(payload_bytes).digest(), byteorder=\"big\", signed=False)",
+    "generator_seed": "int.from_bytes(SHA256(payload_bytes).digest()[:8], byteorder=\"big\", signed=False) & ((1 << 63) - 1)",
+    "python_hash_allowed": false
+  },
+  "training": {
+    "training_global_seed": 20260923,
+    "case_count": 1080,
+    "samples_per_case_per_epoch": 1,
+    "samples_per_epoch": 1080,
+    "max_epochs": 100,
+    "max_sample_presentations": 108000,
+    "physical_batch_size": 8,
+    "gradient_accumulation_steps": 1,
+    "effective_batch_size": 8,
+    "optimizer_steps_per_epoch": 135,
+    "max_optimizer_steps": 13500,
+    "step_count_semantics": "135 optimizer-step opportunities per epoch, at most 13500 successful updates; GradScaler-skipped updates do not advance successful optimizer-step or EMA counters and do not cause extra sample presentations.",
+    "epoch_index_base": 0,
+    "epoch_index_min": 0,
+    "epoch_index_max": 99,
+    "human_epoch": "epoch_index + 1",
+    "drop_last": false,
+    "augmentation": false,
+    "tumor_enrichment": false,
+    "tumor_positive_rejection": false,
+    "support_rejection": false,
+    "model_initialization_seed": 20260923,
+    "case_order": {
+      "purpose": "training_case_order",
+      "payload_fields": [
+        "training_global_seed",
+        "epoch_index",
+        "case_id",
+        "purpose"
+      ],
+      "rule": "Sort all locked training case IDs by (full SHA256 hexadecimal digest of the ordered payload, case_id); case_id is the deterministic collision tie-breaker.",
+      "every_case_exactly_once": true,
+      "independent_of": [
+        "filesystem ordering",
+        "DataLoader worker order",
+        "Python hash randomization",
+        "batch size"
+      ]
+    },
+    "crop": {
+      "shape": [
+        96,
+        96,
+        96
+      ],
+      "coordinate_generation_version": 1,
+      "purpose": "training_crop",
+      "payload_fields": [
+        "training_global_seed",
+        "epoch_index",
+        "case_id",
+        "axis",
+        "purpose"
+      ],
+      "axes": [
+        "d",
+        "h",
+        "w"
+      ],
+      "dimension_source": "actual spatial dimensions of the image returned by the existing case loader",
+      "start_axis": "hash_integer % (volume_axis_size - 96 + 1)",
+      "stop_axis": "start_axis + 96",
+      "volume_axis_smaller_than_patch": "HARD_ERROR",
+      "entirely_in_bounds": true,
+      "gt_used": false,
+      "independent_of_batch_order": true,
+      "record_coordinates_for_every_sample": true,
+      "coordinate_log": "reproducible manifest stream or training logs/history keyed by case_id and epoch_index"
+    },
+    "corruption": {
+      "operator": "local_empirical_resample",
+      "implementation": "scripts.audit_d0b3_corruption_operator.corrupt_input",
+      "donor_semantics": "reuse exact frozen D0-B3 donor construction and corruption helpers without reimplementation or modification",
+      "global_seed": "training_global_seed",
+      "patch_index": "epoch_index",
+      "identity": [
+        "training_global_seed",
+        "case_id",
+        "epoch_index"
+      ],
+      "varies_across_epochs": true,
+      "selected_from_validation_results": false
+    },
+    "diffusion_randomness": {
+      "sample_identity_fields": [
+        "case_id",
+        "epoch_index",
+        "crop_start_d",
+        "crop_start_h",
+        "crop_start_w",
+        "crop_stop_d",
+        "crop_stop_h",
+        "crop_stop_w"
+      ],
+      "seed_payload_fields": [
+        "training_global_seed",
+        "sample_identity",
+        "purpose"
+      ],
+      "sample_identity_encoding": "Ordered JSON array in sample_identity_fields order; use stable_hashing serialization and generator_seed.",
+      "timestep_purpose": "training_timestep",
+      "epsilon_purpose": "training_epsilon",
+      "timestep_distribution": "uniform integer [0,999]",
+      "timestep_generation": "torch.randint(0, 1000, (1,), generator=separately_seeded_cpu_generator).item()",
+      "epsilon_distribution": "independent standard Gaussian",
+      "epsilon_shape": [
+        256,
+        12,
+        12,
+        12
+      ],
+      "epsilon_dtype": "FP32",
+      "epsilon_generation": "One separately seeded CPU torch.Generator per sample; torch.randn((256,12,12,12), dtype=torch.float32, device='cpu', generator=generator), then transfer to execution device.",
+      "independent_of": [
+        "batch ordering",
+        "worker scheduling",
+        "future batching/partitioning"
+      ]
+    }
+  },
+  "forward_diffusion": {
+    "schedule_implementation": "models.latent_diffusion_unet3d.cosine_schedule",
+    "T": 1000,
+    "cosine_offset": 0.008,
+    "max_beta": 0.999,
+    "beta_semantics": "derived from consecutive normalized cosine alpha-bar points, then clamped to max_beta",
+    "alpha": "1-beta",
+    "alpha_bar": "cumprod(alpha)",
+    "prediction_type": "epsilon",
+    "epsilon_supported": "epsilon * support_mask",
+    "z_t": "(sqrt(alpha_bar_t) * z0 + sqrt(1-alpha_bar_t) * epsilon_supported) * support_mask"
+  },
+  "training_loss": {
+    "name": "support-masked epsilon MSE",
+    "target": "epsilon_supported",
+    "numerator": "sum((epsilon_hat - epsilon_supported)^2 * support_mask) over the full physical batch",
+    "denominator": "sum(valid spatial support cells across B) * 256",
+    "aggregation": "valid-scalar-weighted over the full physical batch of 8",
+    "equal_weight_per_case": false,
+    "zero_support": "HARD_ERROR_PER_SAMPLE",
+    "accumulation_weighting_ambiguity": false,
+    "physical_batch_below_8_requires_loss_equivalence_reaudit": true
+  },
+  "optimizer": {
+    "name": "AdamW",
+    "learning_rate": 0.0001,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "epsilon": 1e-08,
+    "weight_decay": 0.0001,
+    "lr_scheduler": "none",
+    "gradient_clipping": {
+      "norm_type": 2,
+      "global": true,
+      "max_norm": 1.0,
+      "after_gradscaler_unscale": true
+    },
+    "early_stopping": false,
+    "max_epochs": 100,
+    "after_epoch_100": "Stop. If convergence is insufficient, formally define a new protocol before additional training; never silently extend."
+  },
+  "precision": {
+    "raw_mri_operations_and_corruption": "FP32",
+    "frozen_e1c": "FP32",
+    "pa": "FP32",
+    "d0a_standardization": "FP32",
+    "diffusion_forward_backward": "CUDA AMP FP16",
+    "gradscaler_enabled": true,
+    "model_master_parameters": "FP32",
+    "optimizer_state": "FP32/default AdamW state semantics",
+    "autocast_frozen_source_extraction": false
+  },
+  "ema": {
+    "enabled": true,
+    "decay": 0.999,
+    "initialization": "copy initial diffusion model weights before the first optimizer step",
+    "update": "after every successful optimizer step",
+    "update_on_gradscaler_skipped_step": false,
+    "warmup": false,
+    "alternate_decay_schedule": false,
+    "validation_and_checkpoint_selection_weights": "EMA",
+    "preserve_raw_and_ema_state": true
+  },
+  "validation": {
+    "validation_global_seed": 20260923,
+    "case_count": 270,
+    "patches_per_case": 4,
+    "total_patches": 1080,
+    "validation_patch_indices": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "augmentation": false,
+    "tumor_enrichment": false,
+    "tumor_positive_rejection": false,
+    "support_rejection": false,
+    "zero_support": "HARD_ERROR_PER_SAMPLE",
+    "manifest": {
+      "filename": "validation_manifest.csv",
+      "fixed": true,
+      "written_and_frozen_before_training": true,
+      "coordinate_generation_version": 1,
+      "patch_shape": [
+        96,
+        96,
+        96
+      ],
+      "gt_used_for_coordinates": false,
+      "purpose": "validation_crop",
+      "payload_fields": [
+        "validation_global_seed",
+        "case_id",
+        "validation_patch_index",
+        "axis",
+        "purpose"
+      ],
+      "axes": [
+        "d",
+        "h",
+        "w"
+      ],
+      "dimension_source": "actual spatial dimensions of the image returned by the existing case loader",
+      "start_axis": "hash_integer % (volume_axis_size - 96 + 1)",
+      "stop_axis": "start_axis + 96",
+      "volume_axis_smaller_than_patch": "HARD_ERROR",
+      "entirely_in_bounds": true,
+      "required_columns": [
+        "case_id",
+        "validation_patch_index",
+        "crop_start_d",
+        "crop_start_h",
+        "crop_start_w",
+        "crop_stop_d",
+        "crop_stop_h",
+        "crop_stop_w",
+        "coordinate_generation_version",
+        "seed",
+        "split_sha256",
+        "timestep",
+        "epsilon_seed"
+      ],
+      "split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca"
+    },
+    "corruption": {
+      "operator": "local_empirical_resample",
+      "implementation": "scripts.audit_d0b3_corruption_operator.corrupt_input",
+      "donor_semantics": "reuse exact frozen D0-B3 donor construction and corruption helpers without reimplementation or modification",
+      "global_seed": "validation_global_seed",
+      "patch_index": "validation_patch_index",
+      "gt_used_only_for_corruption": true,
+      "identical_at_every_validation_epoch": true
+    },
+    "diffusion_randomness": {
+      "sample_identity_fields": [
+        "case_id",
+        "validation_patch_index",
+        "crop_start_d",
+        "crop_start_h",
+        "crop_start_w",
+        "crop_stop_d",
+        "crop_stop_h",
+        "crop_stop_w"
+      ],
+      "seed_payload_fields": [
+        "validation_global_seed",
+        "sample_identity",
+        "purpose"
+      ],
+      "sample_identity_encoding": "Ordered JSON array in sample_identity_fields order; use stable_hashing serialization and generator_seed.",
+      "timestep_purpose": "validation_timestep",
+      "epsilon_purpose": "validation_epsilon",
+      "timestep_distribution": "uniform integer [0,999]",
+      "timestep_generation": "torch.randint(0, 1000, (1,), generator=separately_seeded_cpu_generator).item()",
+      "epsilon_distribution": "independent standard Gaussian",
+      "epsilon_shape": [
+        256,
+        12,
+        12,
+        12
+      ],
+      "epsilon_dtype": "FP32",
+      "epsilon_generation": "One separately seeded CPU torch.Generator per sample; torch.randn((256,12,12,12), dtype=torch.float32, device='cpu', generator=generator), then transfer to execution device.",
+      "epoch_in_seed_payload": false
+    },
+    "identical_across_epochs": [
+      "crop",
+      "corruption",
+      "timestep",
+      "epsilon"
+    ],
+    "human_facing_epochs": [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60,
+      65,
+      70,
+      75,
+      80,
+      85,
+      90,
+      95,
+      100
+    ],
+    "weights": "EMA",
+    "model_mode": "eval",
+    "context": "torch.no_grad()",
+    "validation_based_early_stopping": false,
+    "model_selection_between_scheduled_epochs": false,
+    "primary_metric": {
+      "name": "mean case-level validation support-masked epsilon MSE",
+      "patch_loss": "sum((epsilon_hat - epsilon_supported)^2 * support_mask) / (sum(patch valid spatial support cells) * 256)",
+      "case_metric": "arithmetic mean of the 4 patch losses for that case",
+      "primary_metric": "arithmetic mean of case_metric over all 270 cases",
+      "aggregation_order": [
+        "patch valid-scalar-normalized MSE",
+        "4-patch arithmetic case mean",
+        "270-case arithmetic mean"
+      ],
+      "equal_case_weight_regardless_of_support_size": true,
+      "intentionally_differs_from_training_batch_objective": true
+    },
+    "secondary_diagnostics": [
+      "global support-weighted epsilon MSE",
+      "per-case distribution",
+      "predefined timestep-bin epsilon MSE"
+    ],
+    "secondary_metrics_select_checkpoint": false
+  },
+  "checkpoint_selection": {
+    "weights": "EMA",
+    "metric": "mean case-level validation support-masked epsilon MSE",
+    "rule": "lowest primary validation metric",
+    "tie_tolerance": 1e-12,
+    "improvement": "new_metric < best_metric - 1e-12",
+    "tie_winner": "earlier epoch",
+    "primary_metric_only": true,
+    "first_finite_scheduled_metric_initializes_best": true,
+    "forbidden_selection_sources": [
+      "secondary metrics",
+      "visual reconstruction",
+      "manual selection",
+      "DeltaZ quality",
+      "segmentation results",
+      "sensitivity timestep results"
+    ]
+  },
+  "artifacts": {
+    "required": [
+      "best.pt",
+      "latest.pt",
+      "training_history.csv",
+      "validation_per_case.csv",
+      "validation_summary.json",
+      "training_provenance.json",
+      "validation_manifest.csv"
+    ],
+    "best_checkpoint_required_fields": [
+      "raw_model_state",
+      "ema_state",
+      "optimizer_state",
+      "gradscaler_state",
+      "epoch_index",
+      "human_epoch",
+      "optimizer_step",
+      "primary_validation_metric",
+      "architecture_provenance",
+      "training_contract_provenance"
+    ],
+    "latest_checkpoint_required_fields": [
+      "raw_model_state",
+      "ema_state",
+      "optimizer_state",
+      "gradscaler_state",
+      "epoch_index",
+      "human_epoch",
+      "optimizer_step",
+      "next_sample_cursor",
+      "best_primary_validation_metric",
+      "best_epoch",
+      "rng_state",
+      "sampler_state",
+      "architecture_provenance",
+      "training_contract_provenance"
+    ],
+    "latest_role": "resume-only; must not replace best.pt for primary inference",
+    "retain_every_epoch_checkpoint": false,
+    "training_provenance_required": [
+      "all source hashes and commits",
+      "training and inference contract hashes",
+      "validation manifest SHA256",
+      "seed and coordinate-generation version",
+      "runtime software/hardware and determinism settings",
+      "development-validation limitation"
+    ]
+  },
+  "resume": {
+    "identity_derived_randomness": true,
+    "depends_on_number_of_prior_random_calls": false,
+    "same_future_for_epoch_sample_identity": [
+      "case order",
+      "crop coordinates",
+      "corruption identities",
+      "timesteps",
+      "epsilon"
+    ],
+    "preserve_states": [
+      "raw model",
+      "EMA",
+      "optimizer",
+      "GradScaler",
+      "Python RNG",
+      "NumPy RNG",
+      "torch CPU RNG",
+      "torch CUDA RNG",
+      "sampler epoch and next sample cursor",
+      "successful optimizer-step count",
+      "best metric and epoch"
+    ],
+    "silently_restart_optimizer": false,
+    "silently_restart_ema": false
+  },
+  "validation_interpretation": {
+    "split_role": "DEVELOPMENT_VALIDATION",
+    "used_for_checkpoint_selection": true,
+    "untouched_final_test_set": false,
+    "independent_final_test_set": false,
+    "later_deltaz_or_segmentation_analysis_label": "development/validation analysis, not independent final-test performance",
+    "independent_final_evaluation": "separate/TBD",
+    "independent_paper_claims_require": "separate held-out, external, challenge, or otherwise independent evaluation source",
+    "carry_limitation_into_paper_provenance": true
+  },
+  "pretraining_freeze": {
+    "frozen_before_scientific_training": true,
+    "items": [
+      "architecture",
+      "source checkpoint",
+      "Za normalization",
+      "training split",
+      "validation split",
+      "training crop sampler",
+      "case ordering",
+      "training corruption",
+      "support semantics",
+      "diffusion schedule",
+      "prediction type",
+      "training loss",
+      "optimizer",
+      "learning rate",
+      "weight decay",
+      "batch size",
+      "AMP",
+      "EMA",
+      "epochs",
+      "validation manifest algorithm",
+      "validation randomness",
+      "validation frequency",
+      "primary validation metric",
+      "checkpoint selection",
+      "inference contract reference"
+    ]
+  }
+}
