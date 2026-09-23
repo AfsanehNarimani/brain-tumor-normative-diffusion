@@ -1,0 +1,182 @@
+{
+  "contract_version": 1,
+  "stage": "D0-B4b",
+  "status": "DESIGN_LOCKED_PRE_TRAINING",
+  "purpose": "Pre-specify latent partial-noising, deterministic DDIM reconstruction, and deviation-map definition before scientific diffusion training and before observing validation reconstruction performance.",
+  "artifact_type": "methodological design, not an experiment result",
+  "scientific_training": false,
+  "validation_used_to_choose_inference_hyperparameters": false,
+  "gt_used_at_inference": false,
+  "model_selection": false,
+  "locked_source_provenance": {
+    "e1c_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+    "d0a_normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+    "d0b0_patch_support_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+    "d0b3_corruption_decision_sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+    "d0b4a_microbatch_decision_sha256": "07c268d97c7a39f389548344be7245cee4eba3a390a91d29b6533ab466c5254b",
+    "d0b4a_freeze_commit": "6772b023ab9c1d870f258f45d030b958d1f9b19b"
+  },
+  "inference_source": {
+    "pipeline": [
+      "original unmodified multimodal MRI",
+      "frozen E1-C Encoder",
+      "frozen anatomy projector P_a",
+      "Za",
+      "fixed D0-A per-channel standardization",
+      "z0"
+    ],
+    "production_preprocessing": "Use existing production preprocessing unchanged; no pathology corruption.",
+    "pathology_corruption_at_inference": false,
+    "d0b3_corruption_role": "TRAINING_ONLY",
+    "d0b3_corruption_performed_at_inference": false,
+    "segmentation_mask_available_to_model": false,
+    "segmentation_mask_consumed_by_model": false,
+    "gt_permissions": {
+      "construct_z0": false,
+      "condition_diffusion": false,
+      "define_support": false,
+      "affect_ddim": false,
+      "construct_deviation_maps": false,
+      "offline_evaluation_of_already_created_deviation_outputs_only": true
+    }
+  },
+  "forward_schedule": {
+    "implementation": "models.latent_diffusion_unet3d.cosine_schedule",
+    "prediction_type": "epsilon",
+    "T": 1000,
+    "cosine_offset": 0.008,
+    "max_beta": 0.999,
+    "timestep_index_min": 0,
+    "timestep_index_max": 999,
+    "semantics": [
+      "beta is derived from consecutive normalized cosine alpha-bar points, then clamped to max_beta",
+      "alpha = 1 - beta",
+      "alpha_bar = cumulative product(alpha)"
+    ],
+    "schedule_source": "Use the existing implementation for both training and inference; this contract does not define a second schedule implementation."
+  },
+  "partial_noise": {
+    "primary_timestep": 495,
+    "primary_alpha_bar": 0.5000776052474976,
+    "primary_noise_variance": 0.49992239475250244,
+    "reason": "nearest locked cosine-schedule timestep to alpha_bar = 0.50",
+    "selection_basis": "schedule-defined and pre-specified, not validation-selected",
+    "points": [
+      {"timestep": 327, "target_alpha_bar": 0.75, "alpha_bar": 0.7501165866851807, "role": "lower-noise sensitivity point", "secondary": true, "eligible_for_winner_selection": false},
+      {"timestep": 495, "target_alpha_bar": 0.50, "alpha_bar": 0.5000776052474976, "role": "PRIMARY", "secondary": false, "eligible_for_winner_selection": false},
+      {"timestep": 663, "target_alpha_bar": 0.25, "alpha_bar": 0.25003883242607117, "role": "higher-noise sensitivity point", "secondary": true, "eligible_for_winner_selection": false}
+    ],
+    "sensitivity_may_redefine_primary_retrospectively": false
+  },
+  "ddim": {
+    "sampler": "deterministic DDIM",
+    "eta": 0.0,
+    "model_evaluations": 50,
+    "start_timestep": 495,
+    "end_timestep": 0,
+    "sequence_definition": "round(linspace(495, 0, 50))",
+    "sequence_semantics": "Inclusive endpoints; round to nearest integer. The resolved integer sequence below is authoritative.",
+    "resolved_timesteps": [495, 485, 475, 465, 455, 444, 434, 424, 414, 404, 394, 384, 374, 364, 354, 343, 333, 323, 313, 303, 293, 283, 273, 263, 253, 242, 232, 222, 212, 202, 192, 182, 172, 162, 152, 141, 131, 121, 111, 101, 91, 81, 71, 61, 51, 40, 30, 20, 10, 0],
+    "epsilon_prediction": "epsilon_hat = model(z_current, t) using the declared inference weights",
+    "z0_hat": "(z_t - sqrt(1-alpha_bar_t) * epsilon_hat) / sqrt(alpha_bar_t)",
+    "reverse_transition_condition": "t_prev >= 0; t_prev is the next entry in resolved_timesteps, not necessarily t-1",
+    "z_prev": "sqrt(alpha_bar_prev) * z0_hat + sqrt(1-alpha_bar_prev) * epsilon_hat",
+    "terminal_model_evaluation": "At t=0: Zprior = z0_hat, followed by the required support masking; do not take a further scheduled transition.",
+    "stochastic_reverse_noise": false,
+    "evaluation_count_semantics": "50 model evaluations: 49 scheduled transitions followed by the terminal z0_hat at t=0."
+  },
+  "sensitivity_ddim": [
+    {"role": "SECONDARY_ONLY", "sampler": "deterministic DDIM", "eta": 0.0, "model_evaluations": 50, "start_timestep": 327, "end_timestep": 0, "sequence_definition": "round(linspace(start_timestep, 0, 50))", "resolved_timesteps": [327, 320, 314, 307, 300, 294, 287, 280, 274, 267, 260, 254, 247, 240, 234, 227, 220, 214, 207, 200, 194, 187, 180, 174, 167, 160, 153, 147, 140, 133, 127, 120, 113, 107, 100, 93, 87, 80, 73, 67, 60, 53, 47, 40, 33, 27, 20, 13, 7, 0], "eligible_for_winner_selection": false},
+    {"role": "SECONDARY_ONLY", "sampler": "deterministic DDIM", "eta": 0.0, "model_evaluations": 50, "start_timestep": 663, "end_timestep": 0, "sequence_definition": "round(linspace(start_timestep, 0, 50))", "resolved_timesteps": [663, 649, 636, 622, 609, 595, 582, 568, 555, 541, 528, 514, 501, 487, 474, 460, 447, 433, 419, 406, 392, 379, 365, 352, 338, 325, 311, 298, 284, 271, 257, 244, 230, 216, 203, 189, 176, 162, 149, 135, 122, 108, 95, 81, 68, 54, 41, 27, 14, 0], "eligible_for_winner_selection": false}
+  ],
+  "sensitivity_ddim_semantics": "Resolved integer sequences are authoritative. Use the primary DDIM reverse equations, terminal evaluation, and support masking with each sensitivity sequence. Sensitivity outputs remain secondary and cannot redefine the primary timestep or sequence.",
+  "support": {
+    "raw_definition": "any raw modality nonzero",
+    "raw_patch_shape": [4, 96, 96, 96],
+    "source": "Raw MRI patch before normalization, never normalized MRI or GT segmentation.",
+    "latent_mapping": "Exact non-overlapping 8x8x8 raw-voxel block occupancy",
+    "occupancy_threshold": 0.50,
+    "occupancy_comparison": ">=",
+    "support_mask_shape": ["B", 1, 12, 12, 12],
+    "latent_shape": ["B", 256, 12, 12, 12],
+    "computational_masking_only": true,
+    "learned_conditioning": false,
+    "z0_supported": "z0 * support_mask",
+    "epsilon_supported": "epsilon * support_mask",
+    "initial_partial_noising": "(sqrt(alpha_bar_t) * z0_supported + sqrt(1-alpha_bar_t) * epsilon_supported) * support_mask",
+    "before_every_network_evaluation": "z_current = z_current * support_mask",
+    "after_every_reverse_latent": "z_prev = z_prev * support_mask before the next network evaluation",
+    "final_prior": "Zprior = Zprior * support_mask",
+    "final_prior_zero_outside_support": true
+  },
+  "randomness": {
+    "inference_global_seed": 20260923,
+    "primary_noise_replicates": 4,
+    "replicate_indices": [0, 1, 2, 3],
+    "sample_identity_fields": ["case_id", "crop_start_d", "crop_start_h", "crop_start_w", "crop_stop_d", "crop_stop_h", "crop_stop_w"],
+    "sample_identity_encoding": "Ordered JSON array [case_id, crop_start_d, crop_start_h, crop_start_w, crop_stop_d, crop_stop_h, crop_stop_w]; case_id is an exact string, coordinates are integers from the manifest.",
+    "purpose": "partial_noise",
+    "same_noise_realization_across_sensitivity_timesteps": true,
+    "paired_noise_timesteps": [327, 495, 663],
+    "paired_noise_identity": "For a fixed sample identity and replicate index, use the same epsilon realization at t=327, t=495, and t=663.",
+    "paired_noise_reason": "paired sensitivity comparison isolates partial-noise strength while holding the underlying Gaussian noise realization fixed",
+    "diffusion_timestep_in_seed_payload": false,
+    "seed_timestep_exclusion": "Diffusion timestep is NOT part of the partial-noise seed payload.",
+    "seed_payload": "[inference_global_seed, sample_identity, replicate_index, purpose]",
+    "seed_serialization": "UTF-8 encoding of compact JSON with separators=(',', ':'), ensure_ascii=false, no whitespace or trailing newline; seed and replicate index are integers.",
+    "seed_hash": "SHA256",
+    "seed_integer": "int(sha256(payload_bytes).hexdigest()[:16], 16) & ((1 << 63) - 1)",
+    "noise_generation": "For each sample and replicate, seed a separate CPU torch.Generator and draw torch.randn((256,12,12,12), dtype=torch.float32, device='cpu', generator=generator), then transfer to the execution device and apply support masking. Do not draw from a batch-wide or device-specific generator.",
+    "case_id_alone_is_sufficient": false,
+    "invariant_to": ["batch size", "batch ordering", "device batching/partitioning"],
+    "actual_case_specific_seeds_in_contract": false
+  },
+  "primary_deviation": {
+    "name": "DeltaZ",
+    "latent_space": "fixed D0-A standardized anatomy latent space",
+    "per_channel_absolute_difference": "R_k(c,x) = abs(z0(c,x) - Zprior_k(c,x)) * support_mask(x)",
+    "per_replicate_map": "D_k(x) = mean_c R_k(c,x)",
+    "primary_map": "DeltaZ(x) = mean_k D_k(x)",
+    "aggregation": "mean_replicates(mean_channels(abs(z0-Zprior_k) * support_mask)) * support_mask",
+    "final_support_masking": "DeltaZ = DeltaZ * support_mask",
+    "channel_count": 256,
+    "replicate_count": 4,
+    "channel_aggregation": "arithmetic mean",
+    "replicate_aggregation": "arithmetic mean",
+    "absolute_difference_before_replicate_averaging": true,
+    "forbidden_primary_aggregation": "abs(z0 - mean_k(Zprior_k))",
+    "output_shape": ["B", 1, 12, 12, 12],
+    "outside_support_value": 0,
+    "outside_support_is_valid_observation": false,
+    "outside_support_in_scientific_statistics": false,
+    "outside_support_interpretation": "Zeros outside support represent invalid/masked locations and must not enter scientific summary statistics as real zero-deviation observations."
+  },
+  "secondary_outputs": {
+    "role": "SECONDARY_ONLY",
+    "outputs": [
+      "per-replicate channel-mean absolute deviation maps",
+      "full per-channel absolute difference tensor when storage permits",
+      "replicate-wise variance of D_k(x)",
+      "RMS/L2 channel deviation",
+      "support mask",
+      "sensitivity maps at t=327 and t=663"
+    ],
+    "replace_primary_deltaz": false,
+    "sensitivity_results_may_select_primary_timestep": false
+  },
+  "inference_weights": {
+    "weight_type": "EMA",
+    "checkpoint_source": "checkpoint selected by the already-locked validation criterion",
+    "checkpoint_selection_criterion": "lowest mean case-level validation support-masked epsilon MSE",
+    "defines_new_checkpoint_selection_rule": false,
+    "checkpoint_selection_uses_predeclared_validation_epsilon_mse": true,
+    "inference_hyperparameters_use_validation_reconstruction_performance": false
+  },
+  "design_lock": {
+    "hyperparameters": ["primary_timestep", "sensitivity_timesteps", "eta", "model_evaluations", "primary_noise_replicates", "inference_global_seed", "seed_derivation", "paired_noise_across_sensitivity_timesteps", "support_masking_semantics", "DeltaZ_aggregation"],
+    "frozen_before_scientific_training": true,
+    "frozen_before_observing_validation_reconstruction_performance": true,
+    "selected_from_validation_reconstruction_performance": false,
+    "distinction": "Future checkpoint selection uses the pre-declared validation epsilon-MSE rule. Inference t*, eta, DDIM steps, K, and DeltaZ aggregation are frozen before scientific training and are not selected from validation reconstruction performance."
+  }
+}

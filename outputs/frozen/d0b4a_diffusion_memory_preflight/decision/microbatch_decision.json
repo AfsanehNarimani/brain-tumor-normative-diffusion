@@ -1,0 +1,56 @@
+{
+  "candidate_memory_summaries": [
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 1,
+      "peak_allocated_fraction": 0.15660270779844918,
+      "peak_memory_allocated_bytes": 3961428992,
+      "peak_memory_reserved_bytes": 4150263808,
+      "peak_reserved_fraction": 0.16406770176197644,
+      "physical_microbatch": 8
+    },
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 2,
+      "peak_allocated_fraction": 0.08703114515514772,
+      "peak_memory_allocated_bytes": 2201543680,
+      "peak_memory_reserved_bytes": 3137339392,
+      "peak_reserved_fraction": 0.12402490239308578,
+      "physical_microbatch": 4
+    },
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 4,
+      "peak_allocated_fraction": 0.05008430497659248,
+      "peak_memory_allocated_bytes": 1266934784,
+      "peak_memory_reserved_bytes": 1728053248,
+      "peak_reserved_fraction": 0.06831318153202051,
+      "physical_microbatch": 2
+    },
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 8,
+      "peak_allocated_fraction": 0.03164067863684528,
+      "peak_memory_allocated_bytes": 800384000,
+      "peak_memory_reserved_bytes": 1008730112,
+      "peak_reserved_fraction": 0.03987699067585178,
+      "physical_microbatch": 1
+    }
+  ],
+  "effective_batch_fingerprint": "17743ab4071800a24d9a572519bee6577deda903b0078a8a2aa71845fc24ab4a",
+  "effective_batch_size": 8,
+  "gradient_accumulation_steps": 1,
+  "model_selection": false,
+  "purpose": "GPU memory and shape preflight",
+  "randomness_fingerprint": "02450e90fee61a3907004493442320b261f7aeabfabd21e6614d4c468671c003",
+  "scientific_interpretation": false,
+  "scientific_training": false,
+  "selected_peak_allocated_fraction": 0.15660270779844918,
+  "selected_peak_memory_allocated_bytes": 3961428992,
+  "selected_peak_memory_reserved_bytes": 4150263808,
+  "selected_peak_reserved_fraction": 0.16406770176197644,
+  "selected_physical_microbatch": 8,
+  "selection_rule": "largest passing physical microbatch with peak_reserved_fraction <= 0.90",
+  "stage": "D0-B4a",
+  "validation_used": false
+}

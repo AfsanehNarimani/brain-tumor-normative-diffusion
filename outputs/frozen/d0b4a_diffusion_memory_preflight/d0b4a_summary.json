@@ -1,0 +1,52 @@
+{
+  "all_four_candidates_passed": true,
+  "candidate_memory_summaries": [
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 1,
+      "peak_allocated_fraction": 0.15660270779844918,
+      "peak_memory_allocated_bytes": 3961428992,
+      "peak_memory_reserved_bytes": 4150263808,
+      "peak_reserved_fraction": 0.16406770176197644,
+      "physical_microbatch": 8
+    },
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 2,
+      "peak_allocated_fraction": 0.08703114515514772,
+      "peak_memory_allocated_bytes": 2201543680,
+      "peak_memory_reserved_bytes": 3137339392,
+      "peak_reserved_fraction": 0.12402490239308578,
+      "physical_microbatch": 4
+    },
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 4,
+      "peak_allocated_fraction": 0.05008430497659248,
+      "peak_memory_allocated_bytes": 1266934784,
+      "peak_memory_reserved_bytes": 1728053248,
+      "peak_reserved_fraction": 0.06831318153202051,
+      "physical_microbatch": 2
+    },
+    {
+      "effective_batch_size": 8,
+      "gradient_accumulation_steps": 8,
+      "peak_allocated_fraction": 0.03164067863684528,
+      "peak_memory_allocated_bytes": 800384000,
+      "peak_memory_reserved_bytes": 1008730112,
+      "peak_reserved_fraction": 0.03987699067585178,
+      "physical_microbatch": 1
+    }
+  ],
+  "effective_batch_size": 8,
+  "gradient_accumulation_steps": 1,
+  "model_selection": false,
+  "scientific_interpretation": false,
+  "scientific_training": false,
+  "selected_physical_microbatch": 8,
+  "selection_based_on_elapsed_time": false,
+  "selection_rule": "largest passing physical microbatch with peak_reserved_fraction <= 0.90",
+  "stage": "D0-B4a",
+  "statement": "All four candidates passed. Selection was NOT based on elapsed time. No scientific diffusion training occurred; no validation data were used. Physical microbatch 8 is locked for the current D0-B4 training contract. If training later uses physical microbatch <8 with accumulation, loss-normalization equivalence must be explicitly re-audited.",
+  "validation_used": false
+}
