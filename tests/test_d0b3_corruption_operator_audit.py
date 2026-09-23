@@ -4,6 +4,7 @@ import json
 
 import pytest
 import torch
+from torch.nn import functional as F
 
 from models.encoder import Encoder
 from scripts import audit_d0b3_corruption_operator as audit
@@ -31,6 +32,43 @@ def test_donor_shell_is_exact_chebyshev_radius_eight():
     assert not shell[48, 48, 48]
     assert shell[40, 48, 48] and shell[56, 56, 56]
     assert not shell[39, 48, 48]
+
+
+def _reference_cubic_dilation(mask):
+    return F.max_pool3d(mask[None, None].float(), kernel_size=17, stride=1, padding=8)[0, 0].bool()
+
+
+def _separable_cubic_dilation(mask):
+    volume = mask[None, None].float()
+    for kernel_size, padding in (((17, 1, 1), (8, 0, 0)),
+                                 ((1, 17, 1), (0, 8, 0)),
+                                 ((1, 1, 17), (0, 0, 8))):
+        volume = F.max_pool3d(volume, kernel_size=kernel_size, stride=1, padding=padding)
+    return volume[0, 0].bool()
+
+
+def test_separable_donor_dilation_is_exactly_equal_to_cubic_reference():
+    masks = []
+    center = torch.zeros(audit.PATCH_SHAPE, dtype=torch.bool); center[48, 48, 48] = True
+    masks.append(center)
+    boundary = torch.zeros_like(center)
+    for point in ((0, 0, 0), (0, 48, 95), (95, 0, 48), (48, 95, 0)):
+        boundary[point] = True
+    masks.append(boundary)
+    separated = torch.zeros_like(center); separated[16, 16, 16] = True; separated[80, 80, 80] = True
+    masks.append(separated)
+    touching = torch.zeros_like(center); touching[48, 48, 48] = True; touching[48, 48, 64] = True
+    masks.append(touching)
+    generator = torch.Generator().manual_seed(20260917)
+    masks.extend([(torch.rand(audit.PATCH_SHAPE, generator=generator) < probability)
+                  for probability in (0.0001, 0.001, 0.01)])
+    masks.append(torch.zeros_like(center))
+    masks.append(torch.ones_like(center))
+    for mask in masks:
+        reference = _reference_cubic_dilation(mask)
+        optimized = _separable_cubic_dilation(mask)
+        assert torch.equal(reference, optimized)
+        assert torch.equal(audit.donor_shell(mask), reference & ~mask)
 
 
 def _synthetic_inputs():

@@ -101,8 +101,13 @@ def donor_shell(abnormal, radius=DONOR_RADIUS):
         raise ValueError(f'Expected abnormal patch {PATCH_SHAPE}')
     if radius < 0:
         raise ValueError('Donor radius must be nonnegative')
-    dilated = F.max_pool3d(abnormal[None, None].float(), kernel_size=2 * radius + 1,
-                           stride=1, padding=radius)[0, 0].bool()
+    kernel = 2 * radius + 1
+    volume = abnormal[None, None].float()
+    for kernel_size, padding in (((kernel, 1, 1), (radius, 0, 0)),
+                                 ((1, kernel, 1), (0, radius, 0)),
+                                 ((1, 1, kernel), (0, 0, radius))):
+        volume = F.max_pool3d(volume, kernel_size=kernel_size, stride=1, padding=padding)
+    dilated = volume[0, 0].bool()
     return dilated & ~abnormal
 
 
