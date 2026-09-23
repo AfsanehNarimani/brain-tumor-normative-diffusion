@@ -1,0 +1,86 @@
+{
+  "schema": "d0b3_corruption_operator_decision",
+  "schema_version": 1,
+
+  "decision": {
+    "selected_operator": "local_empirical_resample",
+    "status": "locked",
+    "selection_basis": "Pre-specified primary metric followed by paired case-level statistical analysis.",
+    "selected_by_automatic_code": false,
+    "selected_using_validation_performance": false,
+    "selected_using_diffusion_performance": false,
+    "selected_using_segmentation_performance": false
+  },
+
+  "primary_metric": {
+    "name": "primary_delta_std_region_c_mean",
+    "statistical_unit": "case",
+    "scope": "abnormal-positive patches only",
+    "direction": "lower_is_better",
+    "interpretation": "Case-level weighted standardized absolute Za difference in REGION_C."
+  },
+
+  "region_c_caveat": "REGION_C is outside the local Conv/Pool geometric receptive field of annotated abnormal tissue. It is not interpreted as guaranteed pathology-independent because GroupNorm introduces wider spatial statistical coupling.",
+
+  "descriptive_means": {
+    "zero_fill": 0.029438721888330955,
+    "local_mean_fill": 0.029455328519049598,
+    "local_empirical_resample": 0.02868707620075377
+  },
+
+  "paired_results": {
+    "zero_fill_vs_local_mean_fill": {
+      "mean_delta_b_minus_a": 0.000016606630718646195,
+      "bootstrap_ci95_low": -0.00009296198200771255,
+      "bootstrap_ci95_high": 0.0001218079706046689,
+      "wilcoxon_holm_p": 0.4715863168562311,
+      "reject_after_holm": false,
+      "b_lower_fraction": 0.455
+    },
+
+    "zero_fill_vs_local_empirical_resample": {
+      "mean_delta_b_minus_a": -0.0007516456875771838,
+      "bootstrap_ci95_low": -0.0009523959975795893,
+      "bootstrap_ci95_high": -0.0005549874282802137,
+      "wilcoxon_holm_p": 2.1756980158438443e-15,
+      "reject_after_holm": true,
+      "b_lower_fraction": 0.79
+    },
+
+    "local_mean_fill_vs_local_empirical_resample": {
+      "mean_delta_b_minus_a": -0.0007682523182958299,
+      "bootstrap_ci95_low": -0.0009468192746767364,
+      "bootstrap_ci95_high": -0.0005945402756975415,
+      "wilcoxon_holm_p": 1.7960173822662972e-16,
+      "reject_after_holm": true,
+      "b_lower_fraction": 0.775
+    }
+  },
+
+  "interpretation": "Local empirical resampling produced a modest but consistent reduction in collateral standardized Za shift compared with both zero filling and local mean filling.",
+
+  "scientific_claim_limits": {
+    "healthy_synthesis_claim": false,
+    "normative_latent_claim": false,
+    "pathology_independent_region_c_claim": false
+  },
+
+  "source_git": {
+    "audit_implementation_commit": "26ba1074688099bc94d07605d79621301d94e05e",
+    "donor_shell_optimization_commit": "83ee1d4568e03ced8b352c95165ed037b32296ff",
+    "paired_analysis_commit": "01c388575bca6fa5cd292c5748f3d70f19a88243"
+  },
+
+  "source_artifact_sha256": {
+    "selected_patch_manifest.csv": "30ef2584420aa95a3397b3cc4fb8f552f5790eb53c4efce587cc5e274620e902",
+    "patch_corruption_statistics.csv": "6610436d9f09f9fd0112e61f9b07391619ae916fec91a2e7b5cb90f524791c49",
+    "case_corruption_statistics.csv": "86fa2de9f033e82df566c0810b77e143dc1c2a080ba970e158e3fc22effcd0a6",
+    "corruption_operator_summary.json": "077a97bdc7c2726c9837158436e55c842955f72361d83b893d65acfe5b0aca47",
+    "audit_analysis_provenance.json": "0c4dc30064fca2985ffbce1d30ec41dbb87fdc412e4357b731089300332ba69e",
+
+    "pairwise_statistics.csv": "2672fdf0c66df467f8a3eac127ba473b99724090b8ead0cdf9c6d7016eb74c72",
+    "paired_case_deltas.csv": "b6ceae2afa8fe2be3c82ab459ae4883f9fa7efbd79a0b8e36df96fbf51478fd8",
+    "paired_analysis_summary.json": "983d366470a10983523f6b122e8b9fa5ae0ff66384548ba54e1c9398bec85809",
+    "paired_analysis_provenance.json": "07576a53b104d2d950032150355b49008238d7d790b6db11be73ce66f217d9c0"
+  }
+}

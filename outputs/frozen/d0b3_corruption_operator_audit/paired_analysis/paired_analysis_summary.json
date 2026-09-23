@@ -1,0 +1,117 @@
+{
+  "case_count": 200,
+  "operators": [
+    "zero_fill",
+    "local_mean_fill",
+    "local_empirical_resample"
+  ],
+  "pair_definitions": [
+    {
+      "operator_a": "zero_fill",
+      "operator_b": "local_mean_fill",
+      "delta": "B - A"
+    },
+    {
+      "operator_a": "zero_fill",
+      "operator_b": "local_empirical_resample",
+      "delta": "B - A"
+    },
+    {
+      "operator_a": "local_mean_fill",
+      "operator_b": "local_empirical_resample",
+      "delta": "B - A"
+    }
+  ],
+  "primary_metric": "primary_delta_std_region_c_mean",
+  "statistical_unit": "case",
+  "paired_defined_case_counts": {
+    "zero_fill_vs_local_mean_fill": 200,
+    "zero_fill_vs_local_empirical_resample": 200,
+    "local_mean_fill_vs_local_empirical_resample": 200
+  },
+  "bootstrap_seed": 20260923,
+  "bootstrap_resamples": 10000,
+  "wilcoxon_parameters": {
+    "zero_method": "wilcox",
+    "correction": false,
+    "alternative": "two-sided",
+    "method": "auto"
+  },
+  "bootstrap_ci_method": "percentile 2.5th and 97.5th percentiles",
+  "alpha": 0.05,
+  "holm_correction": "Holm across exactly 3 comparisons",
+  "tie_tolerance": 1e-08,
+  "results": [
+    {
+      "operator_a": "zero_fill",
+      "operator_b": "local_mean_fill",
+      "paired_case_count": 200,
+      "mean_a": 0.02943872188833095,
+      "mean_b": 0.029455328519049605,
+      "mean_delta_b_minus_a": 1.6606630718646195e-05,
+      "median_delta_b_minus_a": 2.1874271950527054e-05,
+      "std_delta_b_minus_a": 0.0007921009101178232,
+      "min_delta_b_minus_a": -0.003211957490199209,
+      "max_delta_b_minus_a": 0.0028667333672868726,
+      "bootstrap_ci95_low": -9.296198200771255e-05,
+      "bootstrap_ci95_high": 0.0001218079706046689,
+      "wilcoxon_raw_p": 0.4715863168562311,
+      "wilcoxon_holm_p": 0.4715863168562311,
+      "reject_after_holm": false,
+      "a_lower_count": 109,
+      "b_lower_count": 91,
+      "tie_count": 0,
+      "a_lower_fraction": 0.545,
+      "b_lower_fraction": 0.455,
+      "tie_fraction": 0.0
+    },
+    {
+      "operator_a": "zero_fill",
+      "operator_b": "local_empirical_resample",
+      "paired_case_count": 200,
+      "mean_a": 0.02943872188833095,
+      "mean_b": 0.02868707620075377,
+      "mean_delta_b_minus_a": -0.0007516456875771838,
+      "median_delta_b_minus_a": -0.0007611875921484587,
+      "std_delta_b_minus_a": 0.001461670157054614,
+      "min_delta_b_minus_a": -0.0060920488592581395,
+      "max_delta_b_minus_a": 0.005518394407084683,
+      "bootstrap_ci95_low": -0.0009523959975795893,
+      "bootstrap_ci95_high": -0.0005549874282802137,
+      "wilcoxon_raw_p": 1.0878490079219222e-15,
+      "wilcoxon_holm_p": 2.1756980158438443e-15,
+      "reject_after_holm": true,
+      "a_lower_count": 42,
+      "b_lower_count": 158,
+      "tie_count": 0,
+      "a_lower_fraction": 0.21,
+      "b_lower_fraction": 0.79,
+      "tie_fraction": 0.0
+    },
+    {
+      "operator_a": "local_mean_fill",
+      "operator_b": "local_empirical_resample",
+      "paired_case_count": 200,
+      "mean_a": 0.029455328519049605,
+      "mean_b": 0.02868707620075377,
+      "mean_delta_b_minus_a": -0.0007682523182958299,
+      "median_delta_b_minus_a": -0.0007692986778779602,
+      "std_delta_b_minus_a": 0.001280714947221297,
+      "min_delta_b_minus_a": -0.0072272952106104404,
+      "max_delta_b_minus_a": 0.0030618404099900104,
+      "bootstrap_ci95_low": -0.0009468192746767364,
+      "bootstrap_ci95_high": -0.0005945402756975415,
+      "wilcoxon_raw_p": 5.986724607554324e-17,
+      "wilcoxon_holm_p": 1.7960173822662972e-16,
+      "reject_after_holm": true,
+      "a_lower_count": 45,
+      "b_lower_count": 155,
+      "tie_count": 0,
+      "a_lower_fraction": 0.225,
+      "b_lower_fraction": 0.775,
+      "tie_fraction": 0.0
+    }
+  ],
+  "no_operator_selected": true,
+  "methodological_interpretation": "Lower primary_delta_std_region_c_mean indicates lower collateral standardized Za shift outside the local Conv/Pool geometric receptive field of annotated abnormal tissue. REGION_C is not interpreted as guaranteed pathology-independent because GroupNorm introduces wider spatial statistical coupling."
+}
