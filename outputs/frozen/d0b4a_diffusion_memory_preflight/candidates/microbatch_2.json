@@ -1,0 +1,448 @@
+{
+  "all_output_shapes_valid": true,
+  "all_za_shapes_valid": true,
+  "architecture": {
+    "attention": false,
+    "base_channels": [
+      64,
+      128,
+      256
+    ],
+    "decoder_channels": [
+      128,
+      64
+    ],
+    "dropout": false,
+    "latent_channels": 256,
+    "latent_shape": [
+      12,
+      12,
+      12
+    ],
+    "residual_blocks_per_level": 2
+  },
+  "cuda_version": "13.0",
+  "current_memory_allocated_bytes": 515161088,
+  "current_memory_reserved_bytes": 1728053248,
+  "d0b3_decision_sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+  "d0b3_manifest_decision_verified": true,
+  "d0b3_manifest_path": "/home/friend/BrainTumorSeg/outputs/frozen/d0b3_corruption_operator_audit/MANIFEST.sha256",
+  "d0b3_manifest_sha256": "98239ecc20d3e966776389b5b6055ec05501f74b54044d8eeee1d38e44887cf6",
+  "d0b3_selected_operator": "local_empirical_resample",
+  "dataset_root": "/home/friend/data/training_data1_v2",
+  "diffusion_schedule": {
+    "cosine_offset": 0.008,
+    "max_beta": 0.999,
+    "timesteps": 1000
+  },
+  "effective_batch_fingerprint": "17743ab4071800a24d9a572519bee6577deda903b0078a8a2aa71845fc24ab4a",
+  "effective_batch_size": 8,
+  "elapsed_seconds": 3.6878455959958956,
+  "expected_branch": "experiment/d0b4-diffusion-design",
+  "failure_reason": null,
+  "failure_stage": null,
+  "git_status_short": [
+    "M configs/data.yaml",
+    " M outputs/frozen/e1c_anatomy_constraint/training/best.pt",
+    "?? 124216639",
+    "?? d0a_latent_distribution_audit.log",
+    "?? d0b0_support_mask_audit.log",
+    "?? d0b1_abnormal_occupancy_audit.log",
+    "?? d0b2_rf_aware_exclusion_audit.log",
+    "?? d0b3_corruption_operator_audit.log",
+    "?? d0b3_corruption_operator_audit_rerun.log",
+    "?? e1c_za_training.log",
+    "?? e1c_zd_prestart_attempt.log",
+    "?? e1c_zd_training.log"
+  ],
+  "gpu_name": "NVIDIA GeForce RTX 3090",
+  "gradient_accumulation_steps": 4,
+  "gradient_finite": true,
+  "loss_finite": true,
+  "losses": [
+    1.0020060539245605,
+    1.0012462139129639,
+    0.9981163740158081,
+    0.9995444416999817
+  ],
+  "memory_headroom_pass": true,
+  "microbatch": 2,
+  "model_parameter_count": 22825280,
+  "model_selection": false,
+  "normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+  "oom": false,
+  "optimizer_state_materialized": true,
+  "optimizer_step_performed": true,
+  "pass": true,
+  "patch_coordinates": [
+    {
+      "case_id": "BraTS-GLI-02914-101",
+      "crop_start_d": 58,
+      "crop_start_h": 28,
+      "crop_start_w": 35,
+      "crop_stop_d": 154,
+      "crop_stop_h": 124,
+      "crop_stop_w": 131,
+      "patch_index": 10,
+      "seed": 4419162737349161800
+    },
+    {
+      "case_id": "BraTS-GLI-02623-102",
+      "crop_start_d": 65,
+      "crop_start_h": 113,
+      "crop_start_w": 42,
+      "crop_stop_d": 161,
+      "crop_stop_h": 209,
+      "crop_stop_w": 138,
+      "patch_index": 2,
+      "seed": 2734442575153083709
+    },
+    {
+      "case_id": "BraTS-GLI-02634-100",
+      "crop_start_d": 16,
+      "crop_start_h": 100,
+      "crop_start_w": 3,
+      "crop_stop_d": 112,
+      "crop_stop_h": 196,
+      "crop_stop_w": 99,
+      "patch_index": 10,
+      "seed": 4017675483556847569
+    },
+    {
+      "case_id": "BraTS-GLI-02780-100",
+      "crop_start_d": 52,
+      "crop_start_h": 27,
+      "crop_start_w": 57,
+      "crop_stop_d": 148,
+      "crop_stop_h": 123,
+      "crop_stop_w": 153,
+      "patch_index": 1,
+      "seed": 3090596903485649185
+    },
+    {
+      "case_id": "BraTS-GLI-02882-100",
+      "crop_start_d": 34,
+      "crop_start_h": 58,
+      "crop_start_w": 44,
+      "crop_stop_d": 130,
+      "crop_stop_h": 154,
+      "crop_stop_w": 140,
+      "patch_index": 2,
+      "seed": 344085302712115086
+    },
+    {
+      "case_id": "BraTS-GLI-02851-101",
+      "crop_start_d": 83,
+      "crop_start_h": 103,
+      "crop_start_w": 7,
+      "crop_stop_d": 179,
+      "crop_stop_h": 199,
+      "crop_stop_w": 103,
+      "patch_index": 19,
+      "seed": 8197638081843401601
+    },
+    {
+      "case_id": "BraTS-GLI-00063-101",
+      "crop_start_d": 19,
+      "crop_start_h": 13,
+      "crop_start_w": 38,
+      "crop_stop_d": 115,
+      "crop_stop_h": 109,
+      "crop_stop_w": 134,
+      "patch_index": 18,
+      "seed": 4019829771023646445
+    },
+    {
+      "case_id": "BraTS-GLI-02754-100",
+      "crop_start_d": 76,
+      "crop_start_h": 0,
+      "crop_start_w": 23,
+      "crop_stop_d": 172,
+      "crop_stop_h": 96,
+      "crop_stop_w": 119,
+      "patch_index": 3,
+      "seed": 7909264129290085749
+    }
+  ],
+  "patch_manifest_path": "/home/friend/BrainTumorSeg/outputs/frozen/d0b_support_mask_audit/patch_manifest.csv",
+  "patch_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+  "peak_allocated_fraction": 0.05008430497659248,
+  "peak_memory_allocated_bytes": 1266934784,
+  "peak_memory_reserved_bytes": 1728053248,
+  "peak_reserved_fraction": 0.06831318153202051,
+  "precision_contract": {
+    "diffusion": "CUDA AMP FP16",
+    "master_parameters": "FP32",
+    "source_extraction": "FP32",
+    "standardization": "FP32"
+  },
+  "python_version": "3.11.10",
+  "randomness_fingerprint": "02450e90fee61a3907004493442320b261f7aeabfabd21e6614d4c468671c003",
+  "runtime_git_branch": "experiment/d0b4-diffusion-design",
+  "runtime_git_commit": "1dc4d09de108024b8c042d6946cd4b6683496e45",
+  "sample_randomness": [
+    {
+      "case_id": "BraTS-GLI-02914-101",
+      "noise_seed": 3601722910276616271,
+      "patch_index": 10,
+      "timestep": 954,
+      "timestep_seed": 5984856395526522202
+    },
+    {
+      "case_id": "BraTS-GLI-02623-102",
+      "noise_seed": 1928748420537230035,
+      "patch_index": 2,
+      "timestep": 415,
+      "timestep_seed": 4479547428092945370
+    },
+    {
+      "case_id": "BraTS-GLI-02634-100",
+      "noise_seed": 161230480628570224,
+      "patch_index": 10,
+      "timestep": 261,
+      "timestep_seed": 7235269247579571432
+    },
+    {
+      "case_id": "BraTS-GLI-02780-100",
+      "noise_seed": 8637471900310337060,
+      "patch_index": 1,
+      "timestep": 542,
+      "timestep_seed": 2195325913249500676
+    },
+    {
+      "case_id": "BraTS-GLI-02882-100",
+      "noise_seed": 8585620148088465643,
+      "patch_index": 2,
+      "timestep": 964,
+      "timestep_seed": 1144280565954881250
+    },
+    {
+      "case_id": "BraTS-GLI-02851-101",
+      "noise_seed": 6211612693231234570,
+      "patch_index": 19,
+      "timestep": 417,
+      "timestep_seed": 1830825104210143007
+    },
+    {
+      "case_id": "BraTS-GLI-00063-101",
+      "noise_seed": 6837839727731227054,
+      "patch_index": 18,
+      "timestep": 917,
+      "timestep_seed": 2271645711616769853
+    },
+    {
+      "case_id": "BraTS-GLI-02754-100",
+      "noise_seed": 7509734640319505246,
+      "patch_index": 3,
+      "timestep": 486,
+      "timestep_seed": 435094275167522903
+    }
+  ],
+  "schema": "d0b4_diffusion_preflight",
+  "schema_version": 2,
+  "scientific_interpretation": false,
+  "scientific_training": false,
+  "seed": 20260923,
+  "selected_cases": [
+    "BraTS-GLI-02914-101",
+    "BraTS-GLI-02623-102",
+    "BraTS-GLI-02634-100",
+    "BraTS-GLI-02780-100",
+    "BraTS-GLI-02882-100",
+    "BraTS-GLI-02851-101",
+    "BraTS-GLI-00063-101",
+    "BraTS-GLI-02754-100"
+  ],
+  "source_checkpoint_path": "/home/friend/BrainTumorSeg/outputs/frozen/e1c_anatomy_constraint/training/best.pt",
+  "source_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+  "source_gradient_free": true,
+  "source_info": {
+    "config": {
+      "data": {
+        "augmentation": {
+          "enabled": true,
+          "flip": {
+            "enabled": true,
+            "probability": 0.5
+          },
+          "gaussian_noise": {
+            "enabled": true,
+            "std_max": 0.05,
+            "std_min": 0.0
+          },
+          "intensity_scale": {
+            "enabled": true,
+            "max": 1.1,
+            "min": 0.9
+          },
+          "intensity_shift": {
+            "enabled": true,
+            "max": 0.1,
+            "min": -0.1
+          }
+        },
+        "foreground_sampling_probability": 0.7,
+        "normalize": true,
+        "patch_size": [
+          96,
+          96,
+          96
+        ],
+        "release": "BraTS2024-GLI-post-treatment",
+        "root": "/home/friend/data/training_data1_v2",
+        "train_cases": "splits/train_cases.txt",
+        "train_manifest": null,
+        "val_cases": "splits/val_cases.txt",
+        "val_manifest": null
+      },
+      "experiment_name": "E1-C anatomy/background reconstruction constraint",
+      "model": {
+        "base_channels": 32,
+        "in_channels": 4,
+        "latent_channels": 256,
+        "latent_projection": "conv1x1x1",
+        "name": "anatomy_constrained_joint_reconstruction_unet3d",
+        "out_channels": 4
+      },
+      "selection_metric": "mean target-positive case Dice over NETC,SNFH,ET,RC,WT,TC; exclude regions with zero positive cases",
+      "train": {
+        "anatomy_reconstruction": {
+          "enabled": true,
+          "lambda_anat": 0.5,
+          "loss_type": "masked L1",
+          "source": "Za only",
+          "target": "observed normalized MRI",
+          "valid_mask": "raw_mask == 0"
+        },
+        "batch_size": 1,
+        "data_config": "configs/data.yaml",
+        "data_protocol": {
+          "augmentation": {
+            "enabled": true,
+            "flip": {
+              "enabled": true,
+              "probability": 0.5
+            },
+            "gaussian_noise": {
+              "enabled": true,
+              "std_max": 0.05,
+              "std_min": 0.0
+            },
+            "intensity_scale": {
+              "enabled": true,
+              "max": 1.1,
+              "min": 0.9
+            },
+            "intensity_shift": {
+              "enabled": true,
+              "max": 0.1,
+              "min": -0.1
+            }
+          },
+          "foreground_sampling_probability": 0.7,
+          "normalize": true,
+          "patch_size": [
+            96,
+            96,
+            96
+          ],
+          "train_cases": "splits/train_cases.txt",
+          "val_cases": "splits/val_cases.txt"
+        },
+        "device": "cuda",
+        "epochs": 30,
+        "experiment_name": "E1-C anatomy/background reconstruction constraint",
+        "learning_rate": 0.001,
+        "num_workers": 4,
+        "output_dir": "outputs/e1c_anatomy_constraint",
+        "reconstruction": {
+          "enabled": true,
+          "lambda_rec": 1.0,
+          "loss_type": "L1"
+        },
+        "seed": 42,
+        "segmentation_loss": "Dice+BCE",
+        "threshold": 0.5,
+        "validation_frequency": 1,
+        "weight_decay": 1e-05
+      }
+    },
+    "epoch": 11,
+    "experiment": "e1c",
+    "model": "anatomy_constrained_joint_reconstruction_unet3d",
+    "parameter_count": 10342156,
+    "path": "/home/friend/BrainTumorSeg/outputs/frozen/e1c_anatomy_constraint/training/best.pt",
+    "sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53"
+  },
+  "step_shapes": [
+    {
+      "output": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ],
+      "za": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "output": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ],
+      "za": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "output": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ],
+      "za": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "output": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ],
+      "za": [
+        2,
+        256,
+        12,
+        12,
+        12
+      ]
+    }
+  ],
+  "timestamp_utc": "2026-09-23T12:37:30.147387+00:00",
+  "torch_version": "2.14.0+cu130",
+  "total_cuda_memory_bytes": 25296044032,
+  "train_split_sha256": "581dc6326a22cb0b9582fa249b8e13fd948597a60c5f454cb5ade0493fa7c18e",
+  "validation_used": false
+}

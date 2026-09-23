@@ -1,0 +1,114 @@
+{
+  "candidate_provenance": {
+    "1": {
+      "cuda_version": "13.0",
+      "d0b3_decision_sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+      "patch_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+      "seed": 20260923,
+      "source_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+      "torch_version": "2.14.0+cu130"
+    },
+    "2": {
+      "cuda_version": "13.0",
+      "d0b3_decision_sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+      "patch_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+      "seed": 20260923,
+      "source_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+      "torch_version": "2.14.0+cu130"
+    },
+    "4": {
+      "cuda_version": "13.0",
+      "d0b3_decision_sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+      "patch_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+      "seed": 20260923,
+      "source_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+      "torch_version": "2.14.0+cu130"
+    },
+    "8": {
+      "cuda_version": "13.0",
+      "d0b3_decision_sha256": "095e1f9671411eca0d12a2f834833d78477a14664504bde3e6e1b46766c6cc2f",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+      "patch_manifest_sha256": "9c4ba67fc195537a5500229722ce55e4772ea5b7d135b351b3a2fc4b857f44b9",
+      "seed": 20260923,
+      "source_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+      "torch_version": "2.14.0+cu130"
+    }
+  },
+  "effective_batch_size": 8,
+  "git_status_short": [
+    "M configs/data.yaml",
+    " M outputs/frozen/e1c_anatomy_constraint/training/best.pt",
+    "?? 124216639",
+    "?? d0a_latent_distribution_audit.log",
+    "?? d0b0_support_mask_audit.log",
+    "?? d0b1_abnormal_occupancy_audit.log",
+    "?? d0b2_rf_aware_exclusion_audit.log",
+    "?? d0b3_corruption_operator_audit.log",
+    "?? d0b3_corruption_operator_audit_rerun.log",
+    "?? e1c_za_training.log",
+    "?? e1c_zd_prestart_attempt.log",
+    "?? e1c_zd_training.log"
+  ],
+  "gpu_name": "NVIDIA GeForce RTX 3090",
+  "gradient_accumulation_steps": 1,
+  "runtime_git_branch": "experiment/d0b4-diffusion-design",
+  "runtime_git_commit": "621fbbe66fd12ebd8870c6464409f2d3b428d8d5",
+  "selected_physical_microbatch": 8,
+  "source_files": [
+    {
+      "frozen_copy_sha256": "ae3f0419aa1bf7199b4eed9942d1956b7db5ead53f834605dee3a56a48bcd942",
+      "frozen_path": "candidates/microbatch_8.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_8_retry1.json",
+      "source_sha256": "ae3f0419aa1bf7199b4eed9942d1956b7db5ead53f834605dee3a56a48bcd942"
+    },
+    {
+      "frozen_copy_sha256": "739dfde6025ca802c8412c8f2ecb01b0f9ee62193d748137da532b1c982d46aa",
+      "frozen_path": "candidates/microbatch_4.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_4_retry1.json",
+      "source_sha256": "739dfde6025ca802c8412c8f2ecb01b0f9ee62193d748137da532b1c982d46aa"
+    },
+    {
+      "frozen_copy_sha256": "6962bc91632036a69dde55c645e3f4cc7ef56acd60097930b98861becc1d3d7b",
+      "frozen_path": "candidates/microbatch_2.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_2_retry1.json",
+      "source_sha256": "6962bc91632036a69dde55c645e3f4cc7ef56acd60097930b98861becc1d3d7b"
+    },
+    {
+      "frozen_copy_sha256": "3fb4fb6a02d1f74b2b6bb8ca5e2f5f2b918742488780ed99f1ed5794eed759a2",
+      "frozen_path": "candidates/microbatch_1.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_1_retry1.json",
+      "source_sha256": "3fb4fb6a02d1f74b2b6bb8ca5e2f5f2b918742488780ed99f1ed5794eed759a2"
+    },
+    {
+      "frozen_copy_sha256": "4f0ffd4f4d2af015cd16a415b7910a8bbfa616a147acdd6adb0c24ef6187c0d1",
+      "frozen_path": "failed_attempts/microbatch_1.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_1.json",
+      "source_sha256": "4f0ffd4f4d2af015cd16a415b7910a8bbfa616a147acdd6adb0c24ef6187c0d1"
+    },
+    {
+      "frozen_copy_sha256": "788a22d8961316cf9feee866bfbbcb545019207a4a741e55d2a55e6e7141768c",
+      "frozen_path": "failed_attempts/microbatch_2.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_2.json",
+      "source_sha256": "788a22d8961316cf9feee866bfbbcb545019207a4a741e55d2a55e6e7141768c"
+    },
+    {
+      "frozen_copy_sha256": "b6e5f589b63328bb5bf35b039df29b4d673ee7d4a3e551d3559fc825043b3e0f",
+      "frozen_path": "failed_attempts/microbatch_4.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_4.json",
+      "source_sha256": "b6e5f589b63328bb5bf35b039df29b4d673ee7d4a3e551d3559fc825043b3e0f"
+    },
+    {
+      "frozen_copy_sha256": "a3ee89e5404a6ad582e571b3b7125085eab0785741cf6be62dfccdcabf24e383",
+      "frozen_path": "failed_attempts/microbatch_8.json",
+      "source_path": "/home/friend/BrainTumorSeg/outputs/d0b4_diffusion_preflight/microbatch_8.json",
+      "source_sha256": "a3ee89e5404a6ad582e571b3b7125085eab0785741cf6be62dfccdcabf24e383"
+    }
+  ]
+}
