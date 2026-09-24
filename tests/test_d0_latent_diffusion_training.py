@@ -428,3 +428,85 @@ def test_zero_support_error_includes_training_identity(monkeypatch):
         trainer._training_batch('unused',[case],7)
     message=str(error.value)
     assert 'case_id=case_zero' in message and 'epoch_index=7' in message and 'crop_coordinates=' in message
+
+
+def test_gpu_smoke_cli_modes_limits_and_required_paths():
+    with pytest.raises(SystemExit):
+        trainer.build_arg_parser(['--smoke', '--gpu-smoke'])
+    with pytest.raises(SystemExit):
+        trainer.build_arg_parser(['--gpu-smoke-train-batches', '1'])
+    with pytest.raises(SystemExit):
+        trainer.build_arg_parser(['--smoke', '--gpu-smoke-validation-patches', '2'])
+    with pytest.raises(SystemExit):
+        trainer.build_arg_parser(['--gpu-smoke'])
+    args = trainer.build_arg_parser(['--gpu-smoke', '--dataset-root', '/dataset',
+        '--output-dir', '/tmp/run-gpu-smoke'])
+    assert args.gpu_smoke and not args.smoke
+    assert args.gpu_smoke_train_batches == 2
+    assert args.gpu_smoke_validation_patches == 8
+    args = trainer.build_arg_parser(['--gpu-smoke', '--dataset-root', '/dataset',
+        '--output-dir=/tmp/run-gpu-smoke', '--gpu-smoke-train-batches', '3',
+        '--gpu-smoke-validation-patches', '5'])
+    assert (args.gpu_smoke_train_batches, args.gpu_smoke_validation_patches) == (3, 5)
+
+
+def test_gpu_smoke_bounded_train_and_validation_inputs_do_not_regenerate(monkeypatch):
+    ids = [f'case_{i:04d}' for i in range(1080)]
+    cases = trainer.gpu_smoke_train_cases(ids, 2)
+    assert len(cases) == 16 and cases == trainer.deterministic_case_order(ids, 0)[:16]
+    assert [len(cases[i:i+trainer.GPU_SMOKE_BATCH_SIZE]) for i in range(0, len(cases), 8)] == [8, 8]
+    with pytest.raises(ValueError, match='enough cases'):
+        trainer.gpu_smoke_train_cases(ids[:10], 2)
+    with pytest.raises(ValueError, match='locked at 8'):
+        trainer.gpu_smoke_train_cases(ids, 2, batch_size=4)
+    rows = [{'case_id': 'c', 'validation_patch_index': i} for i in range(4)] + [
+        {'case_id': 'd', 'validation_patch_index': i} for i in range(4)]
+    monkeypatch.setattr(trainer, 'deterministic_crop', lambda *a, **k: pytest.fail('must use fixed manifest rows'))
+    assert trainer.gpu_smoke_validation_rows(rows, 6) == rows[:6]
+    with pytest.raises(ValueError, match=r'\[1,1080\]'):
+        trainer.gpu_smoke_validation_rows(rows, 0)
+
+
+def test_gpu_smoke_summary_and_artifact_inventory_are_non_scientific(tmp_path):
+    verified = trainer.verify_startup()
+    summary = trainer.gpu_smoke_summary_template(verified, tmp_path, 2, 8)
+    assert summary['scientific_training'] is False
+    assert summary['scientific_training_started'] is False
+    assert summary['run_type'] == 'non_scientific_gpu_smoke'
+    assert summary['checkpoint_selection_performed'] is False
+    output = tmp_path / 'gpu_smoke'
+    output.mkdir()
+    (output / 'gpu_smoke_summary.json').write_text('{}')
+    (output / 'gpu_smoke.log').write_text('')
+    trainer.validate_gpu_smoke_artifact_inventory(output)
+    (output / 'best.pt').write_bytes(b'forbidden')
+    with pytest.raises(RuntimeError, match='Unexpected gpu-smoke artifacts'):
+        trainer.validate_gpu_smoke_artifact_inventory(output)
+
+
+def test_gpu_smoke_path_isolation_and_output_refusal(tmp_path):
+    scientific = tmp_path / 'runs' / 'd0'
+    assert trainer.verify_output_dir(tmp_path / 'runs' / 'd0-smoke', gpu_smoke=True,
+        scientific_path=scientific) == (tmp_path / 'runs' / 'd0-smoke').resolve()
+    with pytest.raises(ValueError, match='separate'):
+        trainer.verify_output_dir(scientific / 'gpu-smoke', gpu_smoke=True, scientific_path=scientific)
+    with pytest.raises(ValueError, match='separate'):
+        trainer.verify_output_dir(tmp_path / 'runs', gpu_smoke=True, scientific_path=scientific)
+    existing = tmp_path / 'existing-gpu-smoke'
+    existing.mkdir()
+    with pytest.raises(FileExistsError):
+        trainer.verify_output_dir(existing, gpu_smoke=True, scientific_path=scientific)
+    with pytest.raises(ValueError, match='containing "smoke"'):
+        trainer.verify_output_dir(tmp_path / 'runs' / 'cpu-test', smoke=True, scientific_path=scientific)
+
+
+def test_frozen_source_fingerprint_detects_parameter_mutation():
+    encoder = torch.nn.Linear(3, 2, bias=False)
+    anatomy = torch.nn.Linear(2, 2, bias=False)
+    source = SimpleNamespace(encoder=encoder,
+        projection=SimpleNamespace(anatomy_projector=anatomy))
+    before = trainer.frozen_source_fingerprint(source)
+    assert trainer.source_fingerprint_unchanged(before, source)
+    with torch.no_grad():
+        anatomy.weight[0, 0] += 1
+    assert not trainer.source_fingerprint_unchanged(before, source)

@@ -28,6 +28,10 @@ from datetime import datetime, timezone
 import numpy as np
 import torch
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from datasets.transforms import normalize_nonzero
 from models.latent_diffusion_unet3d import LatentDiffusionUNet3D, cosine_schedule, masked_epsilon_mse
 from models.latent_probe import E1C_SOURCE_SHA256, file_sha256, load_source
@@ -36,7 +40,6 @@ from scripts.audit_d0b3_corruption_operator import corrupt_input, donor_pools
 from scripts.freeze_d0b4d_validation_manifest import verify as verify_b4d
 from scripts.train_baseline import read_case_ids, read_config
 
-ROOT = Path(__file__).resolve().parents[1]
 FINAL_SHA256 = '05d13292994b59f3c45d70c98591c306970269673e475797620c644446aa86d8'
 B4C_SHA256 = '861ea070f7bfa2677b9345403905e70400190012e56efac722ccbb892af21f75'
 B4B_SHA256 = '29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4'
@@ -63,6 +66,11 @@ DEFAULT_TRAIN_SPLIT = ROOT / 'splits/train_cases.txt'
 DEFAULT_VAL_SPLIT = ROOT / 'splits/val_cases.txt'
 DEFAULT_OUTPUT = ROOT / 'outputs/d0_latent_diffusion'
 DEFAULT_SMOKE_OUTPUT = ROOT / 'outputs/d0_latent_diffusion_smoke'
+GPU_SMOKE_BATCH_SIZE = 8
+GPU_SMOKE_DEFAULT_TRAIN_BATCHES = 2
+GPU_SMOKE_DEFAULT_VALIDATION_PATCHES = 8
+GPU_SMOKE_FORBIDDEN_FILES = ('best.pt', 'latest.pt', 'training_history.csv',
+    'validation_per_case.csv', 'training_provenance.json', 'validation_summary.json')
 LATENT_SHAPE = (256, 12, 12, 12)
 RAW_SHAPE = (4, 96, 96, 96)
 HISTORY_FIELDS = ('epoch_index', 'human_epoch', 'samples_presented', 'successful_optimizer_steps',
@@ -154,6 +162,7 @@ def verify_startup(*, final_freeze=DEFAULT_FINAL_FREEZE, contract_path=DEFAULT_C
         training_split_sha256=TRAIN_SHA256, validation_split_sha256=VAL_SHA256,
         e1c_checkpoint_sha256=E1C_SOURCE_SHA256, d0a_contract_sha256=D0A_SHA256,
         d0b3_decision_sha256=D0B3_SHA256, validation_case_count=270,
+        d0b4d_manifest_sha256=freeze['d0b4d']['manifest_sha256'],
         d0b0_artifact_path=str(Path(d0b0).expanduser().resolve()), d0b0_artifact_sha256=d0b0_sha,
         b4a_decision_path=str(Path(b4a).expanduser().resolve()), b4a_decision_sha256=b4a_sha,
         validation_patches_per_case=4, validation_rows=1080,
@@ -593,14 +602,18 @@ def _is_path_within(path, parent):
         return False
 
 
-def verify_output_dir(path, *, smoke=False, resume=False, scientific_path=DEFAULT_OUTPUT):
+def verify_output_dir(path, *, smoke=False, gpu_smoke=False, resume=False, scientific_path=DEFAULT_OUTPUT):
     path = Path(path).expanduser().resolve()
     frozen = (ROOT / 'outputs/frozen').resolve()
     if path == frozen or frozen in path.parents:
         raise ValueError('Run output cannot be inside frozen artifacts')
     scientific = Path(scientific_path).expanduser().resolve()
-    if smoke and (_is_path_within(path, scientific) or _is_path_within(scientific, path)):
+    if smoke and gpu_smoke:
+        raise ValueError('CPU smoke and GPU smoke modes are mutually exclusive')
+    if (smoke or gpu_smoke) and (_is_path_within(path, scientific) or _is_path_within(scientific, path)):
         raise ValueError('Smoke output must be completely separate from the scientific output path')
+    if smoke and 'smoke' not in path.name.lower():
+        raise ValueError('Smoke output must use a distinct path containing "smoke"')
     if not smoke and path == DEFAULT_SMOKE_OUTPUT.resolve():
         raise ValueError('Scientific mode cannot use the smoke output path')
     if path.exists() and not resume:
@@ -673,6 +686,310 @@ def run_smoke(output_dir=DEFAULT_SMOKE_OUTPUT):
     (output / 'smoke_summary.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
     logger.info('Non-scientific CPU smoke passed; no scientific training performed')
     return report
+
+
+def gpu_smoke_train_cases(case_ids, train_batches, batch_size=GPU_SMOKE_BATCH_SIZE, epoch_index=0):
+    if batch_size != GPU_SMOKE_BATCH_SIZE:
+        raise ValueError('GPU smoke physical batch size is locked at 8; fallback is forbidden')
+    if not isinstance(train_batches, int) or isinstance(train_batches, bool) or train_batches < 1:
+        raise ValueError('GPU smoke train batches must be a positive integer')
+    ordered = deterministic_case_order(case_ids, epoch_index)
+    cases = ordered[:train_batches * batch_size]
+    if len(cases) != train_batches * batch_size:
+        raise ValueError('Locked training split does not contain enough cases for requested full batches')
+    return cases
+
+
+def gpu_smoke_validation_rows(rows, validation_patches):
+    if not isinstance(validation_patches, int) or isinstance(validation_patches, bool) or not 1 <= validation_patches <= 1080:
+        raise ValueError('GPU smoke validation patch count must be in [1,1080]')
+    selected = list(rows[:validation_patches])
+    if len(selected) != validation_patches:
+        raise ValueError('Frozen validation manifest has too few rows')
+    return selected
+
+
+def frozen_source_fingerprint(source):
+    """Hash E1-C Encoder and P_a values without changing their tensors."""
+    digest = hashlib.sha256()
+    modules = (('encoder', source.encoder), ('anatomy_projector', source.projection.anatomy_projector))
+    for module_name, module in modules:
+        for name, parameter in module.named_parameters():
+            tensor = parameter.detach().to(device='cpu').contiguous()
+            digest.update(f'{module_name}.{name}\0{tensor.dtype}\0{tuple(tensor.shape)}\0'.encode())
+            digest.update(tensor.numpy().tobytes())
+    return digest.hexdigest()
+
+
+def source_fingerprint_unchanged(before, source):
+    return before == frozen_source_fingerprint(source)
+
+
+def validate_cli_args(args, parser=None):
+    if args.smoke and args.gpu_smoke:
+        if parser:
+            parser.error('--smoke and --gpu-smoke are mutually exclusive')
+        raise ValueError('--smoke and --gpu-smoke are mutually exclusive')
+    if not args.gpu_smoke and (args.gpu_smoke_train_batches is not None
+                               or args.gpu_smoke_validation_patches is not None):
+        if parser:
+            parser.error('GPU smoke limits are legal only with --gpu-smoke')
+        raise ValueError('GPU smoke limits are legal only with --gpu-smoke')
+    if args.gpu_smoke:
+        if args.dataset_root is None or not args.output_dir_explicit:
+            if parser:
+                parser.error('--gpu-smoke requires --dataset-root and an explicit --output-dir')
+            raise ValueError('--gpu-smoke requires --dataset-root and an explicit --output-dir')
+        if args.gpu_smoke_train_batches is None:
+            args.gpu_smoke_train_batches = GPU_SMOKE_DEFAULT_TRAIN_BATCHES
+        if args.gpu_smoke_validation_patches is None:
+            args.gpu_smoke_validation_patches = GPU_SMOKE_DEFAULT_VALIDATION_PATCHES
+        if args.gpu_smoke_train_batches < 1 or args.gpu_smoke_validation_patches < 1:
+            if parser:
+                parser.error('GPU smoke limits must be positive integers')
+            raise ValueError('GPU smoke limits must be positive integers')
+    return args
+
+
+def build_arg_parser(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--config', type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument('--dataset-root', type=Path)
+    parser.add_argument('--output-dir', type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument('--resume', action='store_true')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--smoke', action='store_true', help='Synthetic CPU utility smoke; non-scientific.')
+    mode.add_argument('--gpu-smoke', action='store_true', help='Bounded real-data CUDA integration smoke; non-scientific.')
+    parser.add_argument('--gpu-smoke-train-batches', type=int, default=None)
+    parser.add_argument('--gpu-smoke-validation-patches', type=int, default=None)
+    argv = list(sys.argv[1:] if argv is None else argv)
+    args = parser.parse_args(argv)
+    args.output_dir_explicit = any(arg == '--output-dir' or arg.startswith('--output-dir=') for arg in argv)
+    return validate_cli_args(args, parser)
+
+
+def configure_gpu_smoke_logging(output):
+    logger = logging.getLogger('d0c1-gpu-smoke')
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    console = logging.StreamHandler(sys.stdout)
+    console.setFormatter(formatter)
+    file_handler = logging.FileHandler(Path(output) / 'gpu_smoke.log')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(console)
+    logger.addHandler(file_handler)
+    return logger
+
+
+def gpu_smoke_runtime_identity():
+    git = lambda *args: subprocess.check_output(['git', *args], cwd=ROOT, text=True).strip()
+    return dict(runtime_git_branch=git('rev-parse', '--abbrev-ref', 'HEAD'),
+        runtime_git_commit=git('rev-parse', 'HEAD'), git_status_short=git('status', '--short').splitlines())
+
+
+def _gpu_smoke_references(verified):
+    keys = ('final_freeze_sha256', 'b4c_contract_sha256', 'b4b_contract_sha256',
+        'validation_manifest_sha256', 'validation_manifest_audit_sha256', 'training_split_sha256',
+        'validation_split_sha256', 'e1c_checkpoint_sha256', 'd0a_contract_sha256', 'd0b4d_manifest_sha256',
+        'd0b0_artifact_sha256', 'b4a_decision_sha256', 'd0b3_decision_sha256')
+    result = {key: verified[key] for key in keys}
+    result.update(d0b0_artifact_path=verified['d0b0_artifact_path'],
+        d0b4a_decision_path=verified['b4a_decision_path'])
+    return result
+
+
+def gpu_smoke_summary_template(verified, dataset_root, train_batches, validation_patches):
+    return dict(stage='D0-C1', status='FAIL', scientific_training=False,
+        scientific_training_started=False, run_type='non_scientific_gpu_smoke',
+        dataset_root=str(Path(dataset_root).expanduser().resolve()),
+        verified_frozen_references=_gpu_smoke_references(verified),
+        train_batches_requested=train_batches, train_batches_completed=0, samples_processed=0,
+        physical_batch_size=GPU_SMOKE_BATCH_SIZE, loss_values=[], gradient_norms=[],
+        successful_optimizer_steps=0, ema_updates=0, validation_patches_requested=validation_patches,
+        validation_patches_completed=0, validation_patch_losses=[], checkpoint_selection_performed=False,
+        source_model_unchanged=False, peak_memory_allocated=0, peak_memory_reserved=0,
+        peak_reserved_fraction=0.0, total_cuda_memory=0,
+        interpretation='Engineering integration check only; losses are not scientific results.')
+
+
+def validate_gpu_smoke_artifact_inventory(output):
+    allowed = {'gpu_smoke_summary.json', 'gpu_smoke.log', 'gpu_smoke_samples.csv'}
+    unexpected = {path.name for path in Path(output).iterdir()} - allowed
+    if unexpected:
+        raise RuntimeError(f'Unexpected gpu-smoke artifacts: {sorted(unexpected)}')
+    forbidden = {name for name in GPU_SMOKE_FORBIDDEN_FILES if (Path(output) / name).exists()}
+    if forbidden:
+        raise RuntimeError(f'GPU smoke created scientific artifacts: {sorted(forbidden)}')
+
+
+def run_gpu_smoke(*, dataset_root, output_dir, train_batches=GPU_SMOKE_DEFAULT_TRAIN_BATCHES,
+                  validation_patches=GPU_SMOKE_DEFAULT_VALIDATION_PATCHES):
+    """Run a disposable real-data CUDA integration check; never select/save checkpoints."""
+    verified = verify_startup()
+    output = verify_output_dir(output_dir, gpu_smoke=True)
+    root = Path(dataset_root).expanduser().resolve()
+    if not root.is_dir():
+        raise FileNotFoundError(f'Dataset root does not exist: {root}')
+    train_ids = verified['train_ids']
+    for case in train_ids[:min(len(train_ids), train_batches * GPU_SMOKE_BATCH_SIZE)]:
+        if not (root / case).is_dir():
+            raise FileNotFoundError(f'Missing locked training case directory: {root / case}')
+    val_rows, _ = load_validation_manifest()
+    selected_val_rows = gpu_smoke_validation_rows(val_rows, validation_patches)
+    for case in {row['case_id'] for row in selected_val_rows}:
+        if not (root / case).is_dir():
+            raise FileNotFoundError(f'Missing locked validation case directory: {root / case}')
+    cases = gpu_smoke_train_cases(train_ids, train_batches)
+    output.mkdir(parents=True, exist_ok=False)
+    logger = configure_gpu_smoke_logging(output)
+    base = dict(**gpu_smoke_summary_template(verified, root, train_batches, validation_patches),
+        **gpu_smoke_runtime_identity(),
+        device='cuda', cuda_version=torch.version.cuda, pytorch_version=str(torch.__version__),
+        )
+    summary_path = output / 'gpu_smoke_summary.json'
+    summary_path.write_text(json.dumps(base, indent=2, sort_keys=True) + '\n')
+    try:
+        model = LatentDiffusionUNet3D()
+        parameter_count = sum(parameter.numel() for parameter in model.parameters())
+        if parameter_count != 22825280:
+            raise ValueError(f'Unexpected model parameter count: {parameter_count}')
+        base['model_parameter_count'] = parameter_count
+        if not torch.cuda.is_available():
+            raise RuntimeError('GPU smoke requires CUDA')
+        device = torch.device('cuda')
+        properties = torch.cuda.get_device_properties(device)
+        base['device_name'] = torch.cuda.get_device_name(device)
+        base['total_cuda_memory'] = int(properties.total_memory)
+        source, source_info = load_source(DEFAULT_E1C, source_experiment='e1c',
+            expected_sha256=E1C_SOURCE_SHA256, expected_epoch=11)
+        source.eval().requires_grad_(False).to(device=device, dtype=torch.float32)
+        source_before = frozen_source_fingerprint(source)
+        d0a = json.loads(DEFAULT_D0A.read_text())
+        means = torch.tensor([c['mean'] for c in d0a['channels']], dtype=torch.float32)
+        stds = torch.tensor([c['population_std'] for c in d0a['channels']], dtype=torch.float32)
+        model = model.to(device=device, dtype=torch.float32)
+        ema = make_ema(model).to(device)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, betas=(0.9, 0.999),
+                                     eps=1e-8, weight_decay=1e-4)
+        scaler = torch.amp.GradScaler('cuda', enabled=True)
+        schedule = cosine_schedule()
+        train_losses, grad_norms = [], []
+        peak_allocated = peak_reserved = 0
+        for batch_index in range(train_batches):
+            batch_cases = cases[batch_index * GPU_SMOKE_BATCH_SIZE:(batch_index + 1) * GPU_SMOKE_BATCH_SIZE]
+            if len(batch_cases) != GPU_SMOKE_BATCH_SIZE:
+                raise RuntimeError('GPU smoke must retain physical batch size 8; no fallback is allowed')
+            items = _training_batch(root, batch_cases, 0)
+            z0, mask = _extract_batch(items, source, means, stds, device)
+            if z0.shape != (GPU_SMOKE_BATCH_SIZE, *LATENT_SHAPE) or not torch.isfinite(z0).all():
+                raise ValueError('Invalid real training z0 shape or values')
+            random_values = [sample_randomness(item['row']) for item in items]
+            timesteps = torch.tensor([value[0] for value in random_values], device=device, dtype=torch.long)
+            epsilon = torch.stack([value[1] for value in random_values]).to(device=device, dtype=torch.float32)
+            zt, target = forward_diffuse(z0, timesteps, epsilon, mask, schedule)
+            if zt.shape != (GPU_SMOKE_BATCH_SIZE, *LATENT_SHAPE) or not torch.isfinite(zt).all():
+                raise ValueError('Invalid real training z_t shape or values')
+            optimizer.zero_grad(set_to_none=True)
+            # Source tensors are ready; measure allocations of the actual diffusion step.
+            torch.cuda.reset_peak_memory_stats(device)
+            with torch.autocast(device_type='cuda', dtype=torch.float16):
+                prediction = model(zt, timesteps)
+            if prediction.shape != z0.shape or not torch.isfinite(prediction).all():
+                raise ValueError('Invalid diffusion prediction shape or values')
+            loss = weighted_batch_loss(prediction, target, mask)
+            if not torch.isfinite(loss):
+                raise ValueError('Non-finite GPU smoke training loss')
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2.0)
+            if not torch.isfinite(norm):
+                raise ValueError('Non-finite GPU smoke gradient norm')
+            old_scale = scaler.get_scale()
+            scaler.step(optimizer)
+            scaler.update()
+            if not optimizer_step_succeeded(old_scale, scaler.get_scale()):
+                raise RuntimeError('GradScaler unexpectedly skipped a GPU smoke optimizer step')
+            before_ema = next(ema.parameters()).detach().clone()
+            current_parameter = next(model.parameters()).detach()
+            ema_update(ema, model, 0.999)
+            expected_ema = before_ema.mul(0.999).add(current_parameter, alpha=0.001)
+            if not torch.equal(next(ema.parameters()), expected_ema):
+                raise RuntimeError('EMA did not update after successful GPU smoke optimizer step')
+            torch.cuda.synchronize(device)
+            peak_allocated = max(peak_allocated, int(torch.cuda.max_memory_allocated(device)))
+            peak_reserved = max(peak_reserved, int(torch.cuda.max_memory_reserved(device)))
+            train_losses.append(float(loss.detach().float().item()))
+            grad_norms.append(float(norm.detach().float().item()))
+            base['train_batches_completed'] += 1
+            base['samples_processed'] += GPU_SMOKE_BATCH_SIZE
+            base['successful_optimizer_steps'] += 1
+            base['ema_updates'] += 1
+            logger.info('gpu-smoke train batch=%d/%d loss=%.8g grad_norm=%.8g',
+                batch_index + 1, train_batches, train_losses[-1], grad_norms[-1])
+        ema.eval()
+        patch_losses = []
+        means_device, stds_device = means.to(device), stds.to(device)
+        cached_case_id, cached_case = None, None
+        with torch.no_grad():
+            for row in selected_val_rows:
+                if cached_case_id != row['case_id']:
+                    image, raw_mask = load_case(root, row['case_id'])
+                    cached_case = (image, raw_mask, normalize_nonzero(image.float()))
+                    cached_case_id = row['case_id']
+                item = _load_item(root, row, row['validation_patch_index'], validation=True, loaded=cached_case)
+                z0 = extract_z0(source, item['corrupted'][None], means_device, stds_device, device)
+                if z0.shape != (1, *LATENT_SHAPE) or not torch.isfinite(z0).all():
+                    raise ValueError('Invalid validation z0 shape or values')
+                identity = [row[key] for key in ('case_id','validation_patch_index','crop_start_d','crop_start_h',
+                    'crop_start_w','crop_stop_d','crop_stop_h','crop_stop_w')]
+                expected_t_seed = generator_seed([20260923, identity, 'validation_timestep'])
+                expected_e_seed = generator_seed([20260923, identity, 'validation_epsilon'])
+                if row['timestep_seed'] != expected_t_seed or row['epsilon_seed'] != expected_e_seed:
+                    raise ValueError('Frozen validation seed identity mismatch')
+                regenerated_t = int(torch.randint(0, 1000, (1,), generator=torch.Generator(device='cpu').manual_seed(
+                    row['timestep_seed'])).item())
+                if regenerated_t != row['timestep']:
+                    raise ValueError('Frozen validation timestep does not match its stored seed')
+                epsilon = torch.randn(LATENT_SHAPE, dtype=torch.float32, device='cpu',
+                    generator=torch.Generator(device='cpu').manual_seed(row['epsilon_seed']))[None].to(device)
+                mask = item['support'][None].to(device=device, dtype=torch.float32)
+                timesteps = torch.tensor([row['timestep']], device=device, dtype=torch.long)
+                zt, target = forward_diffuse(z0, timesteps, epsilon, mask, schedule)
+                if not torch.isfinite(zt).all():
+                    raise ValueError('Non-finite validation z_t')
+                with torch.autocast(device_type='cuda', dtype=torch.float16):
+                    prediction = ema(zt * mask, timesteps)
+                if prediction.shape != z0.shape or not torch.isfinite(prediction).all():
+                    raise ValueError('Invalid validation prediction shape or values')
+                patch_loss = weighted_batch_loss(prediction, target, mask)
+                if not torch.isfinite(patch_loss):
+                    raise ValueError('Non-finite validation patch loss')
+                patch_losses.append(float(patch_loss.item()))
+                logger.info('gpu-smoke validation patch=%d/%d loss=%.8g',
+                    len(patch_losses), validation_patches, patch_losses[-1])
+        base.update(device_name=torch.cuda.get_device_name(device), train_batches_requested=train_batches,
+            train_batches_completed=len(train_losses), samples_processed=len(train_losses) * GPU_SMOKE_BATCH_SIZE,
+            physical_batch_size=GPU_SMOKE_BATCH_SIZE, loss_values=train_losses, gradient_norms=grad_norms,
+            successful_optimizer_steps=len(train_losses), ema_updates=len(train_losses),
+            validation_patches_completed=len(patch_losses), validation_patch_losses=patch_losses,
+            peak_memory_allocated=peak_allocated, peak_memory_reserved=peak_reserved,
+            peak_reserved_fraction=peak_reserved / int(properties.total_memory),
+            source_model_unchanged=source_fingerprint_unchanged(source_before, source),
+            model_parameter_count=parameter_count, source_checkpoint_sha256=source_info['sha256'])
+        if not base['source_model_unchanged']:
+            raise RuntimeError('Frozen E1-C Encoder/P_a parameters changed during GPU smoke')
+        base['status'] = 'PASS'
+        logger.info('GPU smoke passed; no scientific training or checkpoint selection occurred.')
+        summary_path.write_text(json.dumps(base, indent=2, sort_keys=True) + '\n')
+        validate_gpu_smoke_artifact_inventory(output)
+        return base
+    except Exception as exc:
+        base['status'] = 'FAIL'
+        base['failure'] = f'{type(exc).__name__}: {exc}'
+        summary_path.write_text(json.dumps(base, indent=2, sort_keys=True) + '\n')
+        logger.exception('GPU smoke failed; no batch-size fallback was attempted.')
+        raise
 
 
 def _load_item(case_root, row, epoch_index, *, validation=False, loaded=None):
@@ -988,14 +1305,14 @@ def train(config_path=DEFAULT_CONFIG, *, dataset_root=None, output_dir=DEFAULT_O
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', type=Path, default=DEFAULT_CONFIG)
-    parser.add_argument('--dataset-root', type=Path)
-    parser.add_argument('--output-dir', type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument('--resume', action='store_true')
-    parser.add_argument('--smoke', action='store_true', help='Synthetic CPU utility smoke; never scientific training.')
-    args = parser.parse_args()
-    if args.smoke:
+    args = build_arg_parser()
+    if args.gpu_smoke:
+        if args.resume:
+            raise SystemExit('--resume is not available for --gpu-smoke')
+        run_gpu_smoke(dataset_root=args.dataset_root, output_dir=args.output_dir,
+            train_batches=args.gpu_smoke_train_batches,
+            validation_patches=args.gpu_smoke_validation_patches)
+    elif args.smoke:
         output = args.output_dir
         if output == DEFAULT_OUTPUT:
             output = DEFAULT_SMOKE_OUTPUT
