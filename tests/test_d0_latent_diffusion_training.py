@@ -392,6 +392,149 @@ def test_history_and_per_case_append_across_epochs(tmp_path):
     with cases.open(newline='') as f: assert list(csv.DictReader(f)) == []
 
 
+class SimulatedGradScaler:
+    """CPU-only scaler stub mirroring found_inf skip and scale backoff."""
+    def __init__(self, found_inf=False):
+        self.scale = 8.0
+        self.found_inf = found_inf
+        self.step_calls = 0
+        self.skipped = 0
+
+    def _found_inf_per_device(self, optimizer):
+        return {'cpu': torch.tensor(float(self.found_inf))}
+
+    def get_scale(self):
+        return self.scale
+
+    def step(self, optimizer):
+        self.step_calls += 1
+        if self.found_inf:
+            self.skipped += 1
+        else:
+            optimizer.step()
+
+    def update(self):
+        if self.found_inf:
+            self.scale *= 0.5
+
+
+def test_finite_gradient_update_clips_steps_and_updates_ema():
+    model = torch.nn.Linear(1, 1, bias=False)
+    model.weight.data.fill_(2.0)
+    ema = trainer.make_ema(model)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+    model.weight.grad = torch.tensor([[3.0]])
+    scaler = SimulatedGradScaler(found_inf=False)
+
+    norm, successful, skipped = trainer.optimizer_update_after_unscale(
+        model, ema, optimizer, scaler, successful_steps=7)
+
+    assert norm.item() == pytest.approx(3.0)
+    assert successful == 8 and skipped is False
+    assert scaler.step_calls == 1 and scaler.skipped == 0
+    assert model.weight.item() == pytest.approx(1.9)
+    assert ema.weight.item() == pytest.approx(0.999 * 2.0 + 0.001 * 1.9)
+
+
+def test_nonfinite_amp_gradient_is_skipped_once_then_finite_batch_proceeds():
+    model = torch.nn.Linear(1, 1, bias=False)
+    model.weight.data.fill_(2.0)
+    ema = trainer.make_ema(model)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+    scaler = SimulatedGradScaler(found_inf=True)
+    presentations = 0
+    successful = 12
+
+    # One loop iteration is one consumed batch; a skipped update is not retried.
+    for gradient, found_inf in ((float('inf'), True), (1.0, False)):
+        presentations += 1
+        scaler.found_inf = found_inf
+        model.weight.grad = torch.tensor([[gradient]])
+        norm, successful, skipped = trainer.optimizer_update_after_unscale(
+            model, ema, optimizer, scaler, successful_steps=successful)
+        if presentations == 1:
+            assert not torch.isfinite(norm)
+            assert skipped is True
+            assert successful == 12
+            assert model.weight.item() == pytest.approx(2.0)
+            assert ema.weight.item() == pytest.approx(2.0)
+            assert scaler.scale == pytest.approx(4.0)
+            assert scaler.skipped == 1
+        else:
+            assert torch.isfinite(norm)
+            assert skipped is False
+            assert successful == 13
+
+    assert presentations == 2
+    assert scaler.step_calls == 2
+    assert model.weight.item() < 2.0
+    assert ema.weight.item() < 2.0
+
+
+def test_nonfinite_gradient_without_scaler_found_inf_hard_fails():
+    model = torch.nn.Linear(1, 1, bias=False)
+    ema = trainer.make_ema(model)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+    model.weight.grad = torch.tensor([[float('nan')]])
+    scaler = SimulatedGradScaler(found_inf=False)
+    with pytest.raises(ValueError, match='without GradScaler overflow state'):
+        trainer.optimizer_update_after_unscale(model, ema, optimizer, scaler, 0)
+    assert scaler.step_calls == 0
+
+
+def test_skipped_nonfinite_norm_is_excluded_from_epoch_diagnostics():
+    mean, maximum = trainer.finite_grad_norm_summary([2.0, float('inf'), float('nan'), 4.0])
+    assert mean == pytest.approx(3.0)
+    assert maximum == 4.0
+    assert trainer.finite_grad_norm_summary([float('inf'), float('nan')]) == ('', '')
+
+
+def test_epoch_boundary_resume_restarts_next_epoch_and_reuses_exact_rows(tmp_path):
+    # Completed human epoch 90 is zero-based index 89; resume starts index 90.
+    payload = dict(epoch_index=89, human_epoch=90, next_sample_cursor=1080,
+                   resume_granularity='epoch_boundary_only')
+    assert trainer.resume_next_epoch(payload) == 90
+    cases = [f'case_{i:04d}' for i in range(1080)]
+    dimensions = {case: (96, 96, 96) for case in cases}
+    completed = trainer.training_epoch_crop_rows(cases, 0, dimensions)
+    interrupted_epoch = trainer.training_epoch_crop_rows(cases, 1, dimensions)
+    manifest = tmp_path / 'training_crop_manifest.csv'
+    trainer.ensure_training_crop_epoch(manifest, completed)
+    trainer.ensure_training_crop_epoch(manifest, interrupted_epoch)  # prewritten before interruption
+    before = manifest.read_bytes()
+    sha, count = trainer.ensure_training_crop_epoch(manifest, interrupted_epoch)
+    assert manifest.read_bytes() == before
+    assert count == 2160 and sha == hashlib.sha256(before).hexdigest()
+    assert trainer.resume_next_epoch(payload) == 90  # human epoch 91 starts at its first batch
+    bad = dict(payload, next_sample_cursor=40)
+    with pytest.raises(ValueError, match='epoch-boundary'):
+        trainer.resume_next_epoch(bad)
+
+
+def test_resume_event_records_checkpoint_sha_and_preserves_both_commits(tmp_path):
+    original = dict(runtime_git_commit='initial-commit', initial_runtime_git_commit='initial-commit',
+                    resume_events=[])
+    checkpoint = tmp_path / 'latest.pt'
+    checkpoint.write_bytes(b'epoch-90-checkpoint')
+    payload = dict(human_epoch=90, epoch_index=89, successful_optimizer_step=12150)
+    event = trainer.make_resume_event(original, checkpoint, payload, dataset_root=tmp_path/'data',
+        validation_manifest_sha256=trainer.VAL_MANIFEST_SHA256, runtime_branch='experiment/d0-diffusion-training',
+        runtime_commit='resume-commit', git_status_short=[' M trainer.py'], timestamp='2026-09-25T00:00:00Z')
+    trainer.append_resume_event(original, event)
+    assert original['runtime_git_commit'] == 'initial-commit'
+    assert original['initial_runtime_git_commit'] == 'initial-commit'
+    assert event['resume_runtime_git_commit'] == 'resume-commit'
+    assert event['initial_runtime_git_commit'] == 'initial-commit'
+    assert event['checkpoint_sha256'] == hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+    assert event['checkpoint_human_epoch'] == 90
+    assert event['checkpoint_epoch_index'] == 89
+    assert event['checkpoint_successful_optimizer_step'] == 12150
+    assert event['dataset_root'] == str((tmp_path/'data').resolve())
+    assert event['d0b4_final_freeze_sha256'] == trainer.FINAL_SHA256
+    assert event['validation_manifest_sha256'] == trainer.VAL_MANIFEST_SHA256
+    assert original['resume_events'] == [event]
+
+
 def test_smoke_separation_and_reported_non_scientific(tmp_path):
     scientific = tmp_path/'runs'/'d0'
     with pytest.raises(ValueError,match='separate'):

@@ -382,6 +382,61 @@ def optimizer_step_succeeded(old_scale, new_scale):
     return new_scale >= old_scale
 
 
+def _scaler_found_inf(scaler, optimizer):
+    """Read GradScaler's recorded unscale result before allowing a bad step."""
+    reader = getattr(scaler, '_found_inf_per_device', None)
+    if reader is None:
+        raise RuntimeError('GradScaler cannot expose found_inf state; refusing unsafe optimizer step')
+    values = reader(optimizer)
+    return any(bool(torch.as_tensor(value).detach().item()) for value in values.values())
+
+
+def _global_grad_norm(parameters):
+    """Measure the global L2 norm without clipping or modifying gradients."""
+    norms = []
+    for parameter in parameters:
+        if parameter.grad is not None:
+            norms.append(torch.linalg.vector_norm(parameter.grad.detach().float(), ord=2))
+    if not norms:
+        return torch.tensor(0.0, dtype=torch.float32)
+    return torch.linalg.vector_norm(torch.stack(norms), ord=2)
+
+
+def optimizer_update_after_unscale(model, ema, optimizer, scaler, successful_steps, *, decay=0.999):
+    """Clip finite gradients; let GradScaler consume and skip AMP overflows."""
+    norm = _global_grad_norm(model.parameters())
+    finite_norm = bool(torch.isfinite(norm).item())
+    found_inf = _scaler_found_inf(scaler, optimizer)
+    if not finite_norm and not found_inf:
+        raise ValueError('Non-finite global gradient norm without GradScaler overflow state')
+
+    if finite_norm:
+        clipped_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2.0)
+        if not bool(torch.isfinite(clipped_norm).item()):
+            raise ValueError('Non-finite global gradient norm during finite-gradient clipping')
+        norm = clipped_norm
+
+    old_scale = scaler.get_scale()
+    scaler.step(optimizer)
+    scaler.update()
+    succeeded = optimizer_step_succeeded(old_scale, scaler.get_scale())
+    if found_inf and succeeded:
+        raise RuntimeError('GradScaler reported found_inf but did not skip the optimizer update')
+    if not finite_norm and succeeded:
+        raise RuntimeError('GradScaler did not skip an optimizer update with non-finite gradients')
+    if succeeded:
+        successful_steps += 1
+        ema_update(ema, model, decay)
+    return norm, successful_steps, not succeeded
+
+
+def finite_grad_norm_summary(norms):
+    values = [float(value) for value in norms if math.isfinite(float(value))]
+    if not values:
+        return '', ''
+    return sum(values) / len(values), max(values)
+
+
 def ema_update(ema_model, model, decay=0.999):
     with torch.no_grad():
         for ema, current in zip(ema_model.parameters(), model.parameters()):
@@ -583,6 +638,15 @@ def validate_resume_payload(payload, *, model, provenance_sha, manifest_sha):
         raise ValueError('Resume checkpoint is missing required state')
 
 
+def resume_next_epoch(payload):
+    if payload.get('resume_granularity') != 'epoch_boundary_only' or payload.get('next_sample_cursor') != 1080:
+        raise ValueError('Only safe epoch-boundary resume is supported')
+    expected_human = int(payload['epoch_index']) + 1
+    if int(payload.get('human_epoch', -1)) != expected_human:
+        raise ValueError('Resume checkpoint epoch semantics are inconsistent')
+    return int(payload['epoch_index']) + 1
+
+
 def restore_resume(payload, model, ema, optimizer, scaler):
     model.load_state_dict(payload['raw_model_state'], strict=True)
     ema.load_state_dict(payload['ema_state'], strict=True)
@@ -640,10 +704,12 @@ def configure_logging(output):
 def runtime_provenance(config, verified, dataset_root, device, manifest_sha):
     git = lambda *args: subprocess.check_output(['git', *args], cwd=ROOT, text=True).strip()
     contract = json.loads(DEFAULT_CONTRACT.read_text())
+    runtime_commit = git('rev-parse','HEAD')
     return dict(stage='D0-C0', run_type='scientific diffusion training',
         training_start_timestamp=datetime.now(timezone.utc).isoformat(),
         runtime_git_branch=git('rev-parse','--abbrev-ref','HEAD'),
-        runtime_git_commit=git('rev-parse','HEAD'), git_status_short=git('status','--short').splitlines(),
+        runtime_git_commit=runtime_commit, initial_runtime_git_commit=runtime_commit,
+        resume_events=[], git_status_short=git('status','--short').splitlines(),
         git_working_tree_dirty=bool(git('status','--porcelain').strip()),
         dataset_root=str(Path(dataset_root).expanduser().resolve()),
         training_split_sha256=TRAIN_SHA256, validation_split_sha256=VAL_SHA256,
@@ -663,6 +729,43 @@ def runtime_provenance(config, verified, dataset_root, device, manifest_sha):
         resume_granularity='epoch_boundary_only',
         donor_fallback_diagnostic='D0-B3 fallback modality counts recorded per completed epoch; never change samples.',
         verified_source_hashes={k:v for k,v in verified.items() if k.endswith('sha256')})
+
+
+def _write_json_atomic(path, value):
+    path = Path(path)
+    temp = path.with_suffix(path.suffix + '.tmp')
+    with temp.open('w', encoding='utf-8', newline='\n') as stream:
+        stream.write(json.dumps(value, indent=2, sort_keys=True) + '\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temp, path)
+
+
+def make_resume_event(existing_provenance, checkpoint_path, checkpoint_payload, *, dataset_root,
+                      validation_manifest_sha256, runtime_branch=None, runtime_commit=None,
+                      git_status_short=None, timestamp=None):
+    git = lambda *args: subprocess.check_output(['git', *args], cwd=ROOT, text=True).strip()
+    commit = runtime_commit if runtime_commit is not None else git('rev-parse', 'HEAD')
+    return dict(timestamp=timestamp or datetime.now(timezone.utc).isoformat(),
+        event_type='epoch_boundary_resume', checkpoint_path=str(Path(checkpoint_path).expanduser().resolve()),
+        checkpoint_sha256=file_sha256(checkpoint_path),
+        checkpoint_human_epoch=int(checkpoint_payload['human_epoch']),
+        checkpoint_epoch_index=int(checkpoint_payload['epoch_index']),
+        checkpoint_successful_optimizer_step=int(checkpoint_payload['successful_optimizer_step']),
+        initial_runtime_git_commit=existing_provenance.get('initial_runtime_git_commit',
+            existing_provenance.get('runtime_git_commit')),
+        resume_runtime_git_commit=commit,
+        resume_runtime_git_branch=(runtime_branch if runtime_branch is not None else git('rev-parse', '--abbrev-ref', 'HEAD')),
+        runtime_git_status_short=(list(git_status_short) if git_status_short is not None else git('status', '--short').splitlines()),
+        dataset_root=str(Path(dataset_root).expanduser().resolve()),
+        d0b4_final_freeze_sha256=FINAL_SHA256,
+        validation_manifest_sha256=validation_manifest_sha256)
+
+
+def append_resume_event(provenance, event):
+    provenance.setdefault('initial_runtime_git_commit', provenance.get('runtime_git_commit'))
+    provenance.setdefault('resume_events', []).append(event)
+    return provenance
 
 
 def run_smoke(output_dir=DEFAULT_SMOKE_OUTPUT):
@@ -1153,6 +1256,7 @@ def train(config_path=DEFAULT_CONFIG, *, dataset_root=None, output_dir=DEFAULT_O
     if resume:
         existing = json.loads(prov_path.read_text())
         validate_resume_provenance(existing, provenance)
+        provenance = existing
     else:
         if any((output / name).exists() for name in ('best.pt','latest.pt','training_history.csv',
                                                       'validation_per_case.csv','training_provenance.json')):
@@ -1181,14 +1285,7 @@ def train(config_path=DEFAULT_CONFIG, *, dataset_root=None, output_dir=DEFAULT_O
             raise FileNotFoundError('Resume requires latest.pt')
         payload = torch.load(latest_path, map_location='cpu', weights_only=False)
         validate_resume_payload(payload, model=model, provenance_sha=_checkpoint_contract_sha(), manifest_sha=manifest_sha)
-        restore_resume(payload, model, ema, optimizer, scaler)
-        successful_steps = payload['successful_optimizer_step']
-        best_metric, best_epoch = payload['best_primary_validation_metric'], payload['best_epoch']
-        last_primary = payload.get('latest_validation_primary_metric')
-        last_secondary = payload.get('latest_secondary_global_support_weighted_mse')
-        truncate_csv_after_epoch(output/'training_history.csv', HISTORY_FIELDS, payload['epoch_index'])
-        truncate_csv_after_epoch(output/'validation_per_case.csv', CASE_FIELDS, payload['epoch_index'])
-        start_epoch = payload['epoch_index'] + 1
+        start_epoch = resume_next_epoch(payload)
         if start_epoch >= 100:
             raise ValueError('Training already completed 100 epochs')
         expected_next_rows = training_epoch_crop_rows(train_ids, start_epoch, train_dimensions)
@@ -1197,6 +1294,17 @@ def train(config_path=DEFAULT_CONFIG, *, dataset_root=None, output_dir=DEFAULT_O
             checkpoint_sha256=payload['training_crop_manifest_sha256'],
             checkpoint_row_count=payload['training_crop_manifest_row_count'],
             expected_next_rows=expected_next_rows)
+        event = make_resume_event(existing, latest_path, payload, dataset_root=root,
+            validation_manifest_sha256=manifest_sha)
+        append_resume_event(provenance, event)
+        _write_json_atomic(prov_path, provenance)
+        restore_resume(payload, model, ema, optimizer, scaler)
+        successful_steps = payload['successful_optimizer_step']
+        best_metric, best_epoch = payload['best_primary_validation_metric'], payload['best_epoch']
+        last_primary = payload.get('latest_validation_primary_metric')
+        last_secondary = payload.get('latest_secondary_global_support_weighted_mse')
+        truncate_csv_after_epoch(output/'training_history.csv', HISTORY_FIELDS, payload['epoch_index'])
+        truncate_csv_after_epoch(output/'validation_per_case.csv', CASE_FIELDS, payload['epoch_index'])
     best_path = output / 'best.pt'
     for epoch in range(start_epoch, 100):
         epoch_started = time.perf_counter()
@@ -1225,20 +1333,14 @@ def train(config_path=DEFAULT_CONFIG, *, dataset_root=None, output_dir=DEFAULT_O
                 raise ValueError(f'Non-finite loss at epoch_index={epoch}, batch={batch_index//8}')
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
-            norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2.0)
-            if not torch.isfinite(norm):
-                raise ValueError('Non-finite global gradient norm')
-            old_scale = scaler.get_scale()
-            scaler.step(optimizer)
-            scaler.update()
-            succeeded = optimizer_step_succeeded(old_scale, scaler.get_scale())
-            if succeeded:
-                successful_steps += 1
-                ema_update(ema, model, 0.999)
-            else:
+            norm, successful_steps, skipped_update = optimizer_update_after_unscale(
+                model, ema, optimizer, scaler, successful_steps, decay=0.999)
+            if skipped_update:
                 skipped += 1
             optimizer.zero_grad(set_to_none=True)
-            losses.append(float(loss.detach().float().item())); grad_norms.append(float(norm.detach().float().item()))
+            losses.append(float(loss.detach().float().item()))
+            if bool(torch.isfinite(norm).item()):
+                grad_norms.append(float(norm.detach().float().item()))
             if (batch_index // 8 + 1) % 5 == 0:
                 logger.info('human_epoch=%d batch=%d/135 loss=%.7g successful_steps=%d scaler=%.4g elapsed=%.1fs',
                     epoch+1,batch_index//8+1,losses[-1],successful_steps,scaler.get_scale(),time.perf_counter()-epoch_started)
@@ -1259,9 +1361,10 @@ def train(config_path=DEFAULT_CONFIG, *, dataset_root=None, output_dir=DEFAULT_O
                 best_payload['primary_validation_metric'] = primary
                 torch.save(best_payload,best_path.with_suffix('.pt.tmp')); os.replace(best_path.with_suffix('.pt.tmp'),best_path)
             upsert_csv_many(output/'validation_per_case.csv',CASE_FIELDS,case_rows,('epoch_index','case_id'))
+        grad_norm_mean, grad_norm_max = finite_grad_norm_summary(grad_norms)
         epochrow = dict(epoch_index=epoch,human_epoch=human,samples_presented=1080,
             successful_optimizer_steps=successful_steps,mean_training_loss=sum(losses)/len(losses),
-            global_grad_norm_mean=sum(grad_norms)/len(grad_norms),global_grad_norm_max=max(grad_norms),
+            global_grad_norm_mean=grad_norm_mean,global_grad_norm_max=grad_norm_max,
             gradscaler_skipped_steps=skipped,learning_rate=1e-4,elapsed_seconds=time.perf_counter()-epoch_started,
             donor_fallback_modality_count=fallback_total,
             primary_validation_metric=primary if primary is not None else '',
