@@ -1,0 +1,125 @@
+{
+  "contract_version": 1,
+  "stage": "D0-C3a-spatial-design",
+  "status": "CLOSED_FROZEN_PRE_INFERENCE",
+  "purpose": "Pre-specify deterministic MRI window geometry and case-level valid-support aggregation before generating any D0-C3 DeltaZ scientific result.",
+  "design_completion_note": "This is a new pre-inference spatial design completion because D0-B4b did not uniquely define case-level spatial sampling. It is not represented as previously specified by D0-B4b.",
+  "scientific_delta_z_generated": false,
+  "scientific_result_observed": false,
+  "ground_truth_used": false,
+  "primary_case_set": "DEVELOPMENT_VALIDATION",
+  "case_count": 270,
+  "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+  "independent_final_evaluation": "separate/TBD",
+  "locked_dependencies": {
+    "d0b4b_inference_contract_sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4",
+    "d0b4_final_design_freeze_sha256": "05d13292994b59f3c45d70c98591c306970269673e475797620c644446aa86d8",
+    "d0a_normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+    "e1c_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+    "d0c2_best_checkpoint_expected_sha256": "aaa6258f26a56c852dc751b8028bfb046da5752974d4cbaf446ad2699a0c6574",
+    "d0c2_selected_human_epoch": 100
+  },
+  "input_and_preprocessing": {
+    "modalities": ["t1n", "t1c", "t2w", "t2f"],
+    "input": "original unmodified multimodal MRI",
+    "ground_truth_required": false,
+    "pathology_corruption": false,
+    "augmentation": false,
+    "normalization": "existing full-volume nonzero z-normalization, independently per modality; preserve original zero voxels",
+    "normalization_precedes_padding": true,
+    "padding": "zero-pad only on the high end of each spatial axis after full-volume normalization",
+    "symmetric_padding": false,
+    "interpolation_or_resampling": false,
+    "original_voxel_coordinates_preserved": true,
+    "known_original_shape": [182, 218, 182],
+    "known_padded_shape": [184, 224, 184],
+    "padding_target_rule": "For each axis choose the smallest integer >= max(original_axis_size, window_axis_size) that is divisible by encoder_stride=8."
+  },
+  "window_geometry": {
+    "window_size": [96, 96, 96],
+    "stride": [48, 48, 48],
+    "window_starts_rule": "Take 0, stride, 2*stride, ... while start+window_size <= padded_size; append padded_size-window_size if absent.",
+    "start_alignment": 8,
+    "unaligned_start": "HARD_ERROR",
+    "axis_starts_for_known_shape": {
+      "d": [0, 48, 88],
+      "h": [0, 48, 96, 128],
+      "w": [0, 48, 88]
+    },
+    "windows_per_case": 36,
+    "window_index_order": "lexicographic product of d starts, then h starts, then w starts",
+    "manifest_row_order": "case_id ascending, then window_index ascending",
+    "expected_manifest_rows": 9720
+  },
+  "manifest": {
+    "path": "outputs/frozen/d0c3_spatial_inference_design/inference_window_manifest.csv",
+    "geometry_only": true,
+    "contains_ground_truth_fields": false,
+    "contains_deltaz_fields": false,
+    "required_coordinates": [
+      "case_id", "split", "window_index",
+      "original_d", "original_h", "original_w",
+      "padded_d", "padded_h", "padded_w",
+      "start_d", "start_h", "start_w", "stop_d", "stop_h", "stop_w",
+      "latent_start_d", "latent_start_h", "latent_start_w",
+      "latent_stop_d", "latent_stop_h", "latent_stop_w"
+    ],
+    "latent_coordinates": "Raw window starts/stops divided exactly by 8; all starts are divisible by 8.",
+    "frozen_before_scientific_inference": true
+  },
+  "tensor_geometry": {
+    "raw_window_into_e1c": ["B", 4, 96, 96, 96],
+    "za": ["B", 256, 12, 12, 12],
+    "diffusion_input_and_output": ["B", 256, 12, 12, 12],
+    "diffusion_spatial_shape_flexible": false,
+    "diffusion_spatial_shape_contract": [12, 12, 12],
+    "local_support": ["B", 1, 12, 12, 12],
+    "local_deltaz": ["B", 1, 12, 12, 12],
+    "global_latent_shape_for_known_padded_shape": [23, 28, 23],
+    "local_to_global_mapping": "global_index = window_start/8 + local_index; direct integer placement with no interpolation."
+  },
+  "support": {
+    "source": "raw unnormalized MRI window only",
+    "raw_support": "any of the four modalities is nonzero at the voxel",
+    "padding_zero_is_outside_support": true,
+    "occupancy_mapping": "exact non-overlapping 8x8x8 voxel-block occupancy",
+    "valid_rule": "occupancy >= 0.50",
+    "ground_truth_used": false
+  },
+  "case_level_overlap_aggregation": {
+    "primary_rule": "uniform_mean_valid_support_only",
+    "per_global_cell": "Arithmetic mean of local DeltaZ contributions only from windows where the local support mask is valid.",
+    "contribution_count": "Count of valid window contributions for each global latent cell.",
+    "zero_contribution": "Mark invalid in valid_support_global; do not treat the stored zero placeholder as a zero-signal observation.",
+    "weighted_windows": false,
+    "hann_or_gaussian_weighting": false,
+    "learned_weighting": false,
+    "max_or_median": false,
+    "outputs": {
+      "DeltaZ_global": [1, 23, 28, 23],
+      "valid_support_global": [1, 23, 28, 23],
+      "contribution_count_global": [1, 23, 28, 23]
+    }
+  },
+  "noise_identity": {
+    "source_contract": "D0-B4b randomness contract, applied to this manifest's window coordinates",
+    "global_seed": 20260923,
+    "sample_identity": "[case_id, start_d, start_h, start_w, stop_d, stop_h, stop_w]",
+    "replicate_indices": [0, 1, 2, 3],
+    "purpose": "partial_noise",
+    "seed_payload": "[inference_global_seed, sample_identity, replicate_index, purpose]",
+    "serialization": "compact ordered JSON array, separators=(',', ':'), ensure_ascii=false, UTF-8, no trailing newline",
+    "seed_derivation": "int(sha256(payload_bytes).hexdigest()[:16], 16) & ((1 << 63) - 1)",
+    "noise": "Separate CPU torch.Generator per case/window/replicate; draw FP32 torch.randn((256,12,12,12)); transfer to execution device.",
+    "diffusion_timestep_in_seed_payload": false,
+    "paired_across_timesteps": [327, 495, 663],
+    "batch_partition_independent": true
+  },
+  "output_separation": {
+    "delta_z_generation_uses_ground_truth": false,
+    "pathology_evaluation_is_separate_stage": true,
+    "manifest_contains_segmentation_data": false,
+    "window_level_provenance_preserved": true,
+    "case_level_primary_output": "uniform valid-support-only overlap mean"
+  }
+}

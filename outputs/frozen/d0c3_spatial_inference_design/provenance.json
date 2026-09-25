@@ -1,0 +1,40 @@
+{
+  "case_count": 270,
+  "case_set": "DEVELOPMENT_VALIDATION",
+  "contract_path": "configs/d0c3_spatial_inference_contract.json",
+  "contract_sha256": "832b8b04e411802186ddc5ba0fb598fa748d53876c87c282b950863919ef986c",
+  "created_at": "2026-09-25T07:50:12.473060+00:00",
+  "delta_z_generated": false,
+  "design_status": "frozen before any D0-C3 DeltaZ scientific result",
+  "e1c_sha_audit_note": "The request-provided E1-C SHA string had 69 hex characters; the actual checkpoint and locked B4b contract agree on the valid 64-character SHA recorded here.",
+  "git_status_short": [
+    "?? configs/d0c3_spatial_inference_contract.json",
+    "?? scripts/freeze_d0c3_spatial_inference_design.py",
+    "?? tests/test_d0c3_spatial_inference_design.py"
+  ],
+  "ground_truth_used": false,
+  "locked_dependencies": {
+    "d0a_normalization_contract_path": "outputs/frozen/d0_latent_distribution_audit/d0_za_normalization_contract.json",
+    "d0a_normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+    "d0b4_final_freeze_path": "configs/d0b4_final_design_freeze.json",
+    "d0b4_final_freeze_sha256": "05d13292994b59f3c45d70c98591c306970269673e475797620c644446aa86d8",
+    "d0b4b_contract_path": "configs/d0b4b_inference_contract.json",
+    "d0b4b_contract_sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4",
+    "d0c2_best_checkpoint_bytes_verified_by_design_freeze": false,
+    "d0c2_best_checkpoint_path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/best.pt",
+    "d0c2_best_checkpoint_sha256": "aaa6258f26a56c852dc751b8028bfb046da5752974d4cbaf446ad2699a0c6574",
+    "d0c2_best_checkpoint_verification_note": "Checkpoint bytes and EMA state are deliberately not required or verified by this design freeze; verify on the real server before inference.",
+    "d0c2_freeze_manifest_path": "outputs/frozen/d0c2_scientific_diffusion_training/MANIFEST.sha256",
+    "d0c2_freeze_manifest_sha256": "4ceb0baa64992dbfe4a7417b8d6ea8892a1d6001a982d58c1284c11b23bb7eec",
+    "e1c_checkpoint_path": "outputs/frozen/e1c_anatomy_constraint/training/best.pt",
+    "e1c_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+    "validation_split_path": "splits/val_cases.txt",
+    "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca"
+  },
+  "manifest_path": "outputs/frozen/d0c3_spatial_inference_design/inference_window_manifest.csv",
+  "manifest_row_count": 9720,
+  "manifest_sha256": "58fac2ebef778d4d19d6da9f21451c25175c61bb4100c03387e8d3c859c05d53",
+  "runtime_git_branch": "experiment/d0c3-deltaz-analysis",
+  "runtime_git_commit": "2627abbc734e0b32607782d45cdba1d7433f0660",
+  "stage": "D0-C3a-spatial-design"
+}

@@ -1,0 +1,64 @@
+{
+  "aggregation": "uniform_mean_valid_support_only",
+  "axis_starts": {
+    "d": [
+      0,
+      48,
+      88
+    ],
+    "h": [
+      0,
+      48,
+      96,
+      128
+    ],
+    "w": [
+      0,
+      48,
+      88
+    ]
+  },
+  "case_count": 270,
+  "freeze_statement": "This spatial design was frozen before any D0-C3 DeltaZ scientific result was generated.",
+  "global_latent_shape": [
+    23,
+    28,
+    23
+  ],
+  "independent_final_evaluation": "separate/TBD",
+  "local_latent_shape": [
+    12,
+    12,
+    12
+  ],
+  "manifest_rows": 9720,
+  "new_design_completion": true,
+  "note": "Spatial sampling and overlap aggregation complete the pre-inference design; these choices were not specified by D0-B4b.",
+  "original_shape": [
+    182,
+    218,
+    182
+  ],
+  "padded_shape": [
+    184,
+    224,
+    184
+  ],
+  "primary_case_set": "DEVELOPMENT_VALIDATION",
+  "scientific_delta_z_generated": false,
+  "scientific_result_observed": false,
+  "stage": "D0-C3a-spatial-design",
+  "status": "CLOSED_FROZEN_PRE_INFERENCE",
+  "stride": [
+    48,
+    48,
+    48
+  ],
+  "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+  "window_size": [
+    96,
+    96,
+    96
+  ],
+  "windows_per_case": 36
+}
