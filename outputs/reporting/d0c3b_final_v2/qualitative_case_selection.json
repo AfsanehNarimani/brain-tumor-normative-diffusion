@@ -1,0 +1,28 @@
+{
+  "axial_axis": 2,
+  "cases": [
+    {
+      "axial_slice_index": 113,
+      "case_auroc": 0.5666294435138656,
+      "case_id": "BraTS-GLI-02838-101",
+      "selection": "25th_percentile"
+    },
+    {
+      "axial_slice_index": 97,
+      "case_auroc": 0.6142372343116728,
+      "case_id": "BraTS-GLI-02805-100",
+      "selection": "median"
+    },
+    {
+      "axial_slice_index": 111,
+      "case_auroc": 0.6548303118784048,
+      "case_id": "BraTS-GLI-02898-100",
+      "selection": "75th_percentile"
+    }
+  ],
+  "delta_z_mapping": "Each latent cell repeated exactly 8x along each axis, then high-end cropped to original shape; invalid support masked.",
+  "quantile_method": "NumPy linear empirical quantile",
+  "rule": "Among evaluable WT cases, choose the case whose per-case AUROC is nearest the empirical AUROC quantile; ties break by ascending case_id.",
+  "slice_rule": "GT-only axial slice with maximum WT voxel area; first maximum on ties.",
+  "status": "GENERATED"
+}

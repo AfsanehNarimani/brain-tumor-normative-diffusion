@@ -1,0 +1,29 @@
+{
+  "analysis_contract_sha256": "4404e6e32b92271b9e8cdd3bd4d7c249dc13d0fc4b521922beb68b9ff6245fab",
+  "git_status": [],
+  "matplotlib_version": "3.11.2",
+  "python_version": "3.11.10",
+  "qualitative_status": "GENERATED",
+  "reporting_script": "scripts/render_d0c3b_final_results.py",
+  "reporting_script_sha256": "7c2f6a1e5131811d8ed0b4db5a31c6eaf9564fa3f0af1b103feda31c8cdc8f0a",
+  "runtime_git_branch": "analysis/d0c3b-pathology-association",
+  "runtime_git_commit": "f3ce71f539e2798ba2840dc1a1ba2216c3fb7c08",
+  "source_analysis_integrity": {
+    "case_count": 270,
+    "case_region_rows": 810,
+    "completed_case_set_match": true,
+    "expected_case_region_rows": 810,
+    "interpolation_used": false,
+    "source_artifacts_modified": false,
+    "unsupported_cells_excluded": true
+  },
+  "source_directory": "/home/friend/BrainTumorSeg-d0c3/outputs/scientific/d0c3b_pathology_association",
+  "source_sha256": {
+    "MANIFEST.sha256": "5a1fdaed5bf9155d3bb6dd3ffc86c2d2f57b17d57137f70a8b21ab4882209189",
+    "aggregate_summary.csv": "6dbabb32bed51a27c66249d03e77f03e5682c9bae6edfb31830fee98f2ff40d8",
+    "aggregate_summary.json": "9aa202e47c00f3969ad904a04b8a104e7acecb4213ea90558c93fb1c3910124f",
+    "analysis_integrity.json": "cb92a6062e3a949853ee4110690a54c25fd1910455268c03e0bb96243788e818",
+    "analysis_provenance.json": "6678fbd2d01362f2c73be72d2c3f8efc89d4b768c5986ba4ebc61a5c19be32a1",
+    "per_case_metrics.csv": "cfe06dde8f668d1c29ff52c4986af69d59b42767ae13ae5fc04809c6d3828c49"
+  }
+}
