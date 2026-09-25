@@ -285,3 +285,45 @@ def test_source_fingerprint_detects_mutation():
     before = inf.model_fingerprint(module)
     with torch.no_grad(): module.weight.add_(1)
     assert inf.model_fingerprint(module) != before
+
+
+def test_finalization_overrides_running_status_and_preserves_existing_provenance():
+    run_provenance = dict(status='RUNNING', stage='D0-C3a', run_identity={'fixed': 'identity'},
+        scientific_analysis=True, scientific_result=True, custom_provenance='retained')
+    final = inf.finalize_run_provenance(run_provenance, completed_at='2026-09-25T00:00:00+00:00',
+        cases_processed=1, windows_processed=2, source_model_unchanged=True,
+        runtime_final={'runtime_git_commit': 'abc'})
+    assert final['status'] == 'PASS'
+    assert final['completed_at'] == '2026-09-25T00:00:00+00:00'
+    assert final['stage'] == run_provenance['stage']
+    assert final['run_identity'] == run_provenance['run_identity']
+    assert final['custom_provenance'] == 'retained'
+    assert run_provenance['status'] == 'RUNNING'
+
+
+def test_exception_before_finalization_leaves_run_not_pass(tmp_path):
+    path = tmp_path / 'run_provenance.json'
+    in_progress = dict(status='RUNNING', scientific_analysis=False, scientific_result=False,
+                       run_identity={'smoke': True})
+    inf._atomic_json(path, in_progress)
+    with pytest.raises(RuntimeError, match='simulated processing failure'):
+        raise RuntimeError('simulated processing failure')
+    saved = json.loads(path.read_text())
+    assert saved['status'] == 'RUNNING'
+    assert saved.get('completed_at') is None
+
+
+def test_smoke_finalization_preserves_non_scientific_flags_and_resume_reopens_status():
+    smoke = dict(status='RUNNING', scientific_analysis=False, scientific_result=False,
+        smoke={'scientific_analysis': False, 'scientific_result': False}, other='keep')
+    final = inf.finalize_run_provenance(smoke, completed_at='done', cases_processed=1,
+        windows_processed=2, source_model_unchanged=True, runtime_final={})
+    assert final['status'] == 'PASS'
+    assert final['scientific_analysis'] is False and final['scientific_result'] is False
+    assert final['smoke'] == {'scientific_analysis': False, 'scientific_result': False}
+    assert final['other'] == 'keep'
+    resumed = inf.mark_run_in_progress(final, runtime={'runtime_git_commit': 'next'}, started_at='retry')
+    assert resumed['status'] == 'RUNNING'
+    assert 'completed_at' not in resumed
+    assert resumed['previous_completed_at'] == 'done'
+    assert resumed['last_attempt_started_at'] == 'retry'

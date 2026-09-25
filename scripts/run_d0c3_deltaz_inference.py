@@ -478,6 +478,27 @@ def _atomic_json(path, payload):
             temp.unlink()
 
 
+def mark_run_in_progress(provenance, *, runtime, started_at=None):
+    """Return resume provenance that cannot retain a stale completed status."""
+    current = dict(provenance)
+    previous_completed_at = current.pop('completed_at', None)
+    current.update(status='RUNNING', last_attempt_started_at=started_at or datetime.now(timezone.utc).isoformat(),
+                   runtime_last_attempt=runtime)
+    if previous_completed_at is not None:
+        current['previous_completed_at'] = previous_completed_at
+    return current
+
+
+def finalize_run_provenance(provenance, *, completed_at, cases_processed,
+                            windows_processed, source_model_unchanged, runtime_final):
+    """Publish PASS only after all inference and final integrity checks succeeded."""
+    final = dict(provenance)
+    final.update(status='PASS', completed_at=completed_at,
+        cases_processed=cases_processed, windows_processed=windows_processed,
+        source_model_unchanged=source_model_unchanged, runtime_final=runtime_final)
+    return final
+
+
 def atomic_save_case(case_dir, tensors, provenance, replicate_rows):
     """Publish a complete case directory atomically; partial staging is never complete."""
     case_dir = Path(case_dir)
@@ -630,6 +651,8 @@ def run(*, dataset_root, e1c_checkpoint, diffusion_checkpoint, output_dir=None,
         require(resume, 'Run provenance already exists; use --resume only for verified idempotent continuation')
         existing = json.loads(provenance_path.read_text())
         require(existing.get('run_identity') == identity, 'Run provenance mismatch on resume')
+        run_provenance = mark_run_in_progress(existing, runtime=runtime)
+        _atomic_json(provenance_path, run_provenance)
     else:
         _atomic_json(provenance_path, run_provenance)
     output_cases = output / ('smoke_cases' if smoke else 'cases')
@@ -747,8 +770,10 @@ def run(*, dataset_root, e1c_checkpoint, diffusion_checkpoint, output_dir=None,
         writer.writeheader(); writer.writerows(all_summary_rows)
     os.replace(temp_index, output / index_name)
     final_runtime = _runtime_provenance(device)
-    final = dict(**run_provenance, status='PASS', completed_at=datetime.now(timezone.utc).isoformat(),
-        cases_processed=len(all_summary_rows), windows_processed=sum(int(row.get('window_count', 0)) for row in all_summary_rows),
+    final = finalize_run_provenance(run_provenance,
+        completed_at=datetime.now(timezone.utc).isoformat(),
+        cases_processed=len(all_summary_rows),
+        windows_processed=sum(int(row.get('window_count', 0)) for row in all_summary_rows),
         source_model_unchanged=(before_source == model_fingerprint(source)), runtime_final=final_runtime)
     _atomic_json(provenance_path, final)
     return final
