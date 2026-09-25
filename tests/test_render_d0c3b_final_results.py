@@ -34,9 +34,9 @@ def make_source(tmp_path):
             mean_difference_ci95_high=diff+.002, median_median_difference=diff,
             median_difference_ci95_low=diff-.001, median_difference_ci95_high=diff+.001,
             proportion_median_difference_gt_zero=positive))
-        aggs[-1].update({'AUROC_vs_0.5_p_holm': .001 if region=='WT' else .05,
-            'AUPRC_lift_vs_zero_p_holm': .002 if region=='WT' else .06,
-            'median_difference_vs_zero_p_holm': .003 if region=='WT' else .07})
+        aggs[-1].update({'AUROC_vs_0.5_p_holm': 6.06e-41 if region=='WT' else .05,
+            'AUPRC_lift_vs_zero_p_holm': 3.05e-12 if region=='WT' else .06,
+            'median_difference_vs_zero_p_holm': 1.0e-250 if region=='WT' else .07})
     agg_fields = list(aggs[0])
     write_csv(source/'aggregate_summary.csv', agg_fields, aggs)
     (source/'aggregate_summary.json').write_text(json.dumps({'regions': aggs}), encoding='utf-8')
@@ -101,6 +101,14 @@ def test_renderer_reads_manifest_emits_complete_output_manifest_and_preserves_so
     table, selection=render_mod.render(source,output,dataset_root=tmp_path/'no-images',primary_run=tmp_path/'no-run')
     assert [r['Region'] for r in table]==['WT','TC','ET']
     assert selection['status']=='SKIPPED'
+    table_md=(output/'results_table.md').read_text()
+    results_md=(output/'results_summary.md').read_text()
+    paper_md=(output/'paper_results_draft.md').read_text()
+    for text in (table_md,results_md,paper_md):
+        assert '6.060e-41' in text
+        assert '3.050e-12' in text
+        assert '1.000e-250' in text
+        assert '0.000000' not in text
     assert not (output/'figure_04_qualitative_cases.png').exists()
     assert (output/'figure_01_auroc_summary.png').is_file() and (output/'figure_01_auroc_summary.pdf').is_file()
     entries={}
@@ -120,6 +128,14 @@ def test_source_manifest_mismatch_fails_before_reporting(tmp_path):
     with (source/'aggregate_summary.csv').open('a') as stream: stream.write('\n')
     with pytest.raises(ValueError,match='source hash mismatch'):
         render_mod.render(source,tmp_path/'report',dataset_root=tmp_path/'none',primary_run=tmp_path/'none')
+
+
+def test_nonzero_tiny_pvalues_never_render_as_zero():
+    for pvalue in (6.06e-41, 3.05e-12, 1.0e-250, 9.99e-4):
+        rendered=render_mod.format_pvalue(pvalue)
+        assert 'e-' in rendered
+        assert float(rendered) == pytest.approx(pvalue, rel=1e-3)
+    assert render_mod.format_pvalue(.001)=='0.001000'
 
 
 def test_quantitative_summary_propagates_source_values_without_metric_recalculation(tmp_path):

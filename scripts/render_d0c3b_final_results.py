@@ -93,6 +93,16 @@ def format_num(value, digits=6):
     return 'NA' if x is None else f'{x:.{digits}f}'
 
 
+def format_pvalue(value):
+    x = as_float(value)
+    if x is None:
+        return 'NA'
+    require(0.0 <= x <= 1.0, f'Invalid p-value: {x}')
+    if 0.0 < x < 0.001:
+        return f'{x:.3e}'
+    return f'{x:.6f}'
+
+
 def format_ci(row, metric, median_key):
     return f"{format_num(row[median_key])} [{format_num(row[metric+'_ci95_low'])}, {format_num(row[metric+'_ci95_high'])}]"
 
@@ -137,9 +147,9 @@ def build_results_table(aggregate_rows, per_case_rows):
                      'median_median_difference': 'Median DeltaZ difference [95% CI]'}[median_key]
             row[label] = format_ci(agg, metric, median_key)
         row['Cases with positive DeltaZ difference'] = f'{positive} / {len(cases)}'
-        row['Holm p: AUROC > reference'] = format_num(agg['AUROC_vs_0.5_p_holm'], 6)
-        row['Holm p: AUPRC lift'] = format_num(agg['AUPRC_lift_vs_zero_p_holm'], 6)
-        row['Holm p: DeltaZ difference'] = format_num(agg['median_difference_vs_zero_p_holm'], 6)
+        row['Holm p: AUROC > reference'] = format_pvalue(agg['AUROC_vs_0.5_p_holm'])
+        row['Holm p: AUPRC lift'] = format_pvalue(agg['AUPRC_lift_vs_zero_p_holm'])
+        row['Holm p: DeltaZ difference'] = format_pvalue(agg['median_difference_vs_zero_p_holm'])
         rows.append(row)
     return titles, rows
 
@@ -259,7 +269,7 @@ def _write_markdown_table(fields, rows):
 
 
 def _p_statement(agg, key):
-    return format_num(agg[key], 6)
+    return format_pvalue(agg[key])
 
 
 def make_narratives(aggregate, table_rows, per_case_rows):
