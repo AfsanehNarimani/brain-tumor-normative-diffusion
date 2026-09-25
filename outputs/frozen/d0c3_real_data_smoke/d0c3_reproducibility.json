@@ -1,0 +1,50 @@
+{
+  "all_exact": true,
+  "complete_case_aggregation": {
+    "equal_across_reruns": true,
+    "run_values": {
+      "smoke_02": false,
+      "smoke_03": false
+    }
+  },
+  "replicate_provenance_byte_identical": true,
+  "scope": "Two frozen windows from one case across smoke_02 and smoke_03 only.",
+  "tensor_comparison": {
+    "root.complete_case_aggregation": {
+      "exact_equal": true,
+      "value": false
+    },
+    "root.local_DeltaZ": {
+      "dtype": "float32",
+      "exact_equal": true,
+      "max_abs_diff": 0.0,
+      "shape": [
+        2,
+        1,
+        12,
+        12,
+        12
+      ]
+    },
+    "root.local_support": {
+      "dtype": "bool",
+      "exact_equal": true,
+      "max_abs_diff": 0.0,
+      "shape": [
+        2,
+        1,
+        12,
+        12,
+        12
+      ]
+    },
+    "root.processed_window_indices": {
+      "dtype": "int64",
+      "exact_equal": true,
+      "max_abs_diff": 0.0,
+      "shape": [
+        2
+      ]
+    }
+  }
+}

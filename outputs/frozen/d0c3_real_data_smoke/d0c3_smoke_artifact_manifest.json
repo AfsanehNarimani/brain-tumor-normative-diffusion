@@ -1,0 +1,62 @@
+{
+  "smoke_runs": {
+    "smoke_02": {
+      "files": {
+        "smoke_case_index.csv": {
+          "path": "smoke_case_index.csv",
+          "sha256": "86fd06ec4a94e6a1d3e079c56bf34eee31fe436a336072b316c91d4174f03788"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256",
+          "sha256": "284a7545b359ae9584e150ba487d7bf151b269a6f1cf0ec021b4c398fb0ea5d7"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt",
+          "sha256": "26d99592f91a26ad95f01132d0b532658471c7e6bf87e9ed0a213948c18f363b"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/case_provenance.json": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/case_provenance.json",
+          "sha256": "73412fefbe9143ed0d25eabf0624355ea3226405e4cb3cc6e7c0e2e5469fde6f"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv",
+          "sha256": "5357c6aa52505dd4387e926819915fbc616aae38fd4e8d33a05ff78708604316"
+        },
+        "smoke_run_provenance.json": {
+          "path": "smoke_run_provenance.json",
+          "sha256": "747b47d8b1bc1e6b063d66613f64dc501c7782bf43e4a9f618769804be4c6c92"
+        }
+      },
+      "source_run_path": "/home/friend/BrainTumorSeg-d0c3/outputs/smoke/d0c3_deltaz/smoke_02"
+    },
+    "smoke_03": {
+      "files": {
+        "smoke_case_index.csv": {
+          "path": "smoke_case_index.csv",
+          "sha256": "86fd06ec4a94e6a1d3e079c56bf34eee31fe436a336072b316c91d4174f03788"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256",
+          "sha256": "284a7545b359ae9584e150ba487d7bf151b269a6f1cf0ec021b4c398fb0ea5d7"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt",
+          "sha256": "26d99592f91a26ad95f01132d0b532658471c7e6bf87e9ed0a213948c18f363b"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/case_provenance.json": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/case_provenance.json",
+          "sha256": "73412fefbe9143ed0d25eabf0624355ea3226405e4cb3cc6e7c0e2e5469fde6f"
+        },
+        "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv": {
+          "path": "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv",
+          "sha256": "5357c6aa52505dd4387e926819915fbc616aae38fd4e8d33a05ff78708604316"
+        },
+        "smoke_run_provenance.json": {
+          "path": "smoke_run_provenance.json",
+          "sha256": "e0b9d28821e803852e13a3b3e5ae55bccc470db557e55a9a0c2585262a28ba86"
+        }
+      },
+      "source_run_path": "/home/friend/BrainTumorSeg-d0c3/outputs/smoke/d0c3_deltaz/smoke_03"
+    }
+  }
+}

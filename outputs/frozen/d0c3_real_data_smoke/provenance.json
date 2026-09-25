@@ -1,0 +1,95 @@
+{
+  "complete_case_aggregation_observed": {
+    "smoke_02": false,
+    "smoke_03": false
+  },
+  "expected_frozen_identities": {
+    "d0a_normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+    "d0b4b_contract_sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4",
+    "d0c2_checkpoint_sha256": "aaa6258f26a56c852dc751b8028bfb046da5752974d4cbaf446ad2699a0c6574",
+    "e1c_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+    "spatial_contract_sha256": "832b8b04e411802186ddc5ba0fb598fa748d53876c87c282b950863919ef986c",
+    "spatial_manifest_sha256": "58fac2ebef778d4d19d6da9f21451c25175c61bb4100c03387e8d3c859c05d53",
+    "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca"
+  },
+  "git_status_short": [],
+  "runtime_git_branch": "experiment/d0c3-deltaz-inference",
+  "runtime_git_commit": "ea531425aafba3cd01684bd536ee107232c4432e",
+  "source_artifact_manifest": {
+    "smoke_runs": {
+      "smoke_02": {
+        "files": {
+          "smoke_case_index.csv": {
+            "path": "smoke_case_index.csv",
+            "sha256": "86fd06ec4a94e6a1d3e079c56bf34eee31fe436a336072b316c91d4174f03788"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256",
+            "sha256": "284a7545b359ae9584e150ba487d7bf151b269a6f1cf0ec021b4c398fb0ea5d7"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt",
+            "sha256": "26d99592f91a26ad95f01132d0b532658471c7e6bf87e9ed0a213948c18f363b"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/case_provenance.json": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/case_provenance.json",
+            "sha256": "73412fefbe9143ed0d25eabf0624355ea3226405e4cb3cc6e7c0e2e5469fde6f"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv",
+            "sha256": "5357c6aa52505dd4387e926819915fbc616aae38fd4e8d33a05ff78708604316"
+          },
+          "smoke_run_provenance.json": {
+            "path": "smoke_run_provenance.json",
+            "sha256": "747b47d8b1bc1e6b063d66613f64dc501c7782bf43e4a9f618769804be4c6c92"
+          }
+        },
+        "source_run_path": "/home/friend/BrainTumorSeg-d0c3/outputs/smoke/d0c3_deltaz/smoke_02"
+      },
+      "smoke_03": {
+        "files": {
+          "smoke_case_index.csv": {
+            "path": "smoke_case_index.csv",
+            "sha256": "86fd06ec4a94e6a1d3e079c56bf34eee31fe436a336072b316c91d4174f03788"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/CHECKSUMS.sha256",
+            "sha256": "284a7545b359ae9584e150ba487d7bf151b269a6f1cf0ec021b4c398fb0ea5d7"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/case_deltaz.pt",
+            "sha256": "26d99592f91a26ad95f01132d0b532658471c7e6bf87e9ed0a213948c18f363b"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/case_provenance.json": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/case_provenance.json",
+            "sha256": "73412fefbe9143ed0d25eabf0624355ea3226405e4cb3cc6e7c0e2e5469fde6f"
+          },
+          "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv": {
+            "path": "smoke_cases/BraTS-GLI-00008-101/replicate_provenance.csv",
+            "sha256": "5357c6aa52505dd4387e926819915fbc616aae38fd4e8d33a05ff78708604316"
+          },
+          "smoke_run_provenance.json": {
+            "path": "smoke_run_provenance.json",
+            "sha256": "e0b9d28821e803852e13a3b3e5ae55bccc470db557e55a9a0c2585262a28ba86"
+          }
+        },
+        "source_run_path": "/home/friend/BrainTumorSeg-d0c3/outputs/smoke/d0c3_deltaz/smoke_03"
+      }
+    }
+  },
+  "source_artifacts_changed_by_freeze": false,
+  "source_runtime_commits": {
+    "smoke_02": "4e7ca572d6238e3ed1f50e74c4a8f0d9f78c7679",
+    "smoke_03": "4e7ca572d6238e3ed1f50e74c4a8f0d9f78c7679"
+  },
+  "source_runtime_git_status": {
+    "smoke_02": [],
+    "smoke_03": []
+  },
+  "source_smoke_runs": [
+    "smoke_02",
+    "smoke_03"
+  ],
+  "stage": "D0-C3a",
+  "substage": "REAL_DATA_GPU_SMOKE"
+}

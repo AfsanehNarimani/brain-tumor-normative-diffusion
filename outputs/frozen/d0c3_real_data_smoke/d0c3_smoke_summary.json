@@ -1,0 +1,23 @@
+{
+  "case_id": "BraTS-GLI-00008-101",
+  "complete_case_aggregation": false,
+  "complete_case_aggregation_equal_across_reruns": true,
+  "exact_rerun_reproducibility": true,
+  "full_case_windows": 36,
+  "ground_truth_opened": false,
+  "interpretation": "This smoke validates execution and deterministic reproducibility only. It does not constitute a scientific DeltaZ/pathology result.",
+  "local_deltaz_max_abs_diff": 0.0,
+  "pathology_corruption_invoked": false,
+  "replicate_provenance_byte_identical": true,
+  "scientific_analysis": false,
+  "scientific_result": false,
+  "smoke_runs": [
+    "smoke_02",
+    "smoke_03"
+  ],
+  "source_model_unchanged": true,
+  "stage": "D0-C3a",
+  "status": "CLOSED_FROZEN_PASS",
+  "substage": "REAL_DATA_GPU_SMOKE",
+  "windows_per_run": 2
+}
