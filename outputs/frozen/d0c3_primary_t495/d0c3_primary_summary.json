@@ -1,0 +1,23 @@
+{
+  "case_checksum_failures": 0,
+  "case_checksum_manifests_verified": 270,
+  "case_count": 270,
+  "dataset_role": "DEVELOPMENT_VALIDATION",
+  "ddim_evaluations": 50,
+  "eta": 0.0,
+  "exact_frozen_case_set_match": true,
+  "independent_test": false,
+  "provenance_failures": 0,
+  "replicates": 4,
+  "scientific_generation": true,
+  "selected_diffusion_weights": "D0-C2 EMA state_dict key ema_state",
+  "source_model_unchanged_all_cases": true,
+  "stage": "D0-C3a",
+  "statement": "This freeze establishes completeness, integrity, identity, and reproducibility provenance of the primary DeltaZ generation. It does not establish pathology association, tumor localization performance, diagnostic performance, or complementary pathology signal.",
+  "status": "CLOSED_FROZEN_PASS",
+  "substage": "PRIMARY_T495_SCIENTIFIC_GENERATION",
+  "tensor_integrity_failures": 0,
+  "timestep": 495,
+  "total_windows": 9720,
+  "windows_per_case": 36
+}

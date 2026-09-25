@@ -1,0 +1,54 @@
+{
+  "frozen_metadata_only": true,
+  "identities": {
+    "b4b_contract_sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4",
+    "d0a_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+    "diffusion_checkpoint_sha256": "aaa6258f26a56c852dc751b8028bfb046da5752974d4cbaf446ad2699a0c6574",
+    "runtime_git_branch": "experiment/d0c3-scientific-generation",
+    "runtime_git_commit": "75e0d3868b73a947d53534631ef2a6f9d83ebb04",
+    "source_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53",
+    "spatial_contract_sha256": "832b8b04e411802186ddc5ba0fb598fa748d53876c87c282b950863919ef986c",
+    "spatial_manifest_sha256": "58fac2ebef778d4d19d6da9f21451c25175c61bb4100c03387e8d3c859c05d53",
+    "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca"
+  },
+  "locked_input_bytes": {
+    "b4b_contract": {
+      "path": "/home/friend/BrainTumorSeg-d0c3/configs/d0b4b_inference_contract.json",
+      "sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4"
+    },
+    "d0a_contract": {
+      "path": "/home/friend/BrainTumorSeg-d0c3/outputs/frozen/d0_latent_distribution_audit/d0_za_normalization_contract.json",
+      "sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792"
+    },
+    "spatial_contract": {
+      "path": "/home/friend/BrainTumorSeg-d0c3/configs/d0c3_spatial_inference_contract.json",
+      "sha256": "832b8b04e411802186ddc5ba0fb598fa748d53876c87c282b950863919ef986c"
+    },
+    "spatial_design_manifest": {
+      "path": "/home/friend/BrainTumorSeg-d0c3/outputs/frozen/d0c3_spatial_inference_design/MANIFEST.sha256",
+      "sha256": "9986deb5e2077a22c68555baff8fb42423dde4c97d07b29f60cec4f0110703f4"
+    },
+    "spatial_manifest": {
+      "path": "/home/friend/BrainTumorSeg-d0c3/outputs/frozen/d0c3_spatial_inference_design/inference_window_manifest.csv",
+      "sha256": "58fac2ebef778d4d19d6da9f21451c25175c61bb4100c03387e8d3c859c05d53"
+    },
+    "validation_split": {
+      "path": "/home/friend/BrainTumorSeg-d0c3/splits/val_cases.txt",
+      "sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca"
+    }
+  },
+  "no_artifact_copies": true,
+  "runtime_git_branch": "experiment/d0c3-scientific-generation",
+  "runtime_git_commit": "75e0d3868b73a947d53534631ef2a6f9d83ebb04",
+  "runtime_git_status": "clean",
+  "source_run": "/home/friend/BrainTumorSeg-d0c3/outputs/scientific/d0c3_deltaz/primary_t495",
+  "source_runtime": {
+    "cuda_version": "13.0",
+    "device_name": "NVIDIA GeForce RTX 3090",
+    "git_status_short": [],
+    "pytorch_version": "2.14.0+cu130",
+    "runtime_git_branch": "experiment/d0c3-scientific-generation",
+    "runtime_git_commit": "75e0d3868b73a947d53534631ef2a6f9d83ebb04"
+  },
+  "spatial_manifest_sha256": "58fac2ebef778d4d19d6da9f21451c25175c61bb4100c03387e8d3c859c05d53"
+}
