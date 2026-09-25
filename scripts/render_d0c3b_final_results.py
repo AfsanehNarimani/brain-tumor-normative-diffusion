@@ -18,6 +18,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
+import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DEFAULT = ROOT / 'outputs/scientific/d0c3b_pathology_association'
