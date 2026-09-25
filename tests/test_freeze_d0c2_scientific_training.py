@@ -59,7 +59,7 @@ def synthetic_run(root):
             event = dict(event_type='epoch_boundary_resume', checkpoint_human_epoch=90,
                 checkpoint_epoch_index=89, checkpoint_successful_optimizer_step=12150,
                 checkpoint_sha256=freeze.RECOVERY_CHECKPOINT_SHA256,
-                checkpoint_path=str(root / 'prior_latest.pt'),
+                checkpoint_path=str(root / 'latest.pt'),
                 initial_runtime_git_commit=freeze.ORIGINAL_COMMIT,
                 resume_runtime_git_commit=freeze.RESUME_COMMIT,
                 dataset_root='/locked/brats', validation_manifest_sha256=freeze.EXPECTED_SHA256['validation_manifest.csv'],
@@ -135,6 +135,7 @@ def test_validation_trajectory_must_be_strictly_decreasing(completed_run):
 
 def test_recovery_event_is_verified(completed_run):
     source, hashes = completed_run
+    assert hashes['latest.pt'] != freeze.RECOVERY_CHECKPOINT_SHA256
     provenance = json.loads((source/'training_provenance.json').read_text())
     event = freeze._validate_recovery(provenance, source=source,
         manifest_sha=freeze.EXPECTED_SHA256['validation_manifest.csv'])
@@ -149,9 +150,41 @@ def test_recovery_event_is_verified(completed_run):
             manifest_sha=freeze.EXPECTED_SHA256['validation_manifest.csv'])
 
 
+@pytest.mark.parametrize(('target', 'field', 'value', 'message'), [
+    ('event', 'checkpoint_sha256', 'bad-historical-sha', 'checkpoint_sha256'),
+    ('event', 'checkpoint_human_epoch', 89, 'checkpoint_human_epoch'),
+    ('event', 'checkpoint_epoch_index', 88, 'checkpoint_epoch_index'),
+    ('event', 'checkpoint_successful_optimizer_step', 12149, 'checkpoint_successful_optimizer_step'),
+    ('event', 'initial_runtime_git_commit', 'wrong-original', 'initial_runtime_git_commit'),
+    ('event', 'resume_runtime_git_commit', 'wrong-resume', 'resume_runtime_git_commit'),
+    ('event', 'validation_manifest_sha256', 'wrong-manifest', 'validation_manifest_sha256'),
+    ('provenance', 'runtime_git_commit', 'wrong-original', 'Original scientific-run implementation commit'),
+])
+def test_recovery_attestation_fields_are_strictly_checked(completed_run, target, field, value, message):
+    source, _ = completed_run
+    provenance = json.loads((source/'training_provenance.json').read_text())
+    if target == 'event':
+        provenance['resume_events'][0][field] = value
+    else:
+        provenance[field] = value
+    with pytest.raises(ValueError, match=message):
+        freeze._validate_recovery(provenance, source=source,
+            manifest_sha=freeze.EXPECTED_SHA256['validation_manifest.csv'])
+
+
+def test_current_latest_sha_remains_exact_and_hard_fails(completed_run):
+    source, hashes = completed_run
+    assert freeze.EXPECTED_SHA256['latest.pt'] == (
+        '695ac64dcafb01c3621eb767abd1c984d3312f300523ce8168e03bdefbc71a4f')
+    wrong = dict(hashes, **{'latest.pt': '0'*64})
+    with pytest.raises(ValueError, match='SHA256 mismatch for latest.pt'):
+        freeze.audit_source_run(source, expected_hashes=wrong)
+
+
 def test_freeze_references_original_artifacts_and_verify_only_is_read_only(completed_run, tmp_path):
     source, hashes = completed_run
     output = tmp_path/'frozen'
+    source_before = {p.name: p.read_bytes() for p in source.iterdir() if p.is_file()}
     summary = freeze.freeze(source, output, expected_hashes=hashes,
         runtime=dict(runtime_git_branch='test', runtime_git_commit='abc', git_status_short=[]))
     assert summary['stage'] == 'D0-C2' and summary['status'] == 'CLOSED_FROZEN'
@@ -167,6 +200,15 @@ def test_freeze_references_original_artifacts_and_verify_only_is_read_only(compl
     assert summary['interpretation_guards']['za_proven_healthy'] is False
     assert summary['interpretation_guards']['za_proven_pathology_free'] is False
     assert summary['interpretation_guards']['deltaz_or_pathology_analysis_performed'] is False
+    historical = summary['historical_recovery_checkpoint']
+    assert historical['checkpoint_type'] == 'rolling_latest_checkpoint'
+    assert historical['historical_checkpoint_human_epoch'] == 90
+    assert historical['historical_checkpoint_sha256'] == freeze.RECOVERY_CHECKPOINT_SHA256
+    assert historical['historical_checkpoint_bytes_preserved'] is False
+    assert historical['historical_checkpoint_independently_reverified_at_freeze'] is False
+    assert historical['verification_basis'] == 'resume-event provenance captured before continuation'
+    assert historical['current_path_human_epoch'] == 100
+    assert historical['current_path_sha256'] == hashes['latest.pt']
     records = json.loads((output/'d0c2_artifact_manifest.json').read_text())['artifacts']
     assert records['best.pt']['path'] == str(source/'best.pt')
     assert records['best.pt']['sha256'] == hashes['best.pt']
@@ -177,6 +219,7 @@ def test_freeze_references_original_artifacts_and_verify_only_is_read_only(compl
     assert verified['source_audit']['crop_rows'] == 108000
     assert before == after
     assert (output/'MANIFEST.sha256').is_file()
+    assert source_before == {p.name: p.read_bytes() for p in source.iterdir() if p.is_file()}
 
 
 def test_refuses_to_overwrite_existing_frozen_output(completed_run, tmp_path):

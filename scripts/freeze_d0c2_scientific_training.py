@@ -119,9 +119,11 @@ def _validate_recovery(provenance, *, source, manifest_sha):
         require(event.get(field) == value, f'Recovery event mismatch for {field}')
     require(event.get('checkpoint_path'), 'Recovery event is missing checkpoint path')
     recovery_path = Path(event['checkpoint_path'])
-    if recovery_path.is_file():
-        require(sha256_file(recovery_path) == RECOVERY_CHECKPOINT_SHA256,
-                'Recovery checkpoint bytes do not match the recorded checkpoint SHA256')
+    current_latest = (Path(source) / 'latest.pt').resolve()
+    if not recovery_path.is_absolute():
+        recovery_path = recovery_path.resolve()
+    require(recovery_path == current_latest,
+            'Recovery event must identify the rolling latest.pt path')
     require(provenance.get('validation_manifest_sha256') == manifest_sha,
             'Run provenance validation-manifest SHA mismatch')
     return event
@@ -226,6 +228,14 @@ def _freeze_metadata(audit, *, runtime=None):
     artifact_manifest = dict(stage='D0-C2', artifacts=refs,
         checkpoints_copied=False,
         note='Scientific artifacts remain at their original run paths; no checkpoint copies are stored here.')
+    historical_checkpoint_status = dict(checkpoint_type='rolling_latest_checkpoint',
+        historical_checkpoint_human_epoch=90,
+        historical_checkpoint_sha256=RECOVERY_CHECKPOINT_SHA256,
+        historical_checkpoint_bytes_preserved=False,
+        historical_checkpoint_independently_reverified_at_freeze=False,
+        verification_basis='resume-event provenance captured before continuation',
+        current_path=str(source / 'latest.pt'), current_path_human_epoch=100,
+        current_path_sha256=audit['hashes']['latest.pt'])
     summary = dict(stage='D0-C2', status='CLOSED_FROZEN', scientific_training_completed=True,
         epochs=100, sample_presentations=108000, batch_opportunities=13500,
         successful_optimizer_steps=13499, gradscaler_skipped_updates=1,
@@ -242,6 +252,7 @@ def _freeze_metadata(audit, *, runtime=None):
         monotonicity_is_descriptive_only=True,
         selection_rule='Frozen lowest-primary-validation-metric checkpoint rule; monotonicity is not a selection criterion.',
         recovery_interpretation=RECOVERY_INTERPRETATION,
+        historical_recovery_checkpoint=historical_checkpoint_status,
         interpretation_guards=dict(validation_is_development=True,
             epoch_100_selected_by_frozen_checkpoint_rule=True,
             independent_test_performance_established=False,
@@ -256,6 +267,7 @@ def _freeze_metadata(audit, *, runtime=None):
     provenance = dict(stage='D0-C2', frozen_at=datetime.now(timezone.utc).isoformat(),
         source_run_path=str(source), source_artifact_hashes=audit['hashes'],
         recovery_event=audit['recovery_event'], recovery_interpretation=RECOVERY_INTERPRETATION,
+        historical_recovery_checkpoint=historical_checkpoint_status,
         training_runtime_git_commit=audit['provenance'].get('runtime_git_commit'),
         training_initial_runtime_git_commit=audit['provenance'].get('initial_runtime_git_commit',
             audit['provenance'].get('runtime_git_commit')),
@@ -302,6 +314,15 @@ def verify_frozen_directory(output, *, source=DEFAULT_SOURCE, expected_hashes=EX
             and summary.get('training_crop_manifest_rows') == 108000
             and summary.get('training_crop_manifest_sha256') == audit['hashes']['training_crop_manifest.csv'],
             'Frozen summary values mismatch')
+    expected_historical = dict(checkpoint_type='rolling_latest_checkpoint',
+        historical_checkpoint_human_epoch=90, historical_checkpoint_sha256=RECOVERY_CHECKPOINT_SHA256,
+        historical_checkpoint_bytes_preserved=False,
+        historical_checkpoint_independently_reverified_at_freeze=False,
+        verification_basis='resume-event provenance captured before continuation',
+        current_path=str(audit['source'] / 'latest.pt'), current_path_human_epoch=100,
+        current_path_sha256=audit['hashes']['latest.pt'])
+    require(summary.get('historical_recovery_checkpoint') == expected_historical,
+            'Frozen historical rolling-checkpoint status mismatch')
     for name, record in artifacts.get('artifacts', {}).items():
         require(record['sha256'] == audit['hashes'].get(name), f'Artifact reference SHA mismatch: {name}')
         require(Path(record['path']).resolve() == (audit['source'] / name).resolve(),
@@ -312,6 +333,8 @@ def verify_frozen_directory(output, *, source=DEFAULT_SOURCE, expected_hashes=EX
             'Frozen metadata directory must not contain scientific checkpoints')
     require(provenance.get('recovery_event') == audit['recovery_event'],
             'Frozen recovery event does not match source provenance')
+    require(provenance.get('historical_recovery_checkpoint') == expected_historical,
+            'Frozen provenance historical rolling-checkpoint status mismatch')
     require((output / 'd0c2_validation_trajectory.csv').read_bytes()
             == _trajectory_bytes(audit['trajectory']), 'Frozen validation trajectory mismatch')
     return dict(source_audit=audit, frozen_manifest=recorded)
