@@ -1,0 +1,43 @@
+{
+  "artifacts": {
+    "best.pt": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/best.pt",
+      "sha256": "aaa6258f26a56c852dc751b8028bfb046da5752974d4cbaf446ad2699a0c6574"
+    },
+    "latest.pt": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/latest.pt",
+      "sha256": "695ac64dcafb01c3621eb767abd1c984d3312f300523ce8168e03bdefbc71a4f"
+    },
+    "training.log": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/training.log",
+      "sha256": "4c02995823112f36f1cbd7bc78e7fabe92b4ff4959068fefb634bda479801c45"
+    },
+    "training_crop_manifest.csv": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/training_crop_manifest.csv",
+      "sha256": "6a16dee6b2b7fbac422bebf3756e0dd9dc5ea174f17252ea6cc57c4ba9ba5cfa"
+    },
+    "training_history.csv": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/training_history.csv",
+      "sha256": "988388fce7e005a0c28a2f39bee0f3a5754ebbb62aff50355409936addf483db"
+    },
+    "training_provenance.json": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/training_provenance.json",
+      "sha256": "d35c2353a86af3dae2257c236e0ad19fa56c700a320753d795fd5f17c2d6bb4b"
+    },
+    "validation_manifest.csv": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/validation_manifest.csv",
+      "sha256": "2a3a10d0d7b6b34bc412cfee5e30f45912161528ff509e69193f3516af3baee4"
+    },
+    "validation_per_case.csv": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/validation_per_case.csv",
+      "sha256": "b8fa3bbafbfad6d6779ac416abddb8dc5fb25f3c030d6d39a2c88de60c45fc78"
+    },
+    "validation_summary.json": {
+      "path": "/home/friend/BrainTumorSeg/outputs/scientific/d0_latent_diffusion_v1/validation_summary.json",
+      "sha256": "a001d15857813d6fd9913fbbd48c895d4aa84b39c9afdeb68a70d4d1316c394f"
+    }
+  },
+  "checkpoints_copied": false,
+  "note": "Scientific artifacts remain at their original run paths; no checkpoint copies are stored here.",
+  "stage": "D0-C2"
+}
