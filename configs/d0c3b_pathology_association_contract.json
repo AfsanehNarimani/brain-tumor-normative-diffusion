@@ -1,0 +1,79 @@
+{
+  "contract_version": 1,
+  "stage": "D0-C3b",
+  "status": "DESIGN_LOCKED_PRE_ANALYSIS",
+  "purpose": "Evaluate case-level association between the already-frozen primary timestep 495 diffusion-derived deviation maps and BraTS tumor regions in the DEVELOPMENT_VALIDATION set.",
+  "analysis_started": false,
+  "results_observed": false,
+  "dataset_role": "DEVELOPMENT_VALIDATION",
+  "independent_test": false,
+  "sources": {
+    "primary_run": "outputs/scientific/d0c3_deltaz/primary_t495",
+    "primary_freeze": "outputs/frozen/d0c3_primary_t495",
+    "primary_freeze_manifest_sha256": "e0adbadda65afd9c803dabf8a14b657e53e6153d89f6d3d4bed71e958fae2f9c",
+    "validation_split_sha256": "ec5fe6b0bbcf190fe8b7c032f8da4ff1d495969c2d868561e7a3351c572cc5ca",
+    "spatial_manifest_sha256": "58fac2ebef778d4d19d6da9f21451c25175c61bb4100c03387e8d3c859c05d53",
+    "spatial_contract_sha256": "832b8b04e411802186ddc5ba0fb598fa748d53876c87c282b950863919ef986c",
+    "d0b4b_inference_contract_sha256": "29cf659528f6257cd9f8f218e9f4eaf8fabdc6d8a0e4905505aa8548ae68bde4",
+    "d0a_normalization_contract_sha256": "bca5c0f8f1617d73fc4d0850fe5b6f45e4b2bcbacbb4018f1d5d825de49ad792",
+    "diffusion_checkpoint_sha256": "aaa6258f26a56c852dc751b8028bfb046da5752974d4cbaf446ad2699a0c6574",
+    "source_checkpoint_sha256": "cf5a04a2d845cecb45a0ea87d617abad0afab9ad4264abce8342a6045563ee53"
+  },
+  "spatial_alignment": {
+    "delta_z_shape": [1, 23, 28, 23],
+    "original_shape": [182, 218, 182],
+    "padded_shape": [184, 224, 184],
+    "padding": "high-end zeros only",
+    "mapping": "exact non-overlapping 8x8x8 blocks to latent cells; no interpolation"
+  },
+  "labels": {
+    "background": 0,
+    "NETC": 1,
+    "SNFH": 2,
+    "ET": 3,
+    "RC": 4,
+    "regions": {"WT": [1, 2, 3], "TC": [1, 3], "ET": [3]},
+    "region_positive": "at least one voxel in the corresponding 8x8x8 block belongs to the region",
+    "clean_background": "all voxels in the corresponding 8x8x8 block have label 0",
+    "rc_is_not_clean_background": true,
+    "validity": "Only valid_support_global cells are eligible"
+  },
+  "endpoints": {"primary": "WT", "secondary": ["TC", "ET"]},
+  "case_metrics": [
+    "n_positive_cells", "n_background_cells", "positive_prevalence_in_comparison",
+    "positive_DeltaZ_mean", "positive_DeltaZ_median", "background_DeltaZ_mean",
+    "background_DeltaZ_median", "mean_difference", "median_difference", "AUROC",
+    "AUPRC", "AUPRC_baseline_prevalence", "AUPRC_lift", "evaluability_reason"
+  ],
+  "non_evaluable_policy": "Keep each case-region row; metrics are null and an exact reason is recorded if positive or clean-background supported cells are absent.",
+  "aggregate_unit": "case",
+  "bootstrap": {
+    "statistic": "median",
+    "replicates": 10000,
+    "seed": 20260923,
+    "confidence_level": 0.95,
+    "interval": "percentile"
+  },
+  "hypothesis_tests": {
+    "method": "paired case-level Wilcoxon signed-rank",
+    "alternative": "two-sided",
+    "zero_method": "wilcox",
+    "families": {
+      "median_difference_vs_zero": ["WT", "TC", "ET"],
+      "AUROC_vs_0.5": ["WT", "TC", "ET"],
+      "AUPRC_lift_vs_zero": ["WT", "TC", "ET"]
+    },
+    "correction": "Holm separately within each test family across WT/TC/ET"
+  },
+  "terminology": {
+    "Za": "anatomy/background representation",
+    "Zprior": "prior-guided anatomy/background latent reconstruction",
+    "DeltaZ": "diffusion-derived deviation feature/map",
+    "diagnostic_performance_claim": false
+  },
+  "ground_truth_usage": "Ground-truth segmentation was not used during DeltaZ generation and is introduced only in D0-C3b for post-hoc scientific evaluation.",
+  "outputs": [
+    "per_case_metrics.csv", "aggregate_summary.csv", "aggregate_summary.json",
+    "analysis_provenance.json", "analysis_integrity.json", "MANIFEST.sha256"
+  ]
+}
